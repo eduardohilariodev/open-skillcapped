@@ -1,92 +1,231 @@
 import { Content } from "../model/Content";
-import { Course } from "../model/Course";
+import {
+  ManifestCommentary,
+  ManifestCourse,
+  ManifestCourseChapters,
+  Manifest,
+  ManifestVideo,
+} from "./Manifest";
 import { Video } from "../model/Video";
+import { Course } from "../model/Course";
 import { Commentary } from "../model/Commentary";
+import { roleFromString } from "../utils/TitleUtilities";
+import { CourseVideo } from "../model/CourseVideo";
 
 export class Parser {
-  parse(manifest: any): Content {
-    const courses: Course[] = [];
-    const videos: Video[] = [];
-    const commentaries: Commentary[] = [];
+  parse(manifest: Manifest): Content {
+    return {
+      videos: this.parseVideos(
+        manifest.videos,
+        manifest.courses,
+        manifest.videosToCourses
+      ),
+      courses: this.parseCourses(
+        manifest.videos,
+        manifest.courses,
+        manifest.videosToCourses
+      ),
+      commentaries: this.parseCommentaries(manifest.commentaries),
+      unmappedVideos: this.getUnmatchedVideos(
+        manifest.videos,
+        manifest.courses,
+        manifest.videosToCourses
+      ),
+    };
+  }
 
-    // Parse courses
-    if (manifest.courses) {
-      for (const courseData of manifest.courses) {
-        const course: Course = {
-          id: courseData.id,
-          uuid: courseData.id,
-          title: courseData.title,
-          description: courseData.description || "",
-          thumbnailUrl: courseData.thumbnail,
-          url: `https://www.skill-capped.com/lol/course/${courseData.id}`,
-          videos: [],
-          chapters: [],
-          releaseDate: new Date(courseData.release_date * 1000)
-        };
+  parseDate(input: number): Date {
+    const releaseDate = new Date(0);
+    releaseDate.setUTCMilliseconds(input);
+    return releaseDate;
+  }
 
-        // Parse chapters
-        if (courseData.chapters) {
-          for (const chapterData of courseData.chapters) {
-            const chapterVideos: Video[] = [];
-            
-            // Parse videos in this chapter
-            if (chapterData.videos) {
-              for (const videoData of chapterData.videos) {
-                const video: Video = {
-                  id: videoData.id,
-                  uuid: videoData.id,
-                  title: videoData.title,
-                  description: videoData.description || "",
-                  thumbnailUrl: videoData.thumbnail,
-                  url: `https://www.skill-capped.com/lol/video/${videoData.id}`,
-                  releaseDate: new Date(videoData.release_date * 1000),
-                  duration: videoData.duration || 0,
-                  videoUrl: videoData.video_url || undefined,
-                  courseId: courseData.id,
-                  chapterId: chapterData.id
-                };
-                
-                chapterVideos.push(video);
-                videos.push(video);
-                course.videos.push(video);
-              }
-            }
-            
-            course.chapters.push({
-              id: chapterData.id,
-              title: chapterData.title,
-              videos: chapterVideos
-            });
-          }
-        }
-        
-        courses.push(course);
+  getUnmatchedVideos(
+    input: ManifestVideo[],
+    courses: ManifestCourse[],
+    chapters: ManifestCourseChapters
+  ): Video[] {
+    return input.flatMap((video) => {
+      const match = this.matchVideoToCourse(video, courses, chapters);
+
+      if (match !== undefined) {
+        return [];
+      } else {
+        return {
+          ...video,
+        } as unknown as Video;
+      }
+    });
+  }
+
+  matchVideoToCourse(
+    video: ManifestVideo,
+    courses: ManifestCourse[],
+    chapters: ManifestCourseChapters
+  ): { video: string; course: ManifestCourse } | undefined {
+    let courseTitle: string | null = null;
+    for (const [key, value] of Object.entries(chapters)) {
+      const match =
+        value.chapters[0].vids.find((courseVideo) => {
+          return courseVideo.uuid === video.uuid;
+        }) !== undefined;
+      if (match) {
+        courseTitle = key;
+        break;
       }
     }
 
-    // Parse commentaries
-    if (manifest.commentaries) {
-      for (const commentaryData of manifest.commentaries) {
-        const commentary: Commentary = {
-          id: commentaryData.id,
-          uuid: commentaryData.id,
-          title: commentaryData.title,
-          description: commentaryData.description || "",
-          thumbnailUrl: commentaryData.thumbnail,
-          url: `https://www.skill-capped.com/lol/video/${commentaryData.id}`,
-          releaseDate: new Date(commentaryData.release_date * 1000),
-          duration: commentaryData.duration || 0,
-          videoUrl: commentaryData.video_url || undefined
-        };
-        
-        commentaries.push(commentary);
-      }
+    if (courseTitle === null) {
+      return undefined;
+    }
+
+    const matchedCourse = courses.find((candidate) => {
+      return courseTitle === candidate.title;
+    });
+
+    if (matchedCourse === undefined) {
+      return undefined;
     }
 
     return {
-      courses,
-      videos,
-      commentaries
+      video: video.uuid,
+      course: matchedCourse,
     };
   }
-} 
+
+  parseVideos(
+    input: ManifestVideo[],
+    courses: ManifestCourse[],
+    chapters: ManifestCourseChapters
+  ): Video[] {
+    return input.flatMap((video: ManifestVideo): Video | Video[] => {
+      const releaseDate = this.parseDate(video.rDate);
+      const role = roleFromString(video.role);
+      const imageUrl = this.getImageUrl(video);
+      const title = this.rawTitleToDisplayTitle(video.title);
+
+      const match = this.matchVideoToCourse(video, courses, chapters);
+
+      if (match === undefined) {
+        return [];
+      }
+
+      const videoUrl = `https://www.skill-capped.com/lol/course/${video.uuid}`;
+
+      return {
+        role,
+        title,
+        description: video.desc,
+        releaseDate,
+        durationInSeconds: video.durSec,
+        uuid: video.uuid,
+        imageUrl,
+        skillCappedUrl: videoUrl,
+      };
+    });
+  }
+
+  getImageUrl(input: ManifestVideo | ManifestCommentary): string {
+    if (input.tSS !== "") {
+      return input.tSS.replace(
+        "https://d20k8dfo6rtj2t.cloudfront.net/jpg-images/",
+        "https://ik.imagekit.io/skillcapped/customss/jpg-images/"
+      );
+    } else {
+      return `https://ik.imagekit.io/skillcapped/thumbnails/${input.uuid}/thumbnails/thumbnail_${input.tId}.jpg`;
+    }
+  }
+
+  parseCourses(
+    manifestVideos: ManifestVideo[],
+    manifestCourses: ManifestCourse[],
+    manifestCourseChapters: ManifestCourseChapters
+  ): Course[] {
+    const videos = this.parseVideos(
+      manifestVideos,
+      manifestCourses,
+      manifestCourseChapters
+    );
+
+    return manifestCourses.map((course: ManifestCourse): Course => {
+      const releaseDate = this.parseDate(course.rDate);
+      const role = roleFromString(course.role);
+      const title = this.rawTitleToDisplayTitle(course.title);
+
+      let courseVideos: CourseVideo[] = [];
+
+      if (manifestCourseChapters[course.title]) {
+        courseVideos = manifestCourseChapters[
+          course.title
+        ].chapters[0].vids.map((video) => {
+          const videoInfo = videos.find(
+            (candidate) => candidate.uuid === video.uuid
+          );
+          const altTitle =
+            video.altTitle !== undefined
+              ? this.rawTitleToDisplayTitle(video.altTitle)
+              : undefined;
+
+          if (videoInfo === undefined) {
+            throw new Error(`Couldn't find video ${JSON.stringify(video)}`);
+          }
+
+          return {
+            video: videoInfo,
+            altTitle,
+          };
+        });
+      }
+
+      return {
+        title,
+        uuid: course.uuid,
+        description: course.desc || undefined,
+        releaseDate: releaseDate,
+        role: role,
+        image: course.courseImage2,
+        videos: courseVideos,
+      };
+    });
+  }
+
+  parseCommentaries(dumpCommentary: ManifestCommentary[]): Commentary[] {
+    return dumpCommentary.map((commentary): Commentary => {
+      const releaseDate = this.parseDate(commentary.rDate);
+      const role = roleFromString(commentary.role);
+      const imageUrl = this.getImageUrl(commentary);
+      const title = this.rawTitleToDisplayTitle(commentary.title);
+
+      const commentaryUrl = `https://www.skill-capped.com/lol/commentary/${commentary.uuid}`;
+
+      return {
+        role,
+        title,
+        description: commentary.desc || "",
+        releaseDate,
+        durationInSeconds: commentary.durSec,
+        uuid: commentary.uuid,
+        imageUrl,
+        skillCappedUrl: commentaryUrl,
+        staff: commentary.staff,
+        matchLink: commentary.matchLink,
+        champion: commentary.yourChampion,
+        opponent: commentary.theirChampion,
+        kills: commentary.k,
+        deaths: commentary.d,
+        assists: commentary.a,
+        gameLengthInMinutes: Number.parseInt(commentary.gameTime),
+        carry: commentary.carry,
+        type: commentary.type,
+      };
+    });
+  }
+
+  rawTitleToDisplayTitle(title: string): string {
+    return title
+      .replace(/\[.*\]/g, "")
+      .replace(/Season \d+/g, "")
+      .replace(/S\d+/g, "")
+      .replace(/^\s+|\s+$/g, "");
+  }
+}

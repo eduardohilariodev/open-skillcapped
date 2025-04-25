@@ -4,13 +4,17 @@
     <meta charset="utf-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.skill-capped.com https://o92742.ingest.sentry.io https://manifest.better-skill-capped.com; img-src 'self' data: https://ik.imagekit.io"
     />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
     <title>Open SkillCapped</title>
+    <link
+      rel="stylesheet"
+      href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+    />
     <script
       type="module"
       src="./index.tsx"

@@ -6,6 +6,8 @@ const ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("ffmpeg-static");
 const temp = require("temp");
 
+app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
+
 temp.track(); // Initialize temp
 ffmpeg.setFfmpegPath(ffmpegPath); // Set ffmpeg path
 
@@ -26,7 +28,7 @@ const createWindow = () => {
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
-      webSecurity: true,
+      webSecurity: false,
     },
     resizable: true,
     icon: iconPath,
@@ -40,6 +42,33 @@ const createWindow = () => {
   const isDev = !app.isPackaged; // A common way to check
 
   Menu.setApplicationMenu(null);
+
+  mainWindow.webContents.session.webRequest.onHeadersReceived(
+    (details, callback) => {
+      const csp = [
+        "default-src 'self'",
+        // Allow scripts from self, inline, eval (often needed for dev), and GTM
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com",
+        // Explicitly allow GTM script element
+        "script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com",
+        // Allow connections to self, Sentry (specific and wildcard), SkillCapped API and better-skill-capped manifest
+        "connect-src 'self' https://*.ingest.sentry.io https://o92742.ingest.sentry.io https://www.skill-capped.com https://manifest.better-skill-capped.com",
+        "img-src 'self' data: https://ik.imagekit.io",
+        "style-src 'self' 'unsafe-inline'",
+        "font-src 'self'",
+      ].join("; ");
+
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          // Set Content-Security-Policy
+          // Note: 'unsafe-inline' and 'unsafe-eval' might be needed for some libraries/frameworks,
+          // but try removing them for better security if possible.
+          "Content-Security-Policy": [csp],
+        },
+      });
+    }
+  );
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
     (details, callback) => {
@@ -61,15 +90,17 @@ const createWindow = () => {
     mainWindow.webContents.openDevTools(); // Open DevTools automatically in dev
   } else {
     // Production: Load the built index.html file
-    const reactAppPath = path.join(__dirname, "..", "dist", "index.html");
-    mainWindow.loadFile(reactAppPath);
-    // Removed the fallback path logic as it's handled by the dev server now
-    // const fallbackPath = path.join(__dirname, "renderer", "index.html");
-    // if (fs.existsSync(reactAppPath)) {
-    //   mainWindow.loadFile(reactAppPath);
-    // } else {
-    //   mainWindow.loadFile(fallbackPath);
-    // }
+    const reactAppPath = path.join(__dirname, "renderer", "index.html");
+    const fallbackPath = path.join(__dirname, "renderer", "dist", "index.html");
+    if (fs.existsSync(reactAppPath)) {
+      mainWindow.loadFile(reactAppPath);
+    } else if (fs.existsSync(fallbackPath)) {
+      mainWindow.loadFile(fallbackPath);
+    } else {
+      console.error("Could not find any valid HTML file to load");
+      // Try loading from a different location as a last resort
+      mainWindow.loadFile(path.join(__dirname, "..", "dist", "index.html"));
+    }
   }
 };
 

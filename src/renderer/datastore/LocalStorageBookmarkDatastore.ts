@@ -1,56 +1,75 @@
-import { Bookmark } from "../model/Bookmark";
 import { BookmarkDatastore } from "./BookmarkDatastore";
+import { Bookmark, Bookmarkable } from "../model/Bookmark";
 import { Content } from "../model/Content";
+import { isCommentary } from "../model/Commentary";
+import { isVideo } from "../model/Video";
+import { isCourse } from "../model/Course";
+
+const IDENTIFIER = "bookmarks";
 
 export class LocalStorageBookmarkDatastore implements BookmarkDatastore {
-  private static LOCAL_STORAGE_KEY = "bookmarks";
-  private content: Content;
+  private readonly content: Content;
 
   constructor(content: Content) {
     this.content = content;
   }
 
   add(bookmark: Bookmark): void {
-    const bookmarks = this.get();
-    bookmarks.push(bookmark);
-    this.save(bookmarks);
-  }
-
-  remove(bookmark: Bookmark): void {
-    const bookmarks = this.get();
-    const index = bookmarks.findIndex((item) => item.item.uuid === bookmark.item.uuid);
-    if (index !== -1) {
-      bookmarks.splice(index, 1);
-      this.save(bookmarks);
-    }
+    const existingBookmarks = this.get();
+    existingBookmarks.push(bookmark);
+    existingBookmarks.sort(
+      (left, right) => right.date.getTime() - left.date.getTime()
+    );
+    this.set(existingBookmarks);
   }
 
   get(): Bookmark[] {
-    const bookmarksJson = localStorage.getItem(LocalStorageBookmarkDatastore.LOCAL_STORAGE_KEY);
-    if (bookmarksJson === null) {
-      return [];
-    }
+    const bookmarks: Bookmark[] = JSON.parse(
+      window.localStorage.getItem(IDENTIFIER) || "[]"
+    ) as Bookmark[];
+    const updatedBookmarks: Bookmark[] = bookmarks.flatMap((bookmark) => {
+      let matchedItem: Bookmarkable | undefined;
 
-    try {
-      const bookmarks = JSON.parse(bookmarksJson);
-      
-      // Convert date strings back to Date objects
-      return bookmarks.map((bookmark: any) => {
+      if (isCommentary(bookmark.item)) {
+        matchedItem = this.content.commentaries.find((commentary) => {
+          return commentary.uuid === bookmark.item.uuid;
+        });
+      } else if (isCourse(bookmark.item)) {
+        matchedItem = this.content.courses.find((course) => {
+          return course.uuid === bookmark.item.uuid;
+        });
+      } else if (isVideo(bookmark.item)) {
+        matchedItem = this.content.videos.find((video) => {
+          return video.uuid === bookmark.item.uuid;
+        });
+      }
+
+      if (matchedItem === undefined) {
+        console.debug(
+          `Couldn't find matching item for bookmark ${JSON.stringify(bookmark)}`
+        );
+        return [];
+      } else {
         return {
           ...bookmark,
-          date: new Date(bookmark.date)
+          item: matchedItem,
+          date: new Date(bookmark.date as unknown as string),
         };
-      });
-    } catch (e) {
-      console.error("Failed to parse bookmarks from local storage", e);
-      return [];
-    }
+      }
+    });
+    return updatedBookmarks;
   }
 
-  private save(bookmarks: Bookmark[]): void {
-    localStorage.setItem(
-      LocalStorageBookmarkDatastore.LOCAL_STORAGE_KEY,
-      JSON.stringify(bookmarks)
-    );
+  remove(bookmark: Bookmark): void {
+    const filteredBookmarks = this.get().filter((candidate: Bookmark) => {
+      return (
+        candidate !== bookmark && candidate.item.uuid !== bookmark.item.uuid
+      );
+    });
+    this.set(filteredBookmarks);
   }
-} 
+
+  private set(bookmarks: Bookmark[]) {
+    window.localStorage.setItem(IDENTIFIER, JSON.stringify(bookmarks));
+  }
+}

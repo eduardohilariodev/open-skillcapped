@@ -14,7 +14,7 @@ ga4react.initialize().then(
   },
   (err) => {
     console.error(err);
-  },
+  }
 );
 
 // Sentry error tracking setup
@@ -29,5 +29,5 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-); 
+  </React.StrictMode>
+);

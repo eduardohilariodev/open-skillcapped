@@ -1,15 +1,19 @@
+import { LocalStorageManifestDatastore } from "./datastore/LocalStorageManifestDatastore";
 import axios from "axios";
+import { Manifest } from "./parser/Manifest";
 
 export class ManifestLoader {
-  private static manifestUrl = "https://www.skill-capped.com/lol/api/videos/manifest/v1";
+  async load(): Promise<Manifest> {
+    const datastore = new LocalStorageManifestDatastore();
+    if (!datastore.get() || datastore.isStale()) {
+      const response = await axios.get(
+        "https://manifest.better-skill-capped.com/manifest.json"
+      );
+      const manifest = response.data as Manifest;
 
-  async load(): Promise<unknown> {
-    try {
-      const response = await axios.get(ManifestLoader.manifestUrl);
-      return response.data;
-    } catch (error) {
-      console.error("Error loading manifest:", error);
-      throw error;
+      datastore.set(manifest);
     }
+
+    return datastore.get() as Manifest;
   }
-} 
+}

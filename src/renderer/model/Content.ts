@@ -6,4 +6,5 @@ export interface Content {
   courses: Course[];
   videos: Video[];
   commentaries: Commentary[];
-} 
+  unmappedVideos: Video[];
+}

@@ -1,50 +1,34 @@
-import { WatchStatus } from "../model/WatchStatus";
 import { WatchStatusDatastore } from "./WatchStatusDatastore";
+import { WatchStatus } from "../model/WatchStatus";
+
+const IDENTIFIER = "watchStatus";
 
 export class LocalStorageWatchStatusDatastore implements WatchStatusDatastore {
-  private static LOCAL_STORAGE_KEY = "watchStatus";
-
   add(watchStatus: WatchStatus): void {
-    const watchStatuses = this.get();
-    watchStatuses.push(watchStatus);
-    this.save(watchStatuses);
-  }
-
-  remove(watchStatus: WatchStatus): void {
-    const watchStatuses = this.get();
-    const index = watchStatuses.findIndex((item) => item.item.uuid === watchStatus.item.uuid);
-    if (index !== -1) {
-      watchStatuses.splice(index, 1);
-      this.save(watchStatuses);
-    }
+    const existingWatchStatuses = this.get();
+    existingWatchStatuses.push(watchStatus);
+    this.set(existingWatchStatuses);
   }
 
   get(): WatchStatus[] {
-    const watchStatusesJson = localStorage.getItem(LocalStorageWatchStatusDatastore.LOCAL_STORAGE_KEY);
-    if (watchStatusesJson === null) {
-      return [];
-    }
-
-    try {
-      const watchStatuses = JSON.parse(watchStatusesJson);
-      
-      // Convert date strings back to Date objects
-      return watchStatuses.map((watchStatus: any) => {
-        return {
-          ...watchStatus,
-          lastUpdate: new Date(watchStatus.lastUpdate)
-        };
-      });
-    } catch (e) {
-      console.error("Failed to parse watch statuses from local storage", e);
-      return [];
-    }
+    return JSON.parse(
+      window.localStorage.getItem(IDENTIFIER) || "[]"
+    ) as WatchStatus[];
   }
 
-  private save(watchStatuses: WatchStatus[]): void {
-    localStorage.setItem(
-      LocalStorageWatchStatusDatastore.LOCAL_STORAGE_KEY,
-      JSON.stringify(watchStatuses)
+  remove(watchStatus: WatchStatus): void {
+    const filteredWatchStatuses = this.get().filter(
+      (candidate: WatchStatus) => {
+        return (
+          candidate !== watchStatus &&
+          candidate.item.uuid !== watchStatus.item.uuid
+        );
+      }
     );
+    this.set(filteredWatchStatuses);
   }
-} 
+
+  private set(watchStatuses: WatchStatus[]) {
+    window.localStorage.setItem(IDENTIFIER, JSON.stringify(watchStatuses));
+  }
+}
