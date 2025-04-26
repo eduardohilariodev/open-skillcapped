@@ -11,7 +11,6 @@ import {
   faTimes,
   faTrash,
   faSpinner,
-  faSave,
   faClock,
   faCalendarAlt,
   faUserAlt,
@@ -785,6 +784,19 @@ Duration=${calculatedDuration}`;
     };
   }, [isOpen, video, onClose, actualDuration]);
 
+  // Function to handle backdrop clicks
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking the backdrop itself, not its children
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  // Helper to stop event propagation
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   // Find the portal target node
   let modalRoot = document.getElementById("modal-root");
 
@@ -806,199 +818,226 @@ Duration=${calculatedDuration}`;
 
   // Use Portal to render the dialog
   return ReactDOM.createPortal(
-    <div className="hextech-modal-backdrop is-active" onClick={onClose}>
-      <div className="hextech-modal hextech-modal--large hextech-modal--primary" onClick={(e) => e.stopPropagation()}>
-        <div className="hextech-modal__header">
-          <h2 className="hextech-modal__title">
-            {course && <span className="course-name">{course.title}</span>}
-            {getVideoIndex() && <span className="episode-number">#{getVideoIndex()}:</span>}
-            <span className="video-title">{video.title}</span>
-          </h2>
-          <button className="hextech-modal__close" onClick={onClose} aria-label="Close">
-            <FontAwesomeIcon icon={faTimes} />
-          </button>
-        </div>
-        <div className="hextech-modal__content">
-          {isLoading && (
-            <div className="hextech-loading">
-              <span className="loading-icon">
-                <FontAwesomeIcon icon={faSpinner} spin />
-              </span>
-              {status}
+    <div className="video-player-overlay" onClick={handleBackdropClick}>
+      <div className="video-player-dialog" onClick={stopPropagation}>
+        {/* Left panel (60%) - Video Only */}
+        <div className="video-player-left-panel">
+          {/* Video content takes up full space */}
+          <div className="video-player-content">
+            <div className="video-container">
+              {isLoading && (
+                <div className="loading-indicator">
+                  <FontAwesomeIcon icon={faSpinner} className="loading-icon" spin />
+                  <span>{status}</span>
+                </div>
+              )}
+              {errorMessage && (
+                <div className="error-message">
+                  <h3>Error loading video</h3>
+                  <p>{errorMessage}</p>
+                  <p className="info-message">Please try again later or contact support if the problem persists.</p>
+                </div>
+              )}
+              <video ref={videoRef} className="video-player" controls autoPlay playsInline onEnded={handleVideoEnded} />
+              {/* Keep the custom controls */}
+              <div className="custom-video-controls">
+                {/* Progress bar */}
+                <div className="progress-container">
+                  <progress className="custom-progress" value="0" max="100" />
+                </div>
+                {/* Control buttons */}
+                <div className="control-buttons">
+                  <div className="left-controls">
+                    <button
+                      className="control-button previous-button"
+                      onClick={playPreviousInQueue}
+                      title="Previous video"
+                    >
+                      <FontAwesomeIcon icon={faStepBackward} />
+                    </button>
+                    <button className="control-button next-button" onClick={playNextInQueue} title="Next video">
+                      <FontAwesomeIcon icon={faStepForward} />
+                    </button>
+                    <span className="time-display">
+                      0:00 / {actualDuration ? formatDuration(actualDuration) : "..."}
+                    </span>
+                  </div>
+                  <div className="right-controls">
+                    <div className="playback-speed-controls">
+                      <span className="speed-label">{playbackSpeed}x</span>
+                      <div className="speed-options">
+                        <button
+                          className={`speed-button ${playbackSpeed === 0.5 ? "active" : ""}`}
+                          onClick={() => changePlaybackSpeed(0.5)}
+                        >
+                          0.5x
+                        </button>
+                        <button
+                          className={`speed-button ${playbackSpeed === 0.75 ? "active" : ""}`}
+                          onClick={() => changePlaybackSpeed(0.75)}
+                        >
+                          0.75x
+                        </button>
+                        <button
+                          className={`speed-button ${playbackSpeed === 1 ? "active" : ""}`}
+                          onClick={() => changePlaybackSpeed(1)}
+                        >
+                          1x
+                        </button>
+                        <button
+                          className={`speed-button ${playbackSpeed === 1.25 ? "active" : ""}`}
+                          onClick={() => changePlaybackSpeed(1.25)}
+                        >
+                          1.25x
+                        </button>
+                        <button
+                          className={`speed-button ${playbackSpeed === 1.5 ? "active" : ""}`}
+                          onClick={() => changePlaybackSpeed(1.5)}
+                        >
+                          1.5x
+                        </button>
+                        <button
+                          className={`speed-button ${playbackSpeed === 2 ? "active" : ""}`}
+                          onClick={() => changePlaybackSpeed(2)}
+                        >
+                          2x
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
-          {errorMessage && !errorMessage.includes("CORS") && !errorMessage.includes("403") && (
-            <div className="hextech-banner hextech-banner--error">
-              <p>{errorMessage}</p>
-            </div>
-          )}
-          <div className="video-container">
-            <video
-              ref={videoRef}
-              controls
-              autoPlay
-              playsInline
-              preload="metadata"
-              className="video-player lol-hextech-player"
-              data-actual-duration={actualDuration ? formatDuration(actualDuration) : undefined}
-              {...(actualDuration ? { "data-duration": actualDuration, duration: actualDuration } : {})}
-              onLoadStart={(e) => {
-                // Set duration as soon as possible
-                if (actualDuration && e.currentTarget) {
-                  e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
-                  try {
-                    Object.defineProperty(e.currentTarget, "duration", {
-                      configurable: true,
-                      get: function () {
-                        return actualDuration;
-                      },
-                    });
-                  } catch (err) {
-                    console.error("Failed to set initial duration", err);
-                  }
-                }
-              }}
-              onLoadedMetadata={(e) => {
-                // Force duration property on load
-                if (actualDuration && e.currentTarget) {
-                  e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
-                  try {
-                    Object.defineProperty(e.currentTarget, "duration", {
-                      configurable: true,
-                      get: function () {
-                        return actualDuration;
-                      },
-                    });
-
-                    // Force update the time display
-                    const event = new Event("durationchange");
-                    e.currentTarget.dispatchEvent(event);
-                  } catch (err) {
-                    console.error("Failed to override duration:", err);
-                  }
-                }
-              }}
-              onEnded={handleVideoEnded}
-            />
           </div>
         </div>
 
-        {/* New Video Footer */}
-        <div className="hextech-modal__footer video-player-footer">
+        {/* Right panel (40%) - All metadata and controls */}
+        <div className="video-player-right-panel">
+          {/* Right panel header with close button */}
+          <div className="right-panel-header">
+            <h2>
+              {course && <span className="course-name">{course.title}</span>}
+              <button className="close-button" onClick={onClose}>
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </h2>
+          </div>
+
+          {/* Video title section */}
+          <div className="video-title-container">
+            <h2>
+              {getVideoIndex() && <span className="episode-number">#{getVideoIndex()}</span>}
+              {getVideoIndex() && <span className="episode-separator">|</span>}
+              <span className="video-title">{video.title}</span>
+              <span className="video-duration">{actualDuration ? formatDuration(actualDuration) : "..."}</span>
+            </h2>
+          </div>
+
+          {/* Course information if available */}
+          {course && course.description && (
+            <div className="course-info">
+              <h3 className="course-title">{course.title}</h3>
+              <div className="course-description">{course.description}</div>
+            </div>
+          )}
+
+          {/* Video metadata */}
           <div className="video-metadata">
             <div className="metadata-item">
-              <span className="metadata-label">
-                <FontAwesomeIcon icon={faClock} className="metadata-icon" /> Duration:
-              </span>
-              <span className="metadata-value">{actualDuration ? formatDuration(actualDuration) : "Loading..."}</span>
+              <FontAwesomeIcon icon={faClock} className="metadata-icon" />
+              <span className="metadata-label">Duration:</span>
+              <span className="metadata-value">{actualDuration ? formatDuration(actualDuration) : "..."}</span>
             </div>
             <div className="metadata-item">
-              <span className="metadata-label">
-                <FontAwesomeIcon icon={faCalendarAlt} className="metadata-icon" /> Released:
-              </span>
+              <FontAwesomeIcon icon={faCalendarAlt} className="metadata-icon" />
+              <span className="metadata-label">Released:</span>
               <span className="metadata-value">{video.releaseDate.toLocaleDateString()}</span>
             </div>
             <div className="metadata-item">
-              <span className="metadata-label">
-                <FontAwesomeIcon icon={faUserAlt} className="metadata-icon" /> Role:
-              </span>
+              <FontAwesomeIcon icon={faUserAlt} className="metadata-icon" />
+              <span className="metadata-label">Role:</span>
               <span className="metadata-value">{video.role}</span>
             </div>
-          </div>
-
-          {/* Playback Speed Controls in Footer */}
-          <div className="footer-playback-controls">
-            <div className="speed-label">
-              <FontAwesomeIcon icon={faTachometerAlt} className="speed-icon" /> Playback Speed:
-            </div>
-            <div className="speed-buttons">
-              {[1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
-                <button
-                  key={speed}
-                  className={`hextech-button hextech-button--sm ${
-                    playbackSpeed === speed ? "hextech-button--primary" : "hextech-button--secondary"
-                  }`}
-                  onClick={() => changePlaybackSpeed(speed)}
-                  title={`Set ${speed}x speed for all videos`}
-                >
-                  {speed}x
-                </button>
-              ))}
-              <div className="speed-saved-indicator" title="This speed will be used for all videos">
-                <FontAwesomeIcon icon={faSave} />
+            {course && (
+              <div className="metadata-item">
+                <FontAwesomeIcon icon={faListAlt} className="metadata-icon" />
+                <span className="metadata-label">Course:</span>
+                <span className="metadata-value">{course.title}</span>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Video Queue */}
-        <div className={`video-queue-container ${course ? "course-queue" : ""}`}>
-          <div className="queue-header">
-            <h3 className="hextech-title hextech-title--sm">
-              <FontAwesomeIcon icon={faListAlt} className="queue-icon" />
-              {course ? (
-                <>
-                  Course Videos
-                  {course.title && <span className="course-name-badge">{course.title}</span>}
-                </>
-              ) : (
-                "Video Queue"
-              )}
-            </h3>
-            <div className="queue-controls">
-              <button
-                className="hextech-button hextech-button--secondary hextech-button--sm"
-                onClick={playPreviousInQueue}
-                disabled={currentQueueIndex <= 0}
-                title="Play previous video (Alt+Left Arrow)"
-              >
-                <FontAwesomeIcon icon={faStepBackward} /> <span>Previous</span>{" "}
-                <span className="keyboard-shortcut">Alt+←</span>
-              </button>
-              <button
-                className="hextech-button hextech-button--secondary hextech-button--sm"
-                onClick={playNextInQueue}
-                disabled={currentQueueIndex >= displayQueue.length - 1}
-                title="Play next video (Alt+Right Arrow)"
-              >
-                <span>Next</span> <FontAwesomeIcon icon={faStepForward} />{" "}
-                <span className="keyboard-shortcut">Alt+→</span>
-              </button>
-            </div>
-          </div>
-          <div className="queue-list hextech-scrollbar">
-            {displayQueue.length === 0 ? (
-              <div className="empty-queue-message">
-                {course ? `No videos available in "${course.title}"` : "No videos in queue"}
-              </div>
-            ) : (
-              displayQueue.map((queuedVideo, index) => (
-                <div
-                  key={queuedVideo.uuid}
-                  className={`queue-item ${index === currentQueueIndex ? "active" : ""}`}
-                  onClick={() => playQueueItem(index)}
-                >
-                  <div className="queue-item-index">{index + 1}</div>
-                  <div className="queue-item-title">{queuedVideo.title}</div>
-                  <div className="queue-item-duration">
-                    {queuedVideo.durationInSeconds ? formatDuration(queuedVideo.durationInSeconds) : "Unknown"}
-                  </div>
-                  {!course && (
-                    <button
-                      className="queue-item-remove hextech-button hextech-button--icon hextech-button--danger"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeFromQueue(index);
-                      }}
-                      title="Remove from queue"
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  )}
-                </div>
-              ))
             )}
+            <div className="metadata-item">
+              <FontAwesomeIcon icon={faTachometerAlt} className="metadata-icon" />
+              <span className="metadata-label">Speed:</span>
+              <span className="metadata-value">{playbackSpeed}x</span>
+            </div>
           </div>
+
+          {/* Video queue - Takes up remaining space */}
+          {course ? (
+            <div className="course-queue-container">
+              <div className="queue-header">
+                <h3>
+                  <FontAwesomeIcon icon={faListAlt} className="queue-icon" />
+                  Course Videos
+                </h3>
+              </div>
+              <div className="queue-list">
+                {displayQueue.map((queueVideo, index) => (
+                  <div
+                    key={queueVideo.uuid}
+                    className={`queue-item ${queueVideo.uuid === video.uuid ? "active" : ""}`}
+                    onClick={() => playQueueItem(index)}
+                  >
+                    <div className="queue-item-index">{index + 1}</div>
+                    <div className="queue-item-title">{queueVideo.title}</div>
+                    <div className="queue-item-duration">
+                      {queueVideo.durationInSeconds ? formatDuration(queueVideo.durationInSeconds) : "..."}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="video-queue-container">
+              <div className="queue-header">
+                <h3>
+                  <FontAwesomeIcon icon={faListAlt} className="queue-icon" />
+                  Video Queue
+                </h3>
+              </div>
+              <div className="queue-list">
+                {displayQueue.length > 0 ? (
+                  displayQueue.map((queueVideo, index) => (
+                    <div
+                      key={queueVideo.uuid}
+                      className={`queue-item ${queueVideo.uuid === video.uuid ? "active" : ""}`}
+                      onClick={() => playQueueItem(index)}
+                    >
+                      <div className="queue-item-index">{index + 1}</div>
+                      <div className="queue-item-title">{queueVideo.title}</div>
+                      <div className="queue-item-duration">
+                        {queueVideo.durationInSeconds ? formatDuration(queueVideo.durationInSeconds) : "..."}
+                      </div>
+                      {!course && (
+                        <button
+                          className="queue-item-remove"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeFromQueue(index);
+                          }}
+                          title="Remove from queue"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-queue-message">No videos in queue. Add videos to watch them in sequence.</div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>,
