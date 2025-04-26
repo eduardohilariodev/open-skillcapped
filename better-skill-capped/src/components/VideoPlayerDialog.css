@@ -253,3 +253,57 @@
 .video-container:has(.custom-video-controls) video::-webkit-media-controls-panel {
   display: none !important;
 }
+
+/* Fullscreen styles */
+.fullscreen-controls {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  width: 100% !important;
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  padding: 15px 20px !important;
+}
+
+/* Make controls appear on hover in fullscreen */
+:fullscreen .custom-video-controls {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+:fullscreen:hover .custom-video-controls,
+:fullscreen .custom-video-controls:hover {
+  opacity: 1;
+}
+
+/* Ensure controls visibility in all browser versions */
+:-webkit-full-screen .custom-video-controls {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+:-webkit-full-screen:hover .custom-video-controls,
+:-webkit-full-screen .custom-video-controls:hover {
+  opacity: 1;
+}
+
+:-moz-full-screen .custom-video-controls {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+:-moz-full-screen:hover .custom-video-controls,
+:-moz-full-screen .custom-video-controls:hover {
+  opacity: 1;
+}
+
+:-ms-fullscreen .custom-video-controls {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+:-ms-fullscreen:hover .custom-video-controls,
+:-ms-fullscreen .custom-video-controls:hover {
+  opacity: 1;
+}

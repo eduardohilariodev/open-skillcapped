@@ -252,7 +252,12 @@ export function VideoPlayerDialog({
         if (document.fullscreenElement) {
           document.exitFullscreen();
         } else {
-          videoElement.requestFullscreen();
+          const videoContainer = videoElement.parentElement;
+          if (videoContainer) {
+            videoContainer.requestFullscreen().catch((err) => {
+              console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+          }
         }
       });
 
@@ -363,10 +368,30 @@ export function VideoPlayerDialog({
       }
     };
 
+    // Handle fullscreen change
+    const handleFullscreenChange = () => {
+      if (document.fullscreenElement) {
+        // We're in fullscreen mode now
+        const customControls = videoRef.current?.parentElement?.querySelector(".custom-video-controls");
+        if (customControls) {
+          // Ensure the controls are visible in fullscreen
+          customControls.classList.add("fullscreen-controls");
+        }
+      } else {
+        // We've exited fullscreen
+        const customControls = document.querySelector(".custom-video-controls");
+        if (customControls) {
+          customControls.classList.remove("fullscreen-controls");
+        }
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
