@@ -1,6 +1,7 @@
 /** @type {import('postcss').Config} */
 export default {
   plugins: {
-    "@tailwindcss/vite": {},
+    "@tailwindcss/postcss": {},
+    autoprefixer: {},
   },
 };

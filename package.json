@@ -36,6 +36,7 @@
     "typescript": "^5.8.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.4",
     "@tailwindcss/vite": "^4.1.4",
     "@types/hls.js": "^0.13.3",
     "@types/node": "^22.15.0",
@@ -46,6 +47,7 @@
     "@typescript-eslint/eslint-plugin": "^8.31.0",
     "@typescript-eslint/parser": "^8.31.0",
     "@vitejs/plugin-react": "^4.4.1",
+    "autoprefixer": "^10.4.21",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-import": "^2.31.0",
