@@ -8,12 +8,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(1, 10, 19, 0.95); /* LoL background dark with opacity */
+  background-color: rgba(0, 0, 0, 0.9); /* Dark black background with opacity */
   z-index: 9999; /* Ensure dialog appears above all content */
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(5px);
 }
 
 .video-player-dialog {
