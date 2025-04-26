@@ -13,10 +13,8 @@ import { ManifestLoader } from "../ManifestLoader";
 import { Parser } from "../parser/Parser";
 import { VideoPlayerProvider } from "./VideoPlayerPortal";
 
-// Import Hextech styling
-import "../styles/hextech-global.css";
-import "../styles/hextech-magic.css";
-import "../styles/hextech-animations.css";
+// Import global styles with Tailwind
+import "../styles/globals.css";
 
 export interface AppState {
   content?: Content;

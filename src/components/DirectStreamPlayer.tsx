@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import Hls from "hls.js";
 import { VideoUtils } from "../utils/VideoUtils";
-import "./VideoPlayerDialog.css"; // Reusing existing styles
+import "../styles/VideoPlayerDialog.css"; // Fixed import path
 import "../styles/components/_button.css";
 import "../styles/components/_input.css";
 import "../styles/components/_modal.css";

@@ -5,9 +5,6 @@ import React from "react";
 import { Bookmarkable } from "../../model/Bookmark";
 import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
-import "./SearchResult.css";
-import "../../styles/Episode.css";
-import "../../styles/card-states.css";
 import { useVideoPlayer } from "../../components/VideoPlayerPortal";
 import { WatchButton } from "../../components/WatchButton";
 
@@ -26,8 +23,6 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
   const { course, video, matchedStrings, isWatched } = props;
   const { showVideoPlayer } = useVideoPlayer();
 
-  const textStyle = isWatched ? "has-text-grey-lighter" : "";
-
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     showVideoPlayer(video, course);
@@ -43,20 +38,20 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
   const episodeNumber = getVideoIndex();
 
   return (
-    <li className="episode-item">
-      <div className="episode-card" onClick={handleVideoClick}>
-        <div className="episode-content">
-          {episodeNumber && <div className="episode-number">{episodeNumber}</div>}
-          {episodeNumber && <span className="episode-separator">|</span>}
+    <li className="episode-item-base">
+      <div className="episode-card-base" onClick={handleVideoClick}>
+        <div className="episode-content-base">
+          {episodeNumber && <div className="episode-number-base">{episodeNumber}</div>}
+          {episodeNumber && <span className="episode-separator-base">|</span>}
           <Highlighter
-            highlightClassName="bg-yellow-300"
+            highlightClassName="bg-blue-medium/20 text-blue-light px-1 py-0.5 rounded"
             searchWords={matchedStrings}
             autoEscape={true}
             textToHighlight={video.title}
-            className={classNames("episode-title", isWatched ? "watched" : "")}
+            className={classNames(isWatched ? "text-text-muted" : "text-gold-light", "text-base font-medium")}
           />
         </div>
-        <div className="episode-actions">
+        <div className="episode-actions-base">
           <WatchButton video={video} course={course} />
         </div>
       </div>
