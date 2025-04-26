@@ -745,185 +745,195 @@ Duration=${calculatedDuration}`;
   }, [isOpen, video, onClose, actualDuration]);
 
   // Find the portal target node
-  const modalRoot = document.getElementById("modal-root");
+  let modalRoot = document.getElementById("modal-root");
+
+  // If modal root doesn't exist, create one
+  useEffect(() => {
+    if (!document.getElementById("modal-root")) {
+      const div = document.createElement("div");
+      div.id = "modal-root";
+      document.body.appendChild(div);
+      modalRoot = div;
+    }
+  }, []);
 
   if (!isOpen) return null;
 
+  // Get the current modal root (might have been created in the effect)
+  const currentModalRoot = document.getElementById("modal-root");
+  if (!currentModalRoot) return null;
+
   // Use Portal to render the dialog
-  return modalRoot
-    ? ReactDOM.createPortal(
-        <div className="video-player-overlay" onClick={onClose}>
-          <div className="video-player-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="video-player-header">
-              <h2>
-                {course && <span className="course-name">{course.title}</span>}
-                {getVideoIndex() && <span className="episode-number">#{getVideoIndex()}:</span>}
-                <span className="video-title">{video.title}</span>
-              </h2>
-              <button className="close-button" onClick={onClose}>
-                ×
-              </button>
+  return ReactDOM.createPortal(
+    <div className="video-player-overlay" onClick={onClose}>
+      <div className="video-player-dialog" onClick={(e) => e.stopPropagation()}>
+        <div className="video-player-header">
+          <h2>
+            {course && <span className="course-name">{course.title}</span>}
+            {getVideoIndex() && <span className="episode-number">#{getVideoIndex()}:</span>}
+            <span className="video-title">{video.title}</span>
+          </h2>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
+        </div>
+        <div className="video-player-content">
+          {isLoading && (
+            <div className="loading-indicator">
+              <div className="spinner"></div> {status}
             </div>
-            <div className="video-player-content">
-              {isLoading && (
-                <div className="loading-indicator">
-                  <div className="spinner"></div> {status}
-                </div>
-              )}
-              {errorMessage && !errorMessage.includes("CORS") && !errorMessage.includes("403") && (
-                <div className="error-message">
-                  <p>{errorMessage}</p>
-                </div>
-              )}
-              <div className="video-container">
-                <video
-                  ref={videoRef}
-                  controls
-                  autoPlay
-                  playsInline
-                  preload="metadata"
-                  className="video-player lol-hextech-player"
-                  data-actual-duration={actualDuration ? formatDuration(actualDuration) : undefined}
-                  {...(actualDuration ? { "data-duration": actualDuration, duration: actualDuration } : {})}
-                  onLoadStart={(e) => {
-                    // Set duration as soon as possible
-                    if (actualDuration && e.currentTarget) {
-                      e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
-                      try {
-                        Object.defineProperty(e.currentTarget, "duration", {
-                          configurable: true,
-                          get: function () {
-                            return actualDuration;
-                          },
-                        });
-                      } catch (err) {
-                        console.error("Failed to set initial duration", err);
-                      }
-                    }
-                  }}
-                  onLoadedMetadata={(e) => {
-                    // Force duration property on load
-                    if (actualDuration && e.currentTarget) {
-                      e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
-                      try {
-                        Object.defineProperty(e.currentTarget, "duration", {
-                          configurable: true,
-                          get: function () {
-                            return actualDuration;
-                          },
-                        });
-
-                        // Force update the time display
-                        const event = new Event("durationchange");
-                        e.currentTarget.dispatchEvent(event);
-                      } catch (err) {
-                        console.error("Failed to override duration:", err);
-                      }
-                    }
-                  }}
-                  onEnded={handleVideoEnded}
-                />
-              </div>
+          )}
+          {errorMessage && !errorMessage.includes("CORS") && !errorMessage.includes("403") && (
+            <div className="error-message">
+              <p>{errorMessage}</p>
             </div>
+          )}
+          <div className="video-container">
+            <video
+              ref={videoRef}
+              controls
+              autoPlay
+              playsInline
+              preload="metadata"
+              className="video-player lol-hextech-player"
+              data-actual-duration={actualDuration ? formatDuration(actualDuration) : undefined}
+              {...(actualDuration ? { "data-duration": actualDuration, duration: actualDuration } : {})}
+              onLoadStart={(e) => {
+                // Set duration as soon as possible
+                if (actualDuration && e.currentTarget) {
+                  e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
+                  try {
+                    Object.defineProperty(e.currentTarget, "duration", {
+                      configurable: true,
+                      get: function () {
+                        return actualDuration;
+                      },
+                    });
+                  } catch (err) {
+                    console.error("Failed to set initial duration", err);
+                  }
+                }
+              }}
+              onLoadedMetadata={(e) => {
+                // Force duration property on load
+                if (actualDuration && e.currentTarget) {
+                  e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
+                  try {
+                    Object.defineProperty(e.currentTarget, "duration", {
+                      configurable: true,
+                      get: function () {
+                        return actualDuration;
+                      },
+                    });
 
-            {/* New Video Footer */}
-            <div className="video-player-footer">
-              <div className="video-metadata">
-                <div className="metadata-item">
-                  <span className="metadata-label">Duration:</span>
-                  <span className="metadata-value">
-                    {actualDuration ? formatDuration(actualDuration) : "Loading..."}
-                  </span>
-                </div>
-                <div className="metadata-item">
-                  <span className="metadata-label">Released:</span>
-                  <span className="metadata-value">{video.releaseDate.toLocaleDateString()}</span>
-                </div>
-                <div className="metadata-item">
-                  <span className="metadata-label">Role:</span>
-                  <span className="metadata-value">{video.role}</span>
-                </div>
-              </div>
+                    // Force update the time display
+                    const event = new Event("durationchange");
+                    e.currentTarget.dispatchEvent(event);
+                  } catch (err) {
+                    console.error("Failed to override duration:", err);
+                  }
+                }
+              }}
+              onEnded={handleVideoEnded}
+            />
+          </div>
+        </div>
 
-              {/* Playback Speed Controls in Footer */}
-              <div className="footer-playback-controls">
-                <div className="speed-label">Playback Speed:</div>
-                <div className="speed-buttons">
-                  {[1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
-                    <button
-                      key={speed}
-                      className={`speed-button ${playbackSpeed === speed ? "active" : ""}`}
-                      onClick={() => changePlaybackSpeed(speed)}
-                      title={`Set ${speed}x speed for all videos`}
-                    >
-                      {speed}x
-                    </button>
-                  ))}
-                  <div className="speed-saved-indicator" title="This speed will be used for all videos">
-                    <span className="save-icon">💾</span>
-                  </div>
-                </div>
-              </div>
+        {/* New Video Footer */}
+        <div className="video-player-footer">
+          <div className="video-metadata">
+            <div className="metadata-item">
+              <span className="metadata-label">Duration:</span>
+              <span className="metadata-value">{actualDuration ? formatDuration(actualDuration) : "Loading..."}</span>
             </div>
+            <div className="metadata-item">
+              <span className="metadata-label">Released:</span>
+              <span className="metadata-value">{video.releaseDate.toLocaleDateString()}</span>
+            </div>
+            <div className="metadata-item">
+              <span className="metadata-label">Role:</span>
+              <span className="metadata-value">{video.role}</span>
+            </div>
+          </div>
 
-            {/* Video Queue */}
-            <div className="video-queue-container">
-              <div className="queue-header">
-                <h3>{course ? `${course.title} Videos` : "Video Queue"}</h3>
-                <div className="queue-controls">
-                  <button
-                    className="queue-control-button"
-                    onClick={playPreviousInQueue}
-                    disabled={currentQueueIndex <= 0}
-                    title="Play previous video (Alt+Left Arrow)"
-                  >
-                    ← Previous <span className="keyboard-shortcut">Alt+←</span>
-                  </button>
-                  <button
-                    className="queue-control-button"
-                    onClick={playNextInQueue}
-                    disabled={currentQueueIndex >= displayQueue.length - 1}
-                    title="Play next video (Alt+Right Arrow)"
-                  >
-                    Next → <span className="keyboard-shortcut">Alt+→</span>
-                  </button>
-                </div>
-              </div>
-              <div className="queue-list">
-                {displayQueue.length === 0 ? (
-                  <div className="empty-queue-message">
-                    {course ? `No videos available in "${course.title}"` : "No videos in queue"}
-                  </div>
-                ) : (
-                  displayQueue.map((queuedVideo, index) => (
-                    <div
-                      key={queuedVideo.uuid}
-                      className={`queue-item ${index === currentQueueIndex ? "active" : ""}`}
-                      onClick={() => playQueueItem(index)}
-                    >
-                      <div className="queue-item-index">{index + 1}</div>
-                      <div className="queue-item-title">{queuedVideo.title}</div>
-                      <div className="queue-item-duration">
-                        {queuedVideo.durationInSeconds ? formatDuration(queuedVideo.durationInSeconds) : "Unknown"}
-                      </div>
-                      <button
-                        className="queue-item-remove"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFromQueue(index);
-                        }}
-                        title="Remove from queue"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))
-                )}
+          {/* Playback Speed Controls in Footer */}
+          <div className="footer-playback-controls">
+            <div className="speed-label">Playback Speed:</div>
+            <div className="speed-buttons">
+              {[1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
+                <button
+                  key={speed}
+                  className={`speed-button ${playbackSpeed === speed ? "active" : ""}`}
+                  onClick={() => changePlaybackSpeed(speed)}
+                  title={`Set ${speed}x speed for all videos`}
+                >
+                  {speed}x
+                </button>
+              ))}
+              <div className="speed-saved-indicator" title="This speed will be used for all videos">
+                <span className="save-icon">💾</span>
               </div>
             </div>
           </div>
-        </div>,
-        modalRoot,
-      )
-    : null;
+        </div>
+
+        {/* Video Queue */}
+        <div className="video-queue-container">
+          <div className="queue-header">
+            <h3>{course ? `${course.title} Videos` : "Video Queue"}</h3>
+            <div className="queue-controls">
+              <button
+                className="queue-control-button"
+                onClick={playPreviousInQueue}
+                disabled={currentQueueIndex <= 0}
+                title="Play previous video (Alt+Left Arrow)"
+              >
+                ← Previous <span className="keyboard-shortcut">Alt+←</span>
+              </button>
+              <button
+                className="queue-control-button"
+                onClick={playNextInQueue}
+                disabled={currentQueueIndex >= displayQueue.length - 1}
+                title="Play next video (Alt+Right Arrow)"
+              >
+                Next → <span className="keyboard-shortcut">Alt+→</span>
+              </button>
+            </div>
+          </div>
+          <div className="queue-list">
+            {displayQueue.length === 0 ? (
+              <div className="empty-queue-message">
+                {course ? `No videos available in "${course.title}"` : "No videos in queue"}
+              </div>
+            ) : (
+              displayQueue.map((queuedVideo, index) => (
+                <div
+                  key={queuedVideo.uuid}
+                  className={`queue-item ${index === currentQueueIndex ? "active" : ""}`}
+                  onClick={() => playQueueItem(index)}
+                >
+                  <div className="queue-item-index">{index + 1}</div>
+                  <div className="queue-item-title">{queuedVideo.title}</div>
+                  <div className="queue-item-duration">
+                    {queuedVideo.durationInSeconds ? formatDuration(queuedVideo.durationInSeconds) : "Unknown"}
+                  </div>
+                  <button
+                    className="queue-item-remove"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFromQueue(index);
+                    }}
+                    title="Remove from queue"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>,
+    currentModalRoot,
+  );
 }

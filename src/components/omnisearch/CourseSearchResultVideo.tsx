@@ -10,7 +10,7 @@ import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
-import { useVideoPlayer } from "../../contexts/VideoPlayerContext";
+import { useVideoPlayer } from "../../components/VideoPlayerPortal";
 
 export interface SearchResultVideoProps {
   matchedStrings: string[];
@@ -25,7 +25,7 @@ export interface SearchResultVideoProps {
 
 export function CourseSearchResultVideo(props: SearchResultVideoProps): React.ReactElement {
   const { course, video, matchedStrings, isWatched, isBookmarked } = props;
-  const { openVideo } = useVideoPlayer();
+  const { showVideoPlayer } = useVideoPlayer();
 
   const link = getCourseVideoUrl(video, course);
 
@@ -36,7 +36,7 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    openVideo(video, course);
+    showVideoPlayer(video, course);
   };
 
   return (
