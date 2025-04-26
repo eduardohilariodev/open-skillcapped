@@ -2,15 +2,13 @@ import { Video } from "../../model/Video";
 import { Course } from "../../model/Course";
 import Highlighter from "react-highlight-words";
 import React from "react";
-import { getCourseVideoUrl } from "../../utils/UrlUtilities";
 import { Bookmarkable } from "../../model/Bookmark";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
 import { useVideoPlayer } from "../../components/VideoPlayerPortal";
+import { WatchButton } from "../../components/WatchButton";
 
 export interface SearchResultVideoProps {
   matchedStrings: string[];
@@ -24,14 +22,9 @@ export interface SearchResultVideoProps {
 }
 
 export function CourseSearchResultVideo(props: SearchResultVideoProps): React.ReactElement {
-  const { course, video, matchedStrings, isWatched, isBookmarked } = props;
+  const { course, video, matchedStrings, isWatched } = props;
   const { showVideoPlayer } = useVideoPlayer();
 
-  const link = getCourseVideoUrl(video, course);
-
-  const bookmarkHint = isBookmarked ? "Unbookmark" : "Bookmark";
-  const watchToggleIcon = isWatched ? faEyeSlash : faEye;
-  const watchToggleHint = isWatched ? "Mark as unwatched" : "Watch as watched";
   const textStyle = isWatched ? "has-text-grey-lighter" : "";
 
   const handleVideoClick = (e: React.MouseEvent) => {
@@ -62,26 +55,7 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
           />
         </div>
         <div className="episode-actions">
-          <button
-            className={classNames("episode-action-button", isWatched ? "watched" : "")}
-            onClick={(e) => {
-              e.stopPropagation();
-              props.onToggleWatchStatus(video);
-            }}
-            title={watchToggleHint}
-          >
-            <FontAwesomeIcon icon={watchToggleIcon} />
-          </button>
-          <button
-            className={classNames("episode-action-button", isBookmarked ? "bookmarked" : "")}
-            onClick={(e) => {
-              e.stopPropagation();
-              props.onToggleBookmark(video);
-            }}
-            title={bookmarkHint}
-          >
-            <FontAwesomeIcon icon={faBookmark} />
-          </button>
+          <WatchButton video={video} course={course} />
         </div>
       </div>
     </li>

@@ -127,3 +127,21 @@
 .hextech-button > * {
   vertical-align: middle;
 }
+
+/* Watch button styling */
+.watch-icon {
+  display: inline-flex;
+  margin-right: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  transform-origin: center;
+}
+
+.watch-button {
+  background-color: #0ac8b9; /* Hextech blue */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.watch-button:hover .watch-icon {
+  animation: pulse 1s ease infinite;
+}

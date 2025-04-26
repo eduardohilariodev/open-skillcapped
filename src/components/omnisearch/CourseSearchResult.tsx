@@ -7,8 +7,6 @@ import { Watchable } from "../../model/WatchStatus";
 import { FuseSearchResult } from "./search/FuseSearch";
 import { CourseSearchResultVideo } from "./CourseSearchResultVideo";
 import { roleToString } from "../../model/Role";
-import { ToggleBookmarkButton } from "../BookmarkToggleButton";
-import { ToggleWatchStatusButton } from "../ToggleWatchStatusButton";
 import { Bookmarkable } from "../../model/Bookmark";
 
 export interface CourseSearchResultProps {
@@ -52,19 +50,6 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
             <figure className="image course-image">
               <img src={course.image} alt="Course thumbnail" className="thumbnail" />
             </figure>
-
-            <div className="buttons mt-3">
-              <ToggleBookmarkButton
-                item={course}
-                isBookmarked={isBookmarked(course)}
-                onToggleBookmark={onToggleBookmark}
-              />
-              <ToggleWatchStatusButton
-                item={course}
-                isWatched={isWatched(course)}
-                onToggleWatchStatus={onToggleWatchStatus}
-              />
-            </div>
           </div>
 
           {/* Second column - Title, metadata, and builds list */}
@@ -75,14 +60,15 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
             </h3>
             <p className="mb-3">{course.description}</p>
             <div className="tags mb-4">
-              <span className="tag is-primary is-light">Role: {roleToString(props.result.item.role)}</span>
-              <span className="tag is-primary is-light" title={props.result.item.releaseDate.toLocaleString()}>
+              <span className="">{roleToString(props.result.item.role)}</span>
+              <span className="mx-2">•</span>
+              <span className="" title={props.result.item.releaseDate.toLocaleString()}>
                 {props.result.item.releaseDate.toLocaleDateString()}
               </span>
             </div>
 
             {/* Build list */}
-            <div className="course-vjjideos-list">
+            <div className="course-videos-list">
               <ol className="video-list">{videos}</ol>
             </div>
           </div>

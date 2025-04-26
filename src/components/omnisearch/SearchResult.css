@@ -215,7 +215,7 @@ mark:hover::after {
 
 /* Course video list styling - updated */
 .course-videos-list {
-  margin-top: 1rem;
+  margin-top: 2rem;
   border: none;
   border-radius: 0;
   background-color: transparent;
@@ -224,13 +224,13 @@ mark:hover::after {
 .video-list {
   list-style-position: inside;
   margin: 0;
-  padding: 0.5rem 0;
+  padding: 1.5rem 0;
 }
 
 /* Episode styling - new */
 .episode-item {
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
 }
@@ -333,6 +333,11 @@ mark:hover::after {
 
 .box-content ol.video-list > li {
   display: block;
+  margin-bottom: 24px;
+}
+
+.box-content ol.video-list > li:last-child {
+  margin-bottom: 0;
 }
 
 /* Responsive adjustments */
@@ -358,7 +363,7 @@ mark:hover::after {
   }
 
   .episode-item {
-    margin-bottom: 1rem;
+    margin-bottom: 2.5rem;
   }
 
   .episode-actions {
