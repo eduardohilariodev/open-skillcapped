@@ -18,7 +18,6 @@
   box-shadow:
     0 5px 15px rgba(0, 0, 0, 0.3),
     0 0 5px rgba(200, 170, 110, 0.2);
-  transform: translateY(-2px);
   border-color: #c8aa6e; /* LoL gold medium */
 }
 
@@ -128,7 +127,6 @@
 }
 
 .hextech-card:hover {
-  transform: translateY(-3px);
   box-shadow:
     0 8px 16px rgba(0, 0, 0, 0.3),
     0 0 8px rgba(200, 170, 110, 0.2);
@@ -183,7 +181,6 @@
 
 .hextech-filter-panel:hover {
   border-color: #785a28; /* LoL gold dark */
-  transform: translateY(-2px);
 }
 
 /* Filter panel header */

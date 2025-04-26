@@ -82,7 +82,7 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
             </div>
 
             {/* Build list */}
-            <div className="course-videos-list">
+            <div className="course-vjjideos-list">
               <ol className="video-list">{videos}</ol>
             </div>
           </div>

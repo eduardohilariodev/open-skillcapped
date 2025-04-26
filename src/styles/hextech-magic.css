@@ -89,14 +89,14 @@
 
 @keyframes float {
   0% {
-    transform: translateY(0) rotate(0deg);
+    transform: rotate(0deg);
     opacity: 0;
   }
   20% {
     opacity: 0.8;
   }
   100% {
-    transform: translateY(-100px) rotate(360deg);
+    transform: rotate(360deg);
     opacity: 0;
   }
 }
@@ -119,12 +119,10 @@
 }
 
 .hextech-button.hextech-primary:hover {
-  transform: translateY(-2px);
   box-shadow: 0 0 12px rgba(12, 200, 185, 0.8);
 }
 
 .hextech-button.hextech-secondary:hover {
-  transform: translateY(-1px);
   box-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
 }
 

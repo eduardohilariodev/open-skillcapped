@@ -50,9 +50,9 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
 
   return (
     <li className="episode-item">
-      {episodeNumber && <div className="episode-number">{episodeNumber}</div>}
       <div className="episode-card" onClick={handleVideoClick}>
         <div className="episode-content">
+          {episodeNumber && <div className="episode-number">{episodeNumber}</div>}
           <Highlighter
             highlightClassName="bg-yellow-300"
             searchWords={matchedStrings}

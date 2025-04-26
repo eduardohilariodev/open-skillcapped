@@ -60,7 +60,6 @@
 }
 
 .hextech-hover-effect:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(200, 170, 110, 0.2);
 }
 
@@ -126,11 +125,9 @@
 @keyframes hextech-fade-in {
   0% {
     opacity: 0;
-    transform: translateY(10px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
