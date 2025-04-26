@@ -55,7 +55,7 @@ interface VideoPlayerDialogProps {
 }
 
 export function VideoPlayerDialog({
-  video,
+  video: initialVideo,
   course,
   isOpen,
   onClose,
@@ -67,6 +67,7 @@ export function VideoPlayerDialog({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [actualDuration, setActualDuration] = useState<number | null>(null);
   const [formattedCurrentTime, setFormattedCurrentTime] = useState<string>("0:00");
+  const [currentVideo, setCurrentVideo] = useState<Video>(initialVideo);
 
   // Video queue state
   const [videoQueue, setVideoQueue] = useState<Video[]>(() => {
@@ -163,6 +164,7 @@ export function VideoPlayerDialog({
     if (index >= 0 && index < displayQueue.length) {
       setCurrentQueueIndex(index);
       const videoToPlay = displayQueue[index];
+      setCurrentVideo(videoToPlay);
 
       if (hlsRef.current) {
         hlsRef.current.destroy();
@@ -355,24 +357,29 @@ export function VideoPlayerDialog({
     }
   };
 
+  // Update current video when initial video changes
+  useEffect(() => {
+    setCurrentVideo(initialVideo);
+  }, [initialVideo]);
+
   // Add video to queue when opened
   useEffect(() => {
-    if (isOpen && video) {
-      if (!course && !videoQueue.some((v) => v.uuid === video.uuid)) {
-        addToQueue(video);
+    if (isOpen && initialVideo) {
+      if (!course && !videoQueue.some((v) => v.uuid === initialVideo.uuid)) {
+        addToQueue(initialVideo);
       }
 
-      const index = displayQueue.findIndex((v) => v.uuid === video.uuid);
+      const index = displayQueue.findIndex((v) => v.uuid === initialVideo.uuid);
       if (index !== -1) {
         setCurrentQueueIndex(index);
       }
     }
-  }, [isOpen, video, videoQueue.length, displayQueue, course]);
+  }, [isOpen, initialVideo, videoQueue.length, displayQueue, course]);
 
   // Play video when dialog opens and handle keyboard shortcuts
   useEffect(() => {
-    if (isOpen && video) {
-      setupStreamForVideo(video);
+    if (isOpen && initialVideo) {
+      setupStreamForVideo(initialVideo);
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -394,7 +401,7 @@ export function VideoPlayerDialog({
         hlsRef.current = null;
       }
     };
-  }, [isOpen, video, onClose]);
+  }, [isOpen, initialVideo, onClose]);
 
   // Apply playback speed after video loads
   useEffect(() => {
@@ -510,7 +517,7 @@ export function VideoPlayerDialog({
   // Find video index in course videos
   const getVideoIndex = (): number | undefined => {
     if (!course || !course.videos) return undefined;
-    const index = course.videos.findIndex((cv) => cv.video.uuid === video.uuid);
+    const index = course.videos.findIndex((cv) => cv.video.uuid === currentVideo.uuid);
     return index !== -1 ? index + 1 : undefined;
   };
 
@@ -585,7 +592,7 @@ export function VideoPlayerDialog({
                 </span>
               )}
               {getVideoIndex() && <span className="text-[var(--hextech-color-gold-dark)]">|</span>}
-              <span className="font-bold flex-grow">{video.title}</span>
+              <span className="font-bold flex-grow">{currentVideo.title}</span>
               <div className="flex gap-1">
                 {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
                   <button
@@ -613,12 +620,12 @@ export function VideoPlayerDialog({
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faCalendarAlt} className="text-[var(--hextech-color-gold)] mr-2" />
                 <span className="text-gray-400 text-sm">Released:</span>
-                <span className="text-white text-sm font-medium">{video.releaseDate.toLocaleDateString()}</span>
+                <span className="text-white text-sm font-medium">{currentVideo.releaseDate.toLocaleDateString()}</span>
               </div>
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faUserAlt} className="text-[var(--hextech-color-gold)] mr-2" />
                 <span className="text-gray-400 text-sm">Role:</span>
-                <span className="text-white text-sm font-medium">{video.role}</span>
+                <span className="text-white text-sm font-medium">{currentVideo.role}</span>
               </div>
             </div>
           </div>
@@ -655,7 +662,7 @@ export function VideoPlayerDialog({
                 <div
                   key={queueVideo.uuid}
                   className={`flex items-center p-3 cursor-pointer transition-colors mb-1 hover:bg-[var(--hextech-color-background-medium)] ${
-                    queueVideo.uuid === video.uuid
+                    queueVideo.uuid === currentVideo.uuid
                       ? "bg-[var(--hextech-color-background-light)] border-l-2 border-l-[var(--hextech-color-blue-medium)]"
                       : ""
                   }`}
