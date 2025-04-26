@@ -45,12 +45,19 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
       <div className="box-content">
         <div className="corner-top-right"></div>
         <div className="corner-bottom-left"></div>
-        <div className="columns is-multiline">
-          <div className="column is-7">
-            <h3 className="title">
+
+        {/* Header section with image and title/metadata */}
+        <div className="columns">
+          <div className="column is-3">
+            <figure className="image course-image">
+              <img src={course.image} alt="Course thumbnail" className="thumbnail" />
+            </figure>
+          </div>
+          <div className="column is-9">
+            <h3 className="title is-4 mb-2">
               <Highlighter searchWords={props.result.matchedStrings} textToHighlight={course.title} autoEscape={true} />
             </h3>
-            <p>{course.description}</p>
+            <p className="mb-3">{course.description}</p>
             <div className="tags">
               <span className="tag is-primary">Content Type: Course</span>
               <span className="tag is-primary is-light">Role: {roleToString(props.result.item.role)}</span>
@@ -58,17 +65,18 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
                 Released: {props.result.item.releaseDate.toLocaleDateString()}
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* Build list section */}
+        <div className="columns mt-3">
+          <div className="column is-12">
+            <h4 className="title is-5 mb-2">Build List</h4>
             <div className="course-videos-list">
               <ol className="video-list">{videos}</ol>
             </div>
-          </div>
-          <div className="column is-5">
-            <figure className="image">
-              <img src={course.image} alt="Video thumbnail" className="thumbnail" />
-            </figure>
-          </div>
-          <div className="column is-12">
-            <div className="buttons">
+
+            <div className="buttons mt-3">
               <ToggleBookmarkButton
                 item={course}
                 isBookmarked={isBookmarked(course)}

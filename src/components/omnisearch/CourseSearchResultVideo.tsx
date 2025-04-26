@@ -48,25 +48,26 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
         )}
         onClick={handleVideoClick}
       >
-        <div className="flex justify-between items-center w-full gap-3">
-          <div className="flex-1">
+        <div className="flex justify-between items-center w-full">
+          <div className="flex-1 pl-2">
             <Highlighter
               highlightClassName="bg-yellow-300"
               searchWords={matchedStrings}
               autoEscape={true}
               textToHighlight={video.title}
-              className="text-sm"
+              className={classNames("text-base", isWatched ? "text-gray-400" : "text-white")}
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 pr-2">
             <button
               className="text-gray-400 hover:text-gray-200"
               onClick={(e) => {
                 e.stopPropagation();
                 props.onToggleWatchStatus(video);
               }}
+              title={watchToggleHint}
             >
-              <FontAwesomeIcon icon={isWatched ? faEye : faEyeSlash} />
+              <FontAwesomeIcon icon={watchToggleIcon} />
             </button>
             <button
               className={classNames("hover:text-gray-200", isBookmarked ? "text-yellow-400" : "text-gray-400")}
@@ -74,6 +75,7 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
                 e.stopPropagation();
                 props.onToggleBookmark(video);
               }}
+              title={bookmarkHint}
             >
               <FontAwesomeIcon icon={faBookmark} />
             </button>

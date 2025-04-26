@@ -188,27 +188,69 @@ mark:hover::after {
   color: #f0e6d2; /* LoL gold light */
 }
 
+/* Course image styling */
+.course-image {
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid #3d424d;
+}
+
+.course-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Course video list styling - updated */
 .course-videos-list {
   margin-top: 1rem;
+  border: 1px solid #3d424d;
+  border-radius: 4px;
+  background-color: rgba(10, 20, 40, 0.3);
 }
 
 .video-list {
-  list-style-position: inside;
+  list-style-position: outside;
   margin: 0;
-  padding: 0.5rem 1rem;
-  border-left: 1px solid #3d424d; /* LoL grey */
+  padding: 0.75rem 1rem;
 }
 
 .video-list li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   position: relative;
+}
+
+.video-list li:last-child {
+  margin-bottom: 0;
 }
 
 /* Reset default list styling */
 .box-content ol.video-list {
-  margin-left: 1rem;
+  margin-left: 2rem;
   list-style-type: decimal;
+  counter-reset: item;
+}
+
+.box-content ol.video-list > li {
+  display: block;
+}
+
+.box-content ol.video-list > li:before {
+  content: counter(item) ".";
+  counter-increment: item;
+  position: absolute;
+  left: -1.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 500;
+  color: #c8aa6e;
 }
 
 /* Responsive adjustments */
