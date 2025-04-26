@@ -542,11 +542,16 @@ video::-webkit-media-controls-time-remaining-display * {
 
 /* Video controls styling */
 video::-webkit-media-controls {
-  background-color: rgba(1, 10, 19, 0.8) !important; /* LoL background dark with opacity */
+  background-color: transparent !important; /* Remove dark background */
+}
+
+/* This targets the specific control panel */
+video::-webkit-media-controls-panel {
+  background-color: transparent !important;
 }
 
 video::-webkit-media-controls-enclosure {
-  background-color: rgba(10, 20, 40, 0.7) !important; /* LoL background medium with opacity */
+  background-color: transparent !important; /* Make controls enclosure transparent */
 }
 
 /* Customize play button, volume controls, and other video controls */
@@ -600,4 +605,17 @@ video::-webkit-media-controls-time-remaining-display {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Remove any dark backgrounds from video controls */
+video::-webkit-media-controls,
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-enclosure,
+video::-webkit-media-controls-overlay-enclosure {
+  background-color: transparent !important;
+}
+
+/* This specifically targets the dark background overlay shown in the screenshot */
+video::-webkit-media-controls {
+  background-color: transparent !important; /* Remove dark background */
 }

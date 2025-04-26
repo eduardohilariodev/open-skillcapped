@@ -471,14 +471,10 @@ export function VideoPlayerDialog({
         content: "${formatDuration(actualDuration)}" !important;
       }
       
-      /* Fix for media controls overlay */
-      video::-webkit-media-controls-panel,
-      video::-webkit-media-controls-play-button,
-      video::-webkit-media-controls-volume-slider-container,
-      video::-webkit-media-controls-mute-button,
-      video::-webkit-media-controls-timeline,
-      video::-webkit-media-controls-fullscreen-button {
-        filter: none !important;
+      video::-webkit-media-controls,
+      video::-webkit-media-controls-enclosure,
+      video::-webkit-media-controls-panel {
+        background-color: transparent !important;
       }
     `;
     document.head.appendChild(styleEl);
