@@ -1,0 +1,92 @@
+/* Fixed Layout Styles */
+.fixed-layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Fixed searchbar */
+.fixed-layout-search {
+  flex-shrink: 0;
+}
+
+/* Main content area with fixed sidebar */
+.fixed-layout-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Fixed sidebar */
+.fixed-layout-sidebar {
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 80px); /* Adjust based on searchbar height */
+  overflow-y: auto;
+  flex: 0 0 20%; /* Fixed width */
+  padding: 1rem;
+  border-right: 1px solid #eee;
+}
+
+/* Filter panels in sidebar */
+.fixed-layout-sidebar .panel {
+  margin-bottom: 1rem;
+}
+
+/* Scrollable results area */
+.fixed-layout-results {
+  flex: 1;
+  overflow-y: auto;
+  height: calc(100vh - 80px); /* Adjust based on searchbar height */
+  padding: 1rem;
+}
+
+/* Pagination controls at bottom of results */
+.fixed-layout-results .pagination-wrapper {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding: 1rem 0;
+  margin-top: 1rem;
+  z-index: 10;
+  border-top: 1px solid #eee;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fixed-layout-content {
+    flex-direction: column;
+  }
+
+  .fixed-layout-sidebar {
+    position: static;
+    height: auto;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .fixed-layout-results {
+    height: auto;
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .fixed-layout-sidebar {
+    border-right-color: #333;
+  }
+
+  .fixed-layout-results .pagination-wrapper {
+    background-color: #121212;
+    border-top-color: #333;
+  }
+
+  @media (max-width: 768px) {
+    .fixed-layout-sidebar {
+      border-bottom-color: #333;
+    }
+  }
+}

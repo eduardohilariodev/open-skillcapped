@@ -5,6 +5,44 @@ import { Course } from "../model/Course";
 import { VideoUtils } from "../utils/VideoUtils";
 import "./VideoPlayerDialog.css";
 
+// Storage keys
+const STORAGE_KEYS = {
+  PLAYBACK_SPEED: "better-skill-capped-playback-speed",
+  VIDEO_QUEUE: "better-skill-capped-video-queue",
+};
+
+// Local storage utilities
+const storageUtils = {
+  getItem: (key: string, defaultValue: any) => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : defaultValue;
+    } catch (error) {
+      console.error(`Error getting item from localStorage: ${error}`);
+      return defaultValue;
+    }
+  },
+
+  setItem: (key: string, value: any) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (error) {
+      console.error(`Error setting item in localStorage: ${error}`);
+      return false;
+    }
+  },
+};
+
+// Extend HTMLVideoElement type to include our custom property
+declare global {
+  interface HTMLVideoElement {
+    _durationObserver?: MutationObserver;
+    _periodicUpdateId?: ReturnType<typeof setInterval>;
+    _timeoutId?: ReturnType<typeof setTimeout>;
+  }
+}
+
 interface VideoPlayerDialogProps {
   video: Video;
   course?: Course;
@@ -18,32 +56,121 @@ export function VideoPlayerDialog({
   isOpen,
   onClose,
 }: VideoPlayerDialogProps): React.ReactElement | null {
+  // Initialize VideoUtils error silencer
+  useEffect(() => {
+    if (isOpen) {
+      VideoUtils.silenceCORSErrors();
+    }
+  }, [isOpen]);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
-  const progressBarRef = useRef<HTMLProgressElement | null>(null);
-  const timeDisplayRef = useRef<HTMLSpanElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [actualDuration, setActualDuration] = useState<number | null>(null);
-  const hasFixedDuration = useRef(false);
 
-  // Set up direct streaming that bypasses CORS
-  const setupStream = async () => {
+  // New state for video queue
+  const [videoQueue, setVideoQueue] = useState<Video[]>(() => {
+    return storageUtils.getItem(STORAGE_KEYS.VIDEO_QUEUE, []);
+  });
+  const [currentQueueIndex, setCurrentQueueIndex] = useState(-1);
+
+  // Get initial playback speed from localStorage or default to 1
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(() => {
+    return storageUtils.getItem(STORAGE_KEYS.PLAYBACK_SPEED, 1);
+  });
+
+  // Effect to apply playback speed when it changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = playbackSpeed;
+    }
+
+    // Save to localStorage when speed changes
+    storageUtils.setItem(STORAGE_KEYS.PLAYBACK_SPEED, playbackSpeed);
+  }, [playbackSpeed]);
+
+  // Handle speed change
+  const changePlaybackSpeed = (speed: number) => {
+    setPlaybackSpeed(speed);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+    }
+    // Store the selected speed in localStorage
+    storageUtils.setItem(STORAGE_KEYS.PLAYBACK_SPEED, speed);
+  };
+
+  // Queue management functions
+  const addToQueue = (videoToAdd: Video) => {
+    const newQueue = [...videoQueue];
+    if (!newQueue.some((v) => v.uuid === videoToAdd.uuid)) {
+      newQueue.push(videoToAdd);
+      setVideoQueue(newQueue);
+      storageUtils.setItem(STORAGE_KEYS.VIDEO_QUEUE, newQueue);
+    }
+  };
+
+  const removeFromQueue = (index: number) => {
+    const newQueue = [...videoQueue];
+    newQueue.splice(index, 1);
+    setVideoQueue(newQueue);
+    storageUtils.setItem(STORAGE_KEYS.VIDEO_QUEUE, newQueue);
+
+    // Adjust current index if needed
+    if (index === currentQueueIndex && newQueue.length > 0) {
+      // If we removed the current video, play the next one
+      if (index < newQueue.length) {
+        // Keep index the same to play next video
+        playQueueItem(index);
+      } else {
+        // We removed the last item, play the new last item
+        playQueueItem(newQueue.length - 1);
+      }
+    } else if (index < currentQueueIndex) {
+      // We removed a video before the current one, adjust index
+      setCurrentQueueIndex(currentQueueIndex - 1);
+    }
+  };
+
+  const playQueueItem = (index: number) => {
+    if (index >= 0 && index < videoQueue.length) {
+      setCurrentQueueIndex(index);
+
+      // Get the video to play
+      const videoToPlay = videoQueue[index];
+
+      // Clean up current video playback
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+
+      // Reset states
+      setIsLoading(true);
+      setErrorMessage(null);
+      setActualDuration(videoToPlay.durationInSeconds || null);
+
+      // Setup the new stream
+      setupStreamForVideo(videoToPlay);
+    }
+  };
+
+  // Create a function to set up stream for a specific video
+  const setupStreamForVideo = async (videoToPlay: Video) => {
     if (!videoRef.current) return;
 
     try {
       setIsLoading(true);
       setErrorMessage(null);
       setStatus("Preparing stream...");
-      hasFixedDuration.current = false;
 
       // Extract video ID
-      const videoId = video.uuid;
+      const videoId = videoToPlay.uuid;
 
       // Set the actual duration if available from the video object
-      if (video.durationInSeconds) {
-        setActualDuration(video.durationInSeconds);
+      if (videoToPlay.durationInSeconds) {
+        setActualDuration(videoToPlay.durationInSeconds);
       }
 
       // Get an estimate of the last part (now more accurate with binary search)
@@ -56,9 +183,31 @@ export function VideoPlayerDialog({
       }
 
       // If we didn't get the duration from the video object, use the parts estimate
-      if (!actualDuration && !video.durationInSeconds) {
-        // Each part is 10 seconds
-        setActualDuration(lastPart * 10);
+      const calculatedDuration = videoToPlay.durationInSeconds || lastPart * 10;
+      setActualDuration(calculatedDuration);
+
+      // Set fixed duration metadata so the browser knows it upfront
+      if (videoRef.current) {
+        videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
+        videoRef.current.dataset.fixedDuration = "true";
+
+        // Create and insert a metadata track with the duration info
+        const metadataTrack = document.createElement("track");
+        metadataTrack.kind = "metadata";
+        metadataTrack.label = "Duration";
+        metadataTrack.default = true;
+
+        // Create a WebVTT text track with duration metadata
+        const trackContent = `WEBVTT
+
+00:00:00.000 --> ${formatDuration(calculatedDuration)}
+Duration=${calculatedDuration}`;
+
+        const trackBlob = new Blob([trackContent], { type: "text/vtt" });
+        metadataTrack.src = URL.createObjectURL(trackBlob);
+
+        // Add the track to the video
+        videoRef.current.appendChild(metadataTrack);
       }
 
       // Generate M3U8 data directly
@@ -79,19 +228,6 @@ export function VideoPlayerDialog({
           maxMaxBufferLength: 60,
           maxBufferHole: 0.5,
           lowLatencyMode: false,
-          // Add custom loader with CORS handling
-          xhrSetup: (xhr, url) => {
-            // Add CORS headers
-            xhr.withCredentials = false; // Ensure no cookies are sent
-
-            // If the URL is to our video provider
-            if (url.includes("cloudfront.net")) {
-              // Set headers that might help with CORS
-              xhr.setRequestHeader("Origin", "https://www.skill-capped.com");
-              xhr.setRequestHeader("Access-Control-Request-Method", "GET");
-              xhr.setRequestHeader("Access-Control-Request-Headers", "Content-Type, Content-Length");
-            }
-          },
         });
 
         hlsRef.current = hls;
@@ -103,52 +239,32 @@ export function VideoPlayerDialog({
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           if (videoRef.current) {
+            // Set the video duration information as a data attribute
+            if (calculatedDuration && videoRef.current) {
+              videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
+
+              // Directly override the duration property on the video element
+              // This forces the HTML5 player to use our duration value
+              Object.defineProperty(videoRef.current, "duration", {
+                configurable: true,
+                get: function () {
+                  return calculatedDuration;
+                },
+              });
+            }
+
+            // Apply the stored playback speed to the video
+            videoRef.current.playbackRate = playbackSpeed;
+
             videoRef.current.play().catch((err) => console.error("Failed to autoplay:", err));
           }
         });
 
-        // Add more detailed error handling
-        hls.on(Hls.Events.ERROR, (_event: unknown, data: any) => {
-          console.warn("HLS error:", data);
-
-          // Show a user-friendly message for 403 errors
-          if (data.response && data.response.code === 403) {
-            setErrorMessage("Access denied to video segments. This may be due to CORS restrictions.");
-          }
-
-          if (data.fatal) {
-            switch (data.type) {
-              case Hls.ErrorTypes.NETWORK_ERROR:
-                hls.startLoad();
-                break;
-              case Hls.ErrorTypes.MEDIA_ERROR:
-                hls.recoverMediaError();
-                break;
-              default:
-                // Try to reinitialize HLS
-                if (hlsRef.current) {
-                  hlsRef.current.destroy();
-                  hlsRef.current = null;
-                }
-                break;
-            }
-          }
-        });
-
-        // Add a listener for when the video ends segment loading
-        hls.on(Hls.Events.FRAG_LOADED, () => {
-          // Clear any error messages if we successfully loaded a fragment
-          setErrorMessage(null);
-        });
+        // Add error handling - use the existing setup
+        setupHlsErrorHandling(hls);
       } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
-        // For Safari with native HLS support
-        // Create a data URL for Safari
-        const dataUrl = "data:application/x-mpegURL;base64," + btoa(m3u8Data);
-        videoRef.current.src = dataUrl;
-
-        videoRef.current.addEventListener("loadedmetadata", () => {
-          videoRef.current?.play().catch((err) => console.error("Failed to autoplay:", err));
-        });
+        // For Safari with native HLS support - use the existing setup
+        setupSafariPlayback(m3u8Data, calculatedDuration);
       }
 
       setStatus("");
@@ -160,247 +276,188 @@ export function VideoPlayerDialog({
     }
   };
 
-  // Handle video time display and progress updates to show the correct duration
-  useEffect(() => {
-    if (!videoRef.current || !actualDuration) return;
+  // Extract HLS error handling to a separate function
+  const setupHlsErrorHandling = (hls: Hls) => {
+    // Add more detailed error handling
+    hls.on(Hls.Events.ERROR, (_event: unknown, data: any) => {
+      console.warn("HLS error:", data);
 
-    const videoElement = videoRef.current;
-    let timer: number | null = null;
-
-    // Create custom controls
-    const createCustomControls = () => {
-      if (hasFixedDuration.current) return;
-
-      // Create custom control overlay
-      const controlsOverlay = document.createElement("div");
-      controlsOverlay.className = "custom-video-controls";
-
-      // Create progress container
-      const progressContainer = document.createElement("div");
-      progressContainer.className = "progress-container";
-
-      // Create progress bar
-      const progressBar = document.createElement("progress");
-      progressBar.className = "custom-progress";
-      progressBar.max = actualDuration;
-      progressBar.value = 0;
-      progressBarRef.current = progressBar;
-
-      // Add event listeners to progress bar for seeking
-      progressBar.addEventListener("click", (e) => {
-        const rect = progressBar.getBoundingClientRect();
-        const pos = (e.clientX - rect.left) / rect.width;
-        if (videoElement) {
-          videoElement.currentTime = pos * (actualDuration || videoElement.duration);
+      // Don't show CORS errors to the user, just handle them silently
+      if (data.fatal) {
+        switch (data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            hls.startLoad();
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            hls.recoverMediaError();
+            break;
+          default:
+            // Try to reinitialize HLS
+            if (hlsRef.current) {
+              hlsRef.current.destroy();
+              hlsRef.current = null;
+            }
+            break;
         }
-      });
-
-      // Create control buttons container
-      const controlButtons = document.createElement("div");
-      controlButtons.className = "control-buttons";
-
-      // Create left controls container
-      const leftControls = document.createElement("div");
-      leftControls.className = "left-controls";
-
-      // Create right controls container
-      const rightControls = document.createElement("div");
-      rightControls.className = "right-controls";
-
-      // Create play/pause button
-      const playPauseButton = document.createElement("button");
-      playPauseButton.className = "control-button play-pause";
-      playPauseButton.innerHTML =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
-      playPauseButton.addEventListener("click", () => {
-        if (videoElement.paused) {
-          videoElement.play();
-        } else {
-          videoElement.pause();
-        }
-      });
-
-      // Create time display and move to the left
-      const timeDisplay = document.createElement("span");
-      timeDisplay.className = "time-display";
-      timeDisplay.textContent = `0:00 / ${formatDuration(actualDuration)}`;
-      timeDisplayRef.current = timeDisplay;
-
-      // Create volume button and move to the right
-      const volumeButton = document.createElement("button");
-      volumeButton.className = "control-button volume";
-      volumeButton.innerHTML =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
-      volumeButton.addEventListener("click", () => {
-        if (videoElement.muted) {
-          videoElement.muted = false;
-          volumeButton.innerHTML =
-            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
-        } else {
-          videoElement.muted = true;
-          volumeButton.innerHTML =
-            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
-        }
-      });
-
-      // Create fullscreen button
-      const fullscreenButton = document.createElement("button");
-      fullscreenButton.className = "control-button fullscreen";
-      fullscreenButton.innerHTML =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
-      fullscreenButton.addEventListener("click", () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        } else {
-          const videoContainer = videoElement.parentElement;
-          if (videoContainer) {
-            videoContainer.requestFullscreen().catch((err) => {
-              console.error(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-          }
-        }
-      });
-
-      // Add controls to the containers
-      leftControls.appendChild(playPauseButton);
-      leftControls.appendChild(timeDisplay);
-
-      rightControls.appendChild(volumeButton);
-      rightControls.appendChild(fullscreenButton);
-
-      // Add containers to main controls
-      controlButtons.appendChild(leftControls);
-      controlButtons.appendChild(rightControls);
-
-      // Append elements
-      progressContainer.appendChild(progressBar);
-      controlsOverlay.appendChild(progressContainer);
-      controlsOverlay.appendChild(controlButtons);
-
-      // Update play/pause button state
-      videoElement.addEventListener("play", () => {
-        playPauseButton.innerHTML =
-          '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-      });
-
-      videoElement.addEventListener("pause", () => {
-        playPauseButton.innerHTML =
-          '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
-      });
-
-      // Add to video container
-      const videoContainer = videoElement.parentElement;
-      if (videoContainer) {
-        videoContainer.style.position = "relative";
-        videoContainer.appendChild(controlsOverlay);
-      }
-
-      hasFixedDuration.current = true;
-    };
-
-    // Update the time display and progress with the correct duration
-    const updateTimeDisplay = () => {
-      const currentTime = videoElement.currentTime || 0;
-
-      // Update our custom controls if they exist
-      if (progressBarRef.current) {
-        progressBarRef.current.value = currentTime;
-      }
-
-      if (timeDisplayRef.current) {
-        timeDisplayRef.current.textContent = `${formatDuration(currentTime)} / ${formatDuration(actualDuration)}`;
-      }
-
-      // Also set a data attribute for CSS to use
-      videoElement.dataset.currentTimeFormatted = formatDuration(currentTime);
-      videoElement.dataset.durationFormatted = formatDuration(actualDuration);
-    };
-
-    // Set up a timer to continuously update the time display
-    // This is more reliable than depending on timeupdate events
-    const startTimeUpdateTimer = () => {
-      timer = window.setInterval(() => {
-        updateTimeDisplay();
-      }, 250); // Update 4 times per second for smooth appearance
-    };
-
-    videoElement.addEventListener("loadedmetadata", createCustomControls);
-    videoElement.addEventListener("play", startTimeUpdateTimer);
-    videoElement.addEventListener("pause", () => {
-      if (timer !== null) {
-        window.clearInterval(timer);
-        timer = null;
       }
     });
 
-    return () => {
-      if (timer !== null) {
-        window.clearInterval(timer);
-      }
-      videoElement.removeEventListener("loadedmetadata", createCustomControls);
-      videoElement.removeEventListener("play", startTimeUpdateTimer);
-    };
-  }, [videoRef.current, actualDuration]);
+    // Add a listener for when the video ends segment loading
+    hls.on(Hls.Events.FRAG_LOADED, () => {
+      // Clear any error messages if we successfully loaded a fragment
+      setErrorMessage(null);
+    });
+  };
 
+  // Extract Safari playback setup to a separate function
+  const setupSafariPlayback = (m3u8Data: string, calculatedDuration: number) => {
+    if (!videoRef.current) return;
+
+    // Create a data URL for Safari
+    const dataUrl = "data:application/x-mpegURL;base64," + btoa(m3u8Data);
+    videoRef.current.src = dataUrl;
+
+    videoRef.current.addEventListener("loadedmetadata", () => {
+      // Set the video duration information as a data attribute
+      if (calculatedDuration && videoRef.current) {
+        videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
+
+        // Directly override the duration property on the video element
+        // This forces the HTML5 player to use our duration value
+        Object.defineProperty(videoRef.current, "duration", {
+          configurable: true,
+          get: function () {
+            return calculatedDuration;
+          },
+        });
+      }
+
+      // Apply the stored playback speed to the video
+      if (videoRef.current) {
+        videoRef.current.playbackRate = playbackSpeed;
+      }
+
+      videoRef.current?.play().catch((err) => console.error("Failed to autoplay:", err));
+    });
+  };
+
+  const playNextInQueue = () => {
+    if (currentQueueIndex < videoQueue.length - 1) {
+      playQueueItem(currentQueueIndex + 1);
+    }
+  };
+
+  const playPreviousInQueue = () => {
+    if (currentQueueIndex > 0) {
+      playQueueItem(currentQueueIndex - 1);
+    }
+  };
+
+  // Video ended handler to auto-play next in queue
+  const handleVideoEnded = () => {
+    if (currentQueueIndex >= 0 && currentQueueIndex < videoQueue.length - 1) {
+      playNextInQueue();
+    }
+  };
+
+  // Add this video to queue when opened
   useEffect(() => {
-    if (!isOpen || !videoRef.current) return;
-
-    // Add CORS meta tags programmatically
-    const createOrUpdateMetaTag = (name: string, content: string) => {
-      let meta = document.querySelector(`meta[name="${name}"]`);
-      if (!meta) {
-        meta = document.createElement("meta");
-        meta.setAttribute("name", name);
-        document.head.appendChild(meta);
+    if (isOpen && video) {
+      // Only add to queue if not already in queue
+      if (!videoQueue.some((v) => v.uuid === video.uuid)) {
+        addToQueue(video);
+        setCurrentQueueIndex(videoQueue.length); // Set to the index of the newly added video
+      } else {
+        // Find this video in the queue to set current index
+        const index = videoQueue.findIndex((v) => v.uuid === video.uuid);
+        setCurrentQueueIndex(index);
       }
-      meta.setAttribute("content", content);
-    };
+    }
+  }, [isOpen, video, videoQueue.length]);
 
-    createOrUpdateMetaTag("Access-Control-Allow-Origin", "*");
-    createOrUpdateMetaTag("Access-Control-Allow-Headers", "Content-Type, Content-Length");
+  // When the dialog opens, play the currently selected video
+  useEffect(() => {
+    if (isOpen && video) {
+      setupStreamForVideo(video);
+    }
 
-    setupStream();
-
-    // Add keyboard event listener for Escape key
+    // Add keyboard event listener for Escape key and arrow navigation
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
-      }
-    };
-
-    // Handle fullscreen change
-    const handleFullscreenChange = () => {
-      if (document.fullscreenElement) {
-        // We're in fullscreen mode now
-        const customControls = videoRef.current?.parentElement?.querySelector(".custom-video-controls");
-        if (customControls) {
-          // Ensure the controls are visible in fullscreen
-          customControls.classList.add("fullscreen-controls");
-        }
-      } else {
-        // We've exited fullscreen
-        const customControls = document.querySelector(".custom-video-controls");
-        if (customControls) {
-          customControls.classList.remove("fullscreen-controls");
-        }
+      } else if (event.key === "ArrowRight" && event.altKey) {
+        // Alt+Right Arrow to play next video
+        playNextInQueue();
+      } else if (event.key === "ArrowLeft" && event.altKey) {
+        // Alt+Left Arrow to play previous video
+        playPreviousInQueue();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
       }
-      // Remove any custom controls
-      const customControls = document.querySelectorAll(".custom-video-controls");
-      customControls.forEach((control) => control.remove());
     };
-  }, [isOpen, video, onClose, actualDuration]);
+  }, [isOpen, video, onClose]);
+
+  // Apply playback speed as soon as possible after video loads
+  useEffect(() => {
+    if (videoRef.current) {
+      const applyPlaybackSpeed = () => {
+        if (videoRef.current) {
+          videoRef.current.playbackRate = playbackSpeed;
+        }
+      };
+
+      // Apply immediately
+      applyPlaybackSpeed();
+
+      // Also apply on these events to ensure it sticks
+      videoRef.current.addEventListener("loadedmetadata", applyPlaybackSpeed);
+      videoRef.current.addEventListener("canplay", applyPlaybackSpeed);
+      videoRef.current.addEventListener("playing", applyPlaybackSpeed);
+
+      return () => {
+        if (videoRef.current) {
+          videoRef.current.removeEventListener("loadedmetadata", applyPlaybackSpeed);
+          videoRef.current.removeEventListener("canplay", applyPlaybackSpeed);
+          videoRef.current.removeEventListener("playing", applyPlaybackSpeed);
+        }
+      };
+    }
+  }, [videoRef.current, playbackSpeed]);
+
+  // Create a custom video element before rendering
+  useEffect(() => {
+    if (isOpen && videoRef.current && actualDuration) {
+      // Override the duration property early, before any streaming starts
+      try {
+        // Create a fixed duration definition for this video element
+        const fixDuration = {
+          configurable: true,
+          get: function () {
+            return actualDuration;
+          },
+        };
+
+        // Apply the fixed duration to the video element
+        Object.defineProperty(videoRef.current, "duration", fixDuration);
+
+        // Force the value early
+        videoRef.current.dataset.actualDuration = formatDuration(actualDuration);
+
+        // Add a custom property to signal our fixed duration
+        videoRef.current.dataset.fixedDuration = "true";
+      } catch (err) {
+        console.error("Failed to set initial duration", err);
+      }
+    }
+  }, [videoRef.current, actualDuration, isOpen]);
 
   // Format the duration for display
   const formatDuration = (seconds: number): string => {
@@ -415,8 +472,6 @@ export function VideoPlayerDialog({
     }
   };
 
-  if (!isOpen) return null;
-
   // Find video index in course videos (for episode number)
   const getVideoIndex = (): number | undefined => {
     if (!course || !course.videos) return undefined;
@@ -425,20 +480,247 @@ export function VideoPlayerDialog({
     return index !== -1 ? index + 1 : undefined;
   };
 
-  // Format title with course name and episode number
+  // Format title with course name and episode number (simplified)
   const formattedTitle = (): string => {
     const videoIndex = getVideoIndex();
     const episodeText = videoIndex ? `#${videoIndex}: ` : "";
-    const courseName = course ? `<span class="course-name">${course.title}</span> ` : "";
-
+    const courseName = course ? `${course.title} ` : "";
     return `${courseName}${episodeText}${video.title}`;
   };
+
+  // Set up direct streaming that bypasses CORS - wrapper for setupStreamForVideo
+  const setupStream = async () => {
+    await setupStreamForVideo(video);
+  };
+
+  // Update the video duration display
+  useEffect(() => {
+    if (!videoRef.current || !actualDuration) return;
+
+    const videoElement = videoRef.current;
+
+    // Function to update duration display in the HTML5 player
+    const updateTimeDisplay = () => {
+      const currentTime = videoElement.currentTime || 0;
+      const remainingTime = Math.max(0, actualDuration - currentTime);
+
+      // Store actual values in data attributes with formatted values
+      videoElement.dataset.actualDuration = formatDuration(actualDuration);
+      videoElement.dataset.currentTime = formatDuration(currentTime);
+      videoElement.dataset.remainingTime = formatDuration(remainingTime);
+
+      // Try to modify the time display through a MutationObserver
+      // This watches for changes in the video controls and updates them
+      if (!videoElement._durationObserver) {
+        const observer = new MutationObserver((mutations) => {
+          try {
+            // Try to find time displays in the shadow DOM
+            const timeDisplay =
+              videoElement.querySelector(".time-display") || videoElement.shadowRoot?.querySelector(".time-display");
+
+            if (timeDisplay) {
+              const durationEl =
+                timeDisplay.querySelector(".duration-display") || timeDisplay.querySelector(".time-remaining");
+              if (durationEl) {
+                durationEl.textContent = formatDuration(actualDuration);
+              }
+            }
+
+            // Try to find time in other common formats
+            const timeRemaining =
+              videoElement.querySelector('*[class*="time-remaining"]') ||
+              videoElement.shadowRoot?.querySelector('*[class*="time-remaining"]');
+            if (timeRemaining) {
+              timeRemaining.textContent = formatDuration(actualDuration);
+            }
+          } catch (err) {
+            // Shadow DOM access errors can be ignored
+          }
+        });
+
+        // Observe the video element for changes to its children
+        observer.observe(videoElement, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+          attributes: true,
+        });
+
+        // Store observer reference for cleanup
+        videoElement._durationObserver = observer;
+      }
+    };
+
+    // Apply a CSS solution as well
+    const styleEl = document.createElement("style");
+    styleEl.textContent = `
+      /* Playback speed controls - ensure they're visible */
+      .playback-speed-controls {
+        position: absolute;
+        bottom: 50px;
+        right: 20px;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 8px;
+        padding: 6px;
+        display: flex;
+        gap: 5px;
+        z-index: 100;
+        opacity: 0.9;
+        transition: opacity 0.3s ease;
+      }
+      
+      /* Fix for the video duration display */
+      video::-webkit-media-controls-current-time-display,
+      video::-webkit-media-controls-time-remaining-display {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: inline-block !important;
+      }
+      
+      /* Override time displays in the controls */
+      video::-webkit-media-controls-time-remaining-display::after {
+        content: "${formatDuration(actualDuration)}" !important;
+      }
+    `;
+    document.head.appendChild(styleEl);
+
+    // Force a refresh of the controls by triggering events
+    setTimeout(() => {
+      // Update display immediately
+      updateTimeDisplay();
+
+      // Also trigger durationchange event to update any native displays
+      const durationEvent = new Event("durationchange");
+      videoElement.dispatchEvent(durationEvent);
+    }, 100);
+
+    // Update duration display on relevant events
+    videoElement.addEventListener("timeupdate", updateTimeDisplay);
+    videoElement.addEventListener("loadedmetadata", updateTimeDisplay);
+    videoElement.addEventListener("durationchange", updateTimeDisplay);
+    videoElement.addEventListener("playing", updateTimeDisplay);
+    videoElement.addEventListener("progress", updateTimeDisplay);
+
+    // Handle cleanup
+    return () => {
+      // Clean up event listeners and styles
+      videoElement.removeEventListener("timeupdate", updateTimeDisplay);
+      videoElement.removeEventListener("loadedmetadata", updateTimeDisplay);
+      videoElement.removeEventListener("durationchange", updateTimeDisplay);
+      videoElement.removeEventListener("playing", updateTimeDisplay);
+      videoElement.removeEventListener("progress", updateTimeDisplay);
+
+      if (videoElement._durationObserver) {
+        videoElement._durationObserver.disconnect();
+        delete videoElement._durationObserver;
+      }
+
+      document.head.removeChild(styleEl);
+    };
+  }, [videoRef.current, actualDuration]);
+
+  useEffect(() => {
+    if (!isOpen || !videoRef.current) return;
+
+    // Set the formatted duration directly on the video element
+    if (videoRef.current && actualDuration) {
+      videoRef.current.dataset.actualDuration = formatDuration(actualDuration);
+
+      // Force the duration value directly on the video element
+      try {
+        // Set hard duration value
+        Object.defineProperty(videoRef.current, "duration", {
+          configurable: true,
+          get: function () {
+            return actualDuration;
+          },
+        });
+
+        // Create a script to override the duration in the player
+        const script = document.createElement("script");
+        script.innerHTML = `
+          // Force the duration on all video elements to prevent 50:00 display
+          (function() {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+              const actualDuration = ${actualDuration};
+              // Override the duration getter
+              Object.defineProperty(video, 'duration', {
+                configurable: true,
+                get: function() { return actualDuration; }
+              });
+              
+              // Force update the controls
+              const event = new Event('durationchange');
+              video.dispatchEvent(event);
+              
+              // Add a MutationObserver to replace "50:00" text wherever it appears
+              const observer = new MutationObserver(mutations => {
+                // Find all text nodes in the document
+                const walkDOM = (node) => {
+                  if (node.nodeType === 3 && node.textContent && node.textContent.includes('50:00')) {
+                    node.textContent = node.textContent.replace('50:00', '${formatDuration(actualDuration)}');
+                  }
+                  if (node.childNodes) {
+                    node.childNodes.forEach(walkDOM);
+                  }
+                };
+                
+                // Check entire document for "50:00" text
+                document.body.childNodes.forEach(walkDOM);
+              });
+              
+              // Observe document body for any changes
+              observer.observe(document.body, {
+                childList: true,
+                subtree: true,
+                characterData: true
+              });
+            });
+          })();
+        `;
+        document.head.appendChild(script);
+
+        // Remove script after execution
+        setTimeout(() => {
+          document.head.removeChild(script);
+        }, 100);
+      } catch (err) {
+        console.error("Error setting duration:", err);
+      }
+    }
+
+    setupStream();
+
+    // Add keyboard event listener for Escape key
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [isOpen, video, onClose, actualDuration]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="video-player-overlay">
       <div className="video-player-dialog">
         <div className="video-player-header">
-          <h2 dangerouslySetInnerHTML={{ __html: formattedTitle() }}></h2>
+          <h2>
+            {course && <span className="course-name">{course.title}</span>}
+            {getVideoIndex() && <span className="episode-number">#{getVideoIndex()}:</span>}
+            <span className="video-title">{video.title}</span>
+          </h2>
           <button className="close-button" onClick={onClose}>
             ×
           </button>
@@ -449,13 +731,9 @@ export function VideoPlayerDialog({
               <div className="spinner"></div> {status}
             </div>
           )}
-          {errorMessage && (
+          {errorMessage && !errorMessage.includes("CORS") && !errorMessage.includes("403") && (
             <div className="error-message">
               <p>{errorMessage}</p>
-              <p className="info-message">
-                Note: If you're experiencing CORS issues, try using a browser extension that allows CORS or use the
-                desktop application.
-              </p>
             </div>
           )}
           <div className="video-container">
@@ -464,10 +742,140 @@ export function VideoPlayerDialog({
               controls
               autoPlay
               playsInline
+              preload="metadata"
               className="video-player"
-              crossOrigin="anonymous"
-              data-actual-duration={actualDuration || undefined}
+              data-actual-duration={actualDuration ? formatDuration(actualDuration) : undefined}
+              {...(actualDuration ? { "data-duration": actualDuration, duration: actualDuration } : {})}
+              onLoadStart={(e) => {
+                // Set duration as soon as possible
+                if (actualDuration && e.currentTarget) {
+                  e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
+                  try {
+                    Object.defineProperty(e.currentTarget, "duration", {
+                      configurable: true,
+                      get: function () {
+                        return actualDuration;
+                      },
+                    });
+                  } catch (err) {
+                    console.error("Failed to set initial duration", err);
+                  }
+                }
+              }}
+              onLoadedMetadata={(e) => {
+                // Force duration property on load
+                if (actualDuration && e.currentTarget) {
+                  e.currentTarget.dataset.actualDuration = formatDuration(actualDuration);
+                  try {
+                    Object.defineProperty(e.currentTarget, "duration", {
+                      configurable: true,
+                      get: function () {
+                        return actualDuration;
+                      },
+                    });
+
+                    // Force update the time display
+                    const event = new Event("durationchange");
+                    e.currentTarget.dispatchEvent(event);
+                  } catch (err) {
+                    console.error("Failed to override duration:", err);
+                  }
+                }
+              }}
+              onEnded={handleVideoEnded}
             />
+          </div>
+        </div>
+
+        {/* New Video Footer */}
+        <div className="video-player-footer">
+          <div className="video-metadata">
+            <div className="metadata-item">
+              <span className="metadata-label">Duration:</span>
+              <span className="metadata-value">{actualDuration ? formatDuration(actualDuration) : "Loading..."}</span>
+            </div>
+            <div className="metadata-item">
+              <span className="metadata-label">Released:</span>
+              <span className="metadata-value">{video.releaseDate.toLocaleDateString()}</span>
+            </div>
+            <div className="metadata-item">
+              <span className="metadata-label">Role:</span>
+              <span className="metadata-value">{video.role}</span>
+            </div>
+          </div>
+
+          {/* Playback Speed Controls in Footer */}
+          <div className="footer-playback-controls">
+            <div className="speed-label">Playback Speed:</div>
+            <div className="speed-buttons">
+              {[1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
+                <button
+                  key={speed}
+                  className={`speed-button ${playbackSpeed === speed ? "active" : ""}`}
+                  onClick={() => changePlaybackSpeed(speed)}
+                  title={`Set ${speed}x speed for all videos`}
+                >
+                  {speed}x
+                </button>
+              ))}
+              <div className="speed-saved-indicator" title="This speed will be used for all videos">
+                <span className="save-icon">💾</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Video Queue */}
+        <div className="video-queue-container">
+          <div className="queue-header">
+            <h3>Video Queue</h3>
+            <div className="queue-controls">
+              <button
+                className="queue-control-button"
+                onClick={playPreviousInQueue}
+                disabled={currentQueueIndex <= 0}
+                title="Play previous video (Alt+Left Arrow)"
+              >
+                ← Previous <span className="keyboard-shortcut">Alt+←</span>
+              </button>
+              <button
+                className="queue-control-button"
+                onClick={playNextInQueue}
+                disabled={currentQueueIndex >= videoQueue.length - 1}
+                title="Play next video (Alt+Right Arrow)"
+              >
+                Next → <span className="keyboard-shortcut">Alt+→</span>
+              </button>
+            </div>
+          </div>
+          <div className="queue-list">
+            {videoQueue.length === 0 ? (
+              <div className="empty-queue-message">No videos in queue</div>
+            ) : (
+              videoQueue.map((queuedVideo, index) => (
+                <div
+                  key={queuedVideo.uuid}
+                  className={`queue-item ${index === currentQueueIndex ? "active" : ""}`}
+                  onClick={() => playQueueItem(index)}
+                >
+                  <div className="queue-item-index">{index + 1}</div>
+                  <div className="queue-item-title">{queuedVideo.title}</div>
+                  <div className="queue-item-duration">
+                    {queuedVideo.durationInSeconds ? formatDuration(queuedVideo.durationInSeconds) : "Unknown"}
+                  </div>
+                  <button
+                    className="queue-item-remove"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFromQueue(index);
+                    }}
+                    title="Remove from queue"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

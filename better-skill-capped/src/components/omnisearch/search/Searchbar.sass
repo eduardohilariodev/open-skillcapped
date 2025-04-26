@@ -1,10 +1,21 @@
 @import "../../../bulma"
 
+.searchbar
+  width: 100%
+  z-index: 20
+  position: sticky
+  top: 0
+
+  .hero-body
+    padding: 1.5rem
+
 @media (prefers-color-scheme: light)
   .searchbar
     background-color: $primary
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
 
 
 @media (prefers-color-scheme: dark)
   .searchbar
     background-color: #000
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2)

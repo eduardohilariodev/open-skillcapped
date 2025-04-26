@@ -36,12 +36,27 @@
   font-size: 18px;
   color: white;
   flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
 }
 
 .course-name {
   color: #aaa;
   opacity: 0.7;
   font-weight: normal;
+  margin-right: 5px;
+}
+
+.episode-number {
+  color: #e53e3e;
+  margin-right: 5px;
+  font-weight: 500;
+}
+
+.video-title {
+  font-weight: bold;
 }
 
 .video-duration {
@@ -155,6 +170,78 @@
   content: attr(data-actual-duration);
 }
 
+/* Fix for the 50:00 static duration issue - more aggressive approach */
+.video-player::-webkit-media-controls-time-remaining-display {
+  position: relative;
+  visibility: hidden !important;
+}
+
+.video-player::-webkit-media-controls-time-remaining-display::before {
+  content: attr(data-actual-duration);
+  visibility: visible !important;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-player::-webkit-media-controls-time-remaining-display > span:first-child {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+/* Ensure our duration shows instead */
+.video-player[data-actual-duration]::-webkit-media-controls-time-remaining-display::after {
+  content: attr(data-actual-duration);
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  visibility: visible !important;
+}
+
+/* Completely hide any element showing "50:00" - remove invalid CSS */
+/* *:contains("50:00") {
+  visibility: hidden !important;
+} */
+
+/* More specific override for time display elements */
+video::-webkit-media-controls-panel *,
+video::-webkit-media-controls-time-remaining-display *,
+video::-webkit-media-controls-current-time-display * {
+  display: none !important;
+}
+
+/* Force our own time display to show */
+.video-player[data-actual-duration]::-webkit-media-controls-current-time-display::before {
+  content: "0:00 / ";
+  display: inline !important;
+  color: white !important;
+}
+
+.video-player[data-actual-duration]::-webkit-media-controls-time-remaining-display::before {
+  content: attr(data-actual-duration);
+  display: inline !important;
+  color: white !important;
+}
+
+/* Specific override for Chrome's shadow DOM elements */
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display {
+  color: transparent !important;
+}
+
+video::-webkit-media-controls-current-time-display::after,
+video::-webkit-media-controls-time-remaining-display::after {
+  color: white !important;
+}
+
 .loading-indicator {
   position: absolute;
   top: 50%;
@@ -254,7 +341,77 @@
   display: none !important;
 }
 
-/* Fullscreen styles */
+/* Video fullscreen styles */
+:fullscreen,
+:-webkit-full-screen,
+:-moz-full-screen,
+:-ms-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background-color: #000 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  right: 0 !important;
+}
+
+:fullscreen .video-container,
+:-webkit-full-screen .video-container,
+:-moz-full-screen .video-container,
+:-ms-fullscreen .video-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  right: 0 !important;
+}
+
+:fullscreen video,
+:-webkit-full-screen video,
+:-moz-full-screen video,
+:-ms-fullscreen video {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(0) !important;
+}
+
+/* Remove any native controls in fullscreen mode */
+:fullscreen video::-webkit-media-controls,
+:-webkit-full-screen video::-webkit-media-controls,
+:-moz-full-screen video::-webkit-media-controls,
+:-ms-fullscreen video::-webkit-media-controls,
+:fullscreen video::-webkit-media-controls-enclosure,
+:-webkit-full-screen video::-webkit-media-controls-enclosure,
+:-moz-full-screen video::-webkit-media-controls-enclosure,
+:-ms-fullscreen video::-webkit-media-controls-enclosure {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Control visibility in fullscreen mode */
 .fullscreen-controls {
   position: fixed !important;
   bottom: 0 !important;
@@ -264,46 +421,399 @@
   width: 100% !important;
   background-color: rgba(0, 0, 0, 0.6) !important;
   padding: 15px 20px !important;
-}
-
-/* Make controls appear on hover in fullscreen */
-:fullscreen .custom-video-controls {
-  opacity: 0;
+  opacity: 0; /* Start hidden */
   transition: opacity 0.3s ease;
+  pointer-events: auto !important;
+  visibility: hidden;
 }
 
-:fullscreen:hover .custom-video-controls,
-:fullscreen .custom-video-controls:hover {
+.fullscreen-controls.active {
   opacity: 1;
+  visibility: visible;
 }
 
-/* Ensure controls visibility in all browser versions */
-:-webkit-full-screen .custom-video-controls {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-:-webkit-full-screen:hover .custom-video-controls,
-:-webkit-full-screen .custom-video-controls:hover {
-  opacity: 1;
-}
-
-:-moz-full-screen .custom-video-controls {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-:-moz-full-screen:hover .custom-video-controls,
-:-moz-full-screen .custom-video-controls:hover {
-  opacity: 1;
-}
-
+/* Initial state for controls in fullscreen - invisible */
+:fullscreen .custom-video-controls,
+:-webkit-full-screen .custom-video-controls,
+:-moz-full-screen .custom-video-controls,
 :-ms-fullscreen .custom-video-controls {
   opacity: 0;
   transition: opacity 0.3s ease;
+  visibility: hidden;
 }
 
+/* Make controls only visible on hover or when active */
+:fullscreen:hover .custom-video-controls,
+:fullscreen .custom-video-controls.active,
+:-webkit-full-screen:hover .custom-video-controls,
+:-webkit-full-screen .custom-video-controls.active,
+:-moz-full-screen:hover .custom-video-controls,
+:-moz-full-screen .custom-video-controls.active,
 :-ms-fullscreen:hover .custom-video-controls,
-:-ms-fullscreen .custom-video-controls:hover {
+:-ms-fullscreen .custom-video-controls.active {
   opacity: 1;
+  visibility: visible;
+}
+
+/* Playback speed controls */
+.playback-speed-controls {
+  position: absolute;
+  bottom: 60px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+  align-items: center;
+}
+
+.speed-label {
+  color: white;
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.playback-speed-controls:hover {
+  opacity: 1;
+}
+
+.speed-button {
+  background-color: rgba(50, 50, 50, 0.6);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 36px;
+  font-family: Arial, sans-serif;
+}
+
+.speed-button:hover {
+  background-color: rgba(80, 80, 80, 0.8);
+}
+
+.speed-button.active {
+  background-color: #e53e3e;
+  font-weight: bold;
+}
+
+/* Fix for the video duration display - ensure timer is visible */
+video::-webkit-media-controls-time-display,
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: white !important;
+}
+
+/* Force proper duration values */
+.video-player[data-actual-duration]::-webkit-media-controls-time-remaining-display::after {
+  content: attr(data-actual-duration) !important;
+  display: inline !important;
+  visibility: visible !important;
+  color: white !important;
+}
+
+/* Hide any remaining 50:00 duration displays */
+.video-container *[class*="time-remaining"]:not(.modified)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 5;
+}
+
+/* Adjust position in fullscreen */
+:fullscreen .playback-speed-controls,
+:-webkit-full-screen .playback-speed-controls,
+:-moz-full-screen .playback-speed-controls,
+:-ms-fullscreen .playback-speed-controls {
+  bottom: 80px;
+  right: 30px;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 8px 10px;
+}
+
+.speed-saved-indicator {
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e0e0e0;
+  font-size: 12px;
+}
+
+.save-icon {
+  font-size: 14px;
+  margin-left: 3px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.save-icon:hover {
+  opacity: 1;
+}
+
+/* Video Footer and Metadata */
+.video-player-footer {
+  background-color: #212121;
+  border-top: 1px solid #333;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.video-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.metadata-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metadata-label {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.metadata-value {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Playback controls in footer */
+.footer-playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speed-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Video Queue */
+.video-queue-container {
+  background-color: #1a1a1a;
+  border-top: 1px solid #333;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.queue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.queue-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+.queue-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.queue-control-button {
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.queue-control-button:hover {
+  background-color: #555;
+}
+
+.queue-control-button:disabled {
+  background-color: #333;
+  color: #777;
+  cursor: not-allowed;
+}
+
+.queue-list {
+  padding: 8px;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.queue-item:hover {
+  background-color: #2a2a2a;
+}
+
+.queue-item.active {
+  background-color: #3a3a3a;
+  border-left: 3px solid #e53e3e;
+}
+
+.queue-item-title {
+  flex: 1;
+  color: white;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 12px;
+}
+
+.queue-item-duration {
+  color: #aaa;
+  font-size: 12px;
+  padding: 0 8px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.queue-item-remove {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.queue-item-remove:hover {
+  color: white;
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.empty-queue-message {
+  text-align: center;
+  color: #888;
+  padding: 16px;
+  font-style: italic;
+}
+
+/* Hide the default playback speed controls since they're now in the footer */
+.playback-speed-controls {
+  display: none;
+}
+
+/* Layout adjustments for the player dialog with queue */
+.video-player-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.video-player-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Make the video container fill available space */
+.video-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-player {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .video-player-footer {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .video-metadata {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .queue-item {
+    flex-wrap: wrap;
+  }
+
+  .queue-item-title {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+}
+
+.queue-item-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  margin-right: 10px;
+  color: #888;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.queue-item.active .queue-item-index {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.keyboard-shortcut {
+  opacity: 0.7;
+  font-size: 11px;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-left: 5px;
 }

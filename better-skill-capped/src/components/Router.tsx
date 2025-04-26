@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import React from "react";
-import { Footer } from "./Footer";
 import "./Wrapper.css";
 import { Color, Hero, Size } from "./Hero";
 import { Bookmark, Bookmarkable } from "../model/Bookmark";
@@ -79,7 +78,6 @@ export function Router(props: RouterProps): React.ReactElement {
             </Sentry.ErrorBoundary>
           </BrowserRouter>
         </div>
-        <Footer />
       </div>
     </React.Fragment>
   );

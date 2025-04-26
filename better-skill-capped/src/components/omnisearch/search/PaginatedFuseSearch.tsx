@@ -75,18 +75,20 @@ export default class PaginatedFuseSearch<T> extends React.PureComponent<
     return (
       <>
         {resultList}
-        <PaginationControls
-          currentPage={currentPage}
-          lastPage={numberOfPages}
-          onPageChange={(newPage: number) => {
-            this.setState((state) => {
-              return {
-                ...state,
-                currentPage: newPage,
-              };
-            });
-          }}
-        />
+        <div className="pagination-wrapper">
+          <PaginationControls
+            currentPage={currentPage}
+            lastPage={numberOfPages}
+            onPageChange={(newPage: number) => {
+              this.setState((state) => {
+                return {
+                  ...state,
+                  currentPage: newPage,
+                };
+              });
+            }}
+          />
+        </div>
       </>
     );
   }

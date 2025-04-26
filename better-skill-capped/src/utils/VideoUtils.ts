@@ -90,6 +90,9 @@ export class VideoUtils {
     // Include a special header to make HLS.js retry on 403 errors
     data += "\n#EXT-X-INDEPENDENT-SEGMENTS";
 
+    // Add a custom header to indicate we want to suppress 403 errors
+    data += "\n#EXT-X-CUSTOM-SUPPRESS-ERRORS:403";
+
     // Generate the M3U8 with all potential parts
     // The HLS player will automatically handle 403 errors for non-existent parts
     for (let i = 1; i <= lastPart; i++) {
@@ -97,6 +100,27 @@ export class VideoUtils {
     }
 
     return data + "\n#EXT-X-ENDLIST";
+  }
+
+  // Add a helper method to silence CORS/403 errors
+  static silenceCORSErrors() {
+    // Create a custom console.error that filters out 403/CORS errors
+    const originalConsoleError = console.error;
+    console.error = function (...args) {
+      const errorText = args.join(" ");
+      // Skip 403 Forbidden, CORS, and network errors
+      if (
+        errorText.includes("403") ||
+        errorText.includes("Forbidden") ||
+        errorText.includes("CORS") ||
+        errorText.includes("NetworkError") ||
+        errorText.includes("Failed to fetch")
+      ) {
+        // Silently ignore these errors
+        return;
+      }
+      originalConsoleError.apply(console, args);
+    };
   }
 
   // For advanced applications only, not used in web browser context
