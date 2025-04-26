@@ -248,8 +248,22 @@ export function VideoPlayerDialog({
 
   // Handle video ended to autoplay next
   const handleVideoEnded = () => {
-    if (autoplayEnabled && currentQueueIndex >= 0 && currentQueueIndex < displayQueue.length - 1) {
-      playNextInQueue();
+    if (autoplayEnabled) {
+      // Check if we're in a course or in the queue
+      if (course && course.videos) {
+        const currentIndex = course.videos.findIndex((cv) => cv.video.uuid === currentVideo.uuid);
+        if (currentIndex !== -1 && currentIndex < course.videos.length - 1) {
+          // Play the next video in the course
+          playQueueItem(currentIndex + 1);
+        }
+      } else if (displayQueue.length > 0) {
+        // Handle general queue
+        const queueIndex =
+          currentQueueIndex >= 0 ? currentQueueIndex : displayQueue.findIndex((v) => v.uuid === currentVideo.uuid);
+        if (queueIndex !== -1 && queueIndex < displayQueue.length - 1) {
+          playQueueItem(queueIndex + 1);
+        }
+      }
     }
   };
 
@@ -264,8 +278,10 @@ export function VideoPlayerDialog({
 
       const videoId = videoToPlay.uuid;
 
-      if (videoToPlay.durationInSeconds) {
-        setActualDuration(videoToPlay.durationInSeconds);
+      // Get exact duration from video metadata
+      const exactDuration = videoToPlay.durationInSeconds;
+      if (exactDuration) {
+        setActualDuration(exactDuration);
       }
 
       const lastPart = await VideoUtils.findLastPart(videoId, setStatus);
@@ -276,12 +292,39 @@ export function VideoPlayerDialog({
         return;
       }
 
-      const calculatedDuration = videoToPlay.durationInSeconds || lastPart * 10;
+      // If exactDuration is available, use it; otherwise estimate based on parts
+      const calculatedDuration = exactDuration || lastPart * 10;
       setActualDuration(calculatedDuration);
 
+      // Force the video element to report the correct duration
       if (videoRef.current) {
+        // Store the actual duration for reference
         videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
         videoRef.current.dataset.fixedDuration = "true";
+
+        // Define a non-configurable duration property to prevent browser overrides
+        try {
+          // First delete existing property if defined
+          if (Object.getOwnPropertyDescriptor(videoRef.current, "duration")?.configurable !== false) {
+            // Only attempt to delete if it's configurable
+            Object.defineProperty(videoRef.current, "duration", {
+              configurable: true,
+              get: function () {
+                return calculatedDuration;
+              },
+            });
+          }
+
+          // Then redefine with our exact value
+          Object.defineProperty(videoRef.current, "duration", {
+            configurable: false, // Make it non-configurable to prevent overrides
+            get: function () {
+              return calculatedDuration;
+            },
+          });
+        } catch (e) {
+          console.error("Failed to override video duration:", e);
+        }
       }
 
       // Generate M3U8 data
@@ -311,15 +354,20 @@ export function VideoPlayerDialog({
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           if (videoRef.current) {
-            // Set video duration
+            // Set video duration immediately on manifest load
             if (calculatedDuration) {
               videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
+
+              // Override duration property - critical for seekbar positioning
               Object.defineProperty(videoRef.current, "duration", {
                 configurable: true,
                 get: function () {
                   return calculatedDuration;
                 },
               });
+
+              // Manually trigger durationchange event to update UI
+              videoRef.current.dispatchEvent(new Event("durationchange"));
             }
 
             // Apply playback speed
@@ -328,6 +376,23 @@ export function VideoPlayerDialog({
             // Remove autoplay attempts
             setStatus("Video ready. Click play to start.");
           }
+        });
+
+        // Also fix duration when first fragments load
+        hls.on(Hls.Events.FRAG_LOADED, () => {
+          if (videoRef.current && calculatedDuration) {
+            // Re-enforce duration property and trigger UI update
+            Object.defineProperty(videoRef.current, "duration", {
+              configurable: true,
+              get: function () {
+                return calculatedDuration;
+              },
+            });
+            videoRef.current.dispatchEvent(new Event("durationchange"));
+          }
+
+          // Clear errors when video loads successfully
+          setErrorMessage(null);
         });
 
         // Error handling
@@ -349,11 +414,6 @@ export function VideoPlayerDialog({
             }
           }
         });
-
-        // Clear errors when video loads successfully
-        hls.on(Hls.Events.FRAG_LOADED, () => {
-          setErrorMessage(null);
-        });
       } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
         // For Safari with native HLS support
         const dataUrl = "data:application/x-mpegURL;base64," + btoa(m3u8Data);
@@ -362,17 +422,37 @@ export function VideoPlayerDialog({
         videoRef.current.addEventListener("loadedmetadata", () => {
           if (calculatedDuration && videoRef.current) {
             videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
+
+            // Override duration property for consistent behavior
             Object.defineProperty(videoRef.current, "duration", {
               configurable: true,
               get: function () {
                 return calculatedDuration;
               },
             });
+
+            // Manually trigger durationchange event
+            videoRef.current.dispatchEvent(new Event("durationchange"));
           }
 
           if (videoRef.current) {
             videoRef.current.playbackRate = playbackSpeed;
             setStatus("Video ready. Click play to start.");
+          }
+        });
+
+        // Also ensure duration is correctly set when enough data is loaded
+        videoRef.current.addEventListener("canplay", () => {
+          if (calculatedDuration && videoRef.current) {
+            // Reapply duration override
+            Object.defineProperty(videoRef.current, "duration", {
+              configurable: true,
+              get: function () {
+                return calculatedDuration;
+              },
+            });
+
+            videoRef.current.dispatchEvent(new Event("durationchange"));
           }
         });
       }
@@ -463,75 +543,113 @@ export function VideoPlayerDialog({
 
     const videoElement = videoRef.current;
 
+    // Force correct duration on the video element
+    const enforceDuration = () => {
+      if (videoElement && actualDuration) {
+        try {
+          // Make the property configurable first if it's not already
+          if (Object.getOwnPropertyDescriptor(videoElement, "duration")?.configurable === false) {
+            Object.defineProperty(videoElement, "duration", {
+              configurable: true,
+              get: function () {
+                return actualDuration;
+              },
+            });
+          }
+
+          // Then redefine it as non-configurable
+          Object.defineProperty(videoElement, "duration", {
+            configurable: false, // Prevent any further changes
+            get: function () {
+              return actualDuration;
+            },
+          });
+
+          // Also enforce maximum time value to prevent seeking beyond actual duration
+          if (videoElement.currentTime > actualDuration) {
+            videoElement.currentTime = actualDuration;
+          }
+
+          // Force UI update
+          const event = new Event("durationchange");
+          videoElement.dispatchEvent(event);
+        } catch (e) {
+          console.error("Error enforcing duration:", e);
+        }
+      }
+    };
+
     const updateTimeDisplay = () => {
       const currentTime = videoElement.currentTime || 0;
       setFormattedCurrentTime(formatDuration(currentTime));
+
+      // Make sure current time never exceeds duration
+      if (currentTime > actualDuration) {
+        videoElement.currentTime = actualDuration;
+      }
 
       videoElement.dataset.actualDuration = formatDuration(actualDuration);
       videoElement.dataset.currentTime = formatDuration(currentTime);
     };
 
-    // Override duration property to fix seek bar
-    Object.defineProperty(videoElement, "duration", {
-      configurable: true,
-      get: function () {
-        return actualDuration;
-      },
-    });
+    // Override seekbar behavior by intercepting timeupdate events
+    const handleTimeUpdate = (e: Event) => {
+      // Keep current time within bounds of actual duration
+      if (videoElement.currentTime > actualDuration) {
+        videoElement.currentTime = actualDuration;
+      }
+      updateTimeDisplay();
+    };
 
-    // Fix seek bar by ensuring metadata properly loads
-    const fixSeekBar = () => {
-      // Ensure the seek bar shows the correct duration
-      if (videoElement.seekable && videoElement.seekable.length > 0) {
-        // Don't dispatch events that will trigger the event listeners
-        // that call fixSeekBar again, which creates an infinite loop
-
-        // Instead, just update UI elements directly if needed
-        updateTimeDisplay();
+    // Also intercept seeking events to prevent seeking beyond the actual duration
+    const preventExcessiveSeeking = (e: Event) => {
+      if (e.target && (e.target as HTMLVideoElement).currentTime > actualDuration) {
+        (e.target as HTMLVideoElement).currentTime = actualDuration;
       }
     };
 
-    // Trigger duration change event
+    // Enforce duration multiple times to ensure it sticks
+    enforceDuration();
+
+    // Run enforcement more frequently at the beginning
+    const initialFixInterval = setInterval(enforceDuration, 100);
     setTimeout(() => {
-      updateTimeDisplay();
-      fixSeekBar();
-    }, 100);
+      clearInterval(initialFixInterval);
+      const durationInterval = setInterval(enforceDuration, 1000); // Keep checking regularly
+      return () => clearInterval(durationInterval);
+    }, 3000);
 
-    // Set up periodic check to ensure seekbar is correctly sized
-    const seekBarInterval = setInterval(fixSeekBar, 500);
+    // Add event listeners
+    videoElement.addEventListener("timeupdate", handleTimeUpdate);
+    videoElement.addEventListener("seeking", preventExcessiveSeeking);
+    videoElement.addEventListener("seeked", preventExcessiveSeeking);
+    videoElement.addEventListener("loadedmetadata", updateTimeDisplay);
+    videoElement.addEventListener("durationchange", updateTimeDisplay);
+    videoElement.addEventListener("playing", updateTimeDisplay);
 
-    // Update time display on relevant events
-    videoRef.current?.addEventListener("timeupdate", updateTimeDisplay);
-    videoRef.current?.addEventListener("loadedmetadata", () => {
-      updateTimeDisplay();
+    // Add event listener for playback rate
+    const handlePlaybackRateChange = () => {
       if (videoRef.current) {
         videoRef.current.playbackRate = playbackSpeed;
       }
-    });
-    videoRef.current?.addEventListener("durationchange", updateTimeDisplay);
-    videoRef.current?.addEventListener("playing", updateTimeDisplay);
-    videoRef.current?.addEventListener("canplay", () => {
-      if (videoRef.current) {
-        videoRef.current.playbackRate = playbackSpeed;
-      }
-    });
-
-    // Handle seek operations
-    const handleSeeked = () => {
-      updateTimeDisplay();
-      // Ensure time display is updated after seeking
-      setTimeout(updateTimeDisplay, 50);
     };
-    videoRef.current?.addEventListener("seeked", handleSeeked);
+
+    videoElement.addEventListener("canplay", handlePlaybackRateChange);
 
     return () => {
-      clearInterval(seekBarInterval);
-      videoRef.current?.removeEventListener("timeupdate", updateTimeDisplay);
-      videoRef.current?.removeEventListener("loadedmetadata", updateTimeDisplay);
-      videoRef.current?.removeEventListener("durationchange", updateTimeDisplay);
-      videoRef.current?.removeEventListener("playing", updateTimeDisplay);
-      videoRef.current?.removeEventListener("seeked", handleSeeked);
+      // Clear all intervals
+      clearInterval(initialFixInterval);
 
+      // Remove all event listeners
+      videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+      videoElement.removeEventListener("seeking", preventExcessiveSeeking);
+      videoElement.removeEventListener("seeked", preventExcessiveSeeking);
+      videoElement.removeEventListener("loadedmetadata", updateTimeDisplay);
+      videoElement.removeEventListener("durationchange", updateTimeDisplay);
+      videoElement.removeEventListener("playing", updateTimeDisplay);
+      videoElement.removeEventListener("canplay", handlePlaybackRateChange);
+
+      // Remove any mutation observers
       if (videoRef.current?._durationObserver) {
         videoRef.current._durationObserver.disconnect();
         delete videoRef.current._durationObserver;
