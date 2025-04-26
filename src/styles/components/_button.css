@@ -207,3 +207,14 @@
   color: var(--hextech-color-gold-light);
   box-shadow: inset 0 0 var(--hextech-spacing-2) rgba(0, 0, 0, 0.3);
 }
+
+/* Watch button compact mode */
+.watch-button.compact {
+  padding: 0.25rem 0.5rem;
+  min-width: auto;
+  height: auto;
+}
+
+.watch-button.compact .watch-icon {
+  margin-right: 0;
+}

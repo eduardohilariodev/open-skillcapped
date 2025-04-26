@@ -11,10 +11,11 @@ export interface WatchButtonProps {
   video: Video;
   course?: Course;
   disabled?: boolean;
+  compact?: boolean;
 }
 
 export function WatchButton(props: WatchButtonProps): React.ReactElement {
-  const { video, course, disabled = false } = props;
+  const { video, course, disabled = false, compact = true } = props;
   const { showVideoPlayer } = useVideoPlayer();
 
   // Apply League of Legends styling
@@ -31,14 +32,14 @@ export function WatchButton(props: WatchButtonProps): React.ReactElement {
         onToggle={handleWatchClick}
         type={buttonType}
         disabled={disabled}
-        classes="watch-button"
+        classes={`watch-button ${compact ? "compact" : ""}`}
         buttonText={() => {
           return (
             <React.Fragment>
               <span className="watch-icon">
                 <FontAwesomeIcon icon={faPlay} />
               </span>
-              <span>Watch</span>
+              {!compact && <span>Watch</span>}
             </React.Fragment>
           );
         }}

@@ -60,7 +60,7 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
               <Highlighter searchWords={props.result.matchedStrings} textToHighlight={course.title} autoEscape={true} />
             </h3>
             <p className="mb-3">{course.description}</p>
-            <div className="tags mb-4">
+            <div className="tags mb-3">
               <span className="">{roleToString(props.result.item.role)}</span>
               <span className="mx-2">•</span>
               <span className="" title={props.result.item.releaseDate.toLocaleString()}>

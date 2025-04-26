@@ -48,11 +48,11 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
             searchWords={matchedStrings}
             autoEscape={true}
             textToHighlight={video.title}
-            className={classNames(isWatched ? "text-text-muted" : "text-gold-light", "text-base font-medium")}
+            className={classNames(isWatched ? "text-text-muted" : "text-gold-light", "text-sm font-medium")}
           />
         </div>
         <div className="episode-actions-base">
-          <WatchButton video={video} course={course} />
+          <WatchButton video={video} course={course} compact={true} />
         </div>
       </div>
     </li>

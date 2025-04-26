@@ -5,7 +5,7 @@ module.exports = plugin(({ addComponents }) => {
   addComponents({
     // Episode item styling
     ".episode-item-base": {
-      "@apply mb-6 flex items-center": {},
+      "@apply mb-3 flex items-center": {},
       "&:last-child": {
         "@apply mb-0": {},
       },
@@ -13,7 +13,7 @@ module.exports = plugin(({ addComponents }) => {
 
     // Episode card styling
     ".episode-card-base": {
-      "@apply bg-background-medium/30 border border-gold-dark rounded p-4 flex justify-between items-center cursor-pointer transition-all":
+      "@apply bg-background-medium/30 border border-gold-dark rounded py-2 px-3 flex justify-between items-center cursor-pointer transition-all":
         {},
       "@apply hover:shadow-hextech-hover hover:bg-background-medium/50 hover:border-gold-medium": {},
     },
@@ -25,7 +25,7 @@ module.exports = plugin(({ addComponents }) => {
 
     // Episode number styling
     ".episode-number-base": {
-      "@apply relative left-0 min-w-8 h-8 flex items-center justify-center bg-transparent text-blue-medium font-bold font-beaufort border-0 mr-0 flex-shrink-0":
+      "@apply relative left-0 min-w-6 h-6 flex items-center justify-center bg-transparent text-blue-medium font-bold font-beaufort border-0 mr-0 flex-shrink-0":
         {},
     },
 
@@ -36,7 +36,7 @@ module.exports = plugin(({ addComponents }) => {
 
     // Episode title styling
     ".episode-title-base": {
-      "@apply text-gold-light text-base font-medium": {},
+      "@apply text-gold-light text-sm font-medium": {},
       "&.watched": {
         "@apply text-text-muted": {},
       },
@@ -44,8 +44,8 @@ module.exports = plugin(({ addComponents }) => {
 
     // Episode actions area
     ".episode-actions-base": {
-      "@apply flex gap-6 ml-6 pl-6": {},
-      "@apply sm:gap-3 sm:ml-3 sm:pl-3": {},
+      "@apply flex gap-3 ml-3 pl-3": {},
+      "@apply sm:gap-2 sm:ml-2 sm:pl-2": {},
     },
 
     // Highlight styling for search matches
