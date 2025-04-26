@@ -1,16 +1,16 @@
 import { Video } from "../../model/Video";
 import { Course } from "../../model/Course";
 import Highlighter from "react-highlight-words";
-import React, { useState } from "react";
+import React from "react";
 import { getCourseVideoUrl } from "../../utils/UrlUtilities";
 import { Bookmarkable } from "../../model/Bookmark";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
-import { VideoPlayerDialog } from "../VideoPlayerDialog";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
+import { useVideoPlayer } from "../../contexts/VideoPlayerContext";
 
 export interface SearchResultVideoProps {
   matchedStrings: string[];
@@ -25,8 +25,7 @@ export interface SearchResultVideoProps {
 
 export function CourseSearchResultVideo(props: SearchResultVideoProps): React.ReactElement {
   const { course, video, matchedStrings, isWatched, isBookmarked } = props;
-  const { title } = video;
-  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const { openVideo } = useVideoPlayer();
 
   const link = getCourseVideoUrl(video, course);
 
@@ -37,7 +36,7 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsPlayerOpen(true);
+    openVideo(video, course);
   };
 
   return (
@@ -81,7 +80,6 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
           </div>
         </div>
       </div>
-      <VideoPlayerDialog video={video} course={course} isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
     </li>
   );
 }

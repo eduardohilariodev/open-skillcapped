@@ -12,6 +12,7 @@ import { Color, Hero, Size } from "./Hero";
 import { ManifestLoader } from "../ManifestLoader";
 import { Parser } from "../parser/Parser";
 import { applyHextechEffects } from "../styles/hextech-index";
+import { VideoPlayerProvider } from "./VideoPlayerPortal";
 
 // Import Hextech styling
 import "../styles/hextech-global.css";
@@ -185,28 +186,30 @@ export default class App extends React.Component<unknown, AppState> {
 
   render(): React.ReactNode {
     return (
-      <div className="hextech-app">
-        <div className="hextech-energy-lines"></div>
-        <Sentry.ErrorBoundary
-          fallback={<Hero title="Something went wrong" color={Color.STATUS_ERROR} size={Size.FULL} />}
-          showDialog={true}
-        >
-          <Router
-            content={this.state.content}
-            bookmarks={this.state.bookmarks}
-            onToggleBookmark={(item: Bookmarkable) => this.onToggleBookmark(item)}
-            watchStatuses={this.state.watchStatuses}
-            onToggleWatchStatus={(item: Watchable) => this.onToggleWatchStatus(item)}
-            isBookmarked={this.isBookmarked.bind(this)}
-            isWatched={this.isWatched.bind(this)}
-            isDownloadEnabled={this.state.isDownloadEnabled}
-            isTipsModalVisible={this.state.isTipsModalVisible}
-            onToggleTipsModal={this.onToggleTipsModal.bind(this)}
-            isDirectStreamModalVisible={this.state.isDirectStreamModalVisible}
-            onToggleDirectStreamModal={this.onToggleDirectStreamModal.bind(this)}
-          />
-        </Sentry.ErrorBoundary>
-      </div>
+      <VideoPlayerProvider>
+        <div className="hextech-app">
+          <div className="hextech-energy-lines"></div>
+          <Sentry.ErrorBoundary
+            fallback={<Hero title="Something went wrong" color={Color.STATUS_ERROR} size={Size.FULL} />}
+            showDialog={true}
+          >
+            <Router
+              content={this.state.content}
+              bookmarks={this.state.bookmarks}
+              onToggleBookmark={(item: Bookmarkable) => this.onToggleBookmark(item)}
+              watchStatuses={this.state.watchStatuses}
+              onToggleWatchStatus={(item: Watchable) => this.onToggleWatchStatus(item)}
+              isBookmarked={this.isBookmarked.bind(this)}
+              isWatched={this.isWatched.bind(this)}
+              isDownloadEnabled={this.state.isDownloadEnabled}
+              isTipsModalVisible={this.state.isTipsModalVisible}
+              onToggleTipsModal={this.onToggleTipsModal.bind(this)}
+              isDirectStreamModalVisible={this.state.isDirectStreamModalVisible}
+              onToggleDirectStreamModal={this.onToggleDirectStreamModal.bind(this)}
+            />
+          </Sentry.ErrorBoundary>
+        </div>
+      </VideoPlayerProvider>
     );
   }
 }
