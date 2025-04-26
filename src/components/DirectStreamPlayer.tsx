@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import ReactDOM from "react-dom";
 import Hls from "hls.js";
 import { VideoUtils } from "../utils/VideoUtils";
 import "./VideoPlayerDialog.css"; // Reusing existing styles
@@ -141,11 +142,14 @@ export function DirectStreamPlayer({ isOpen, onClose }: DirectStreamPlayerProps)
     }
   };
 
+  // Find the portal target node
+  const modalRoot = document.getElementById("modal-root");
+
   if (!isOpen) return null;
 
-  return (
-    <div className="video-player-overlay">
-      <div className="video-player-dialog" style={{ maxWidth: "800px" }}>
+  const content = (
+    <div className="video-player-overlay" onClick={onClose}>
+      <div className="video-player-dialog" style={{ maxWidth: "800px" }} onClick={(e) => e.stopPropagation()}>
         <div className="video-player-header">
           <h2>Direct Stream</h2>
           <button className="close-button" onClick={onClose}>
@@ -213,4 +217,6 @@ export function DirectStreamPlayer({ isOpen, onClose }: DirectStreamPlayerProps)
       </div>
     </div>
   );
+
+  return modalRoot ? ReactDOM.createPortal(content, modalRoot) : content;
 }

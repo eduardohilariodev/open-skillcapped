@@ -1,5 +1,5 @@
 import { roleToString } from "../../model/Role";
-import React, { useState } from "react";
+import React from "react";
 import { Video } from "../../model/Video";
 import { ToggleWatchStatusButton } from "../ToggleWatchStatusButton";
 import { ToggleBookmarkButton } from "../BookmarkToggleButton";
@@ -9,7 +9,7 @@ import { getStreamUrl } from "../../utils/UrlUtilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudDownloadAlt } from "@fortawesome/free-solid-svg-icons";
 import Highlighter from "react-highlight-words";
-import { VideoPlayerDialog } from "../VideoPlayerDialog";
+import { useVideoPlayer } from "../../contexts/VideoPlayerContext";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
 
@@ -25,7 +25,7 @@ export interface VideoSearchResultProps {
 
 export function VideoSearchResult(props: VideoSearchResultProps): React.ReactElement {
   const { video, matchedStrings, isDownloadEnabled } = props;
-  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const { openVideo } = useVideoPlayer();
   const buttonProps = {
     ...props,
     item: video,
@@ -33,7 +33,7 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsPlayerOpen(true);
+    openVideo(video);
   };
 
   return (
@@ -77,14 +77,13 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
                 src={video.imageUrl}
                 alt="Video thumbnail"
                 className="thumbnail"
-                onClick={() => setIsPlayerOpen(true)}
+                onClick={handleVideoClick}
                 style={{ cursor: "pointer" }}
               />
             </figure>
           </div>
         </div>
       </div>
-      <VideoPlayerDialog video={video} isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
     </div>
   );
 }

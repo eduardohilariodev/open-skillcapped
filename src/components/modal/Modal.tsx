@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import * as React from "react";
+import ReactDOM from "react-dom";
 import { colors, typography } from "../../styles";
 import { HextechCorner } from "../../styles/components/hextech-shapes";
 import "./Modal.css";
@@ -12,7 +13,13 @@ export interface ModalProps {
   variant?: "gold" | "blue";
 }
 
-export function Modal({ children, onClose, isVisible, title, variant = "gold" }: ModalProps): React.ReactElement {
+export function Modal({
+  children,
+  onClose,
+  isVisible,
+  title,
+  variant = "gold",
+}: ModalProps): React.ReactElement | null {
   const modalClasses: string = classNames({
     modal: true,
     "is-clipped": true,
@@ -101,7 +108,12 @@ export function Modal({ children, onClose, isVisible, title, variant = "gold" }:
     backgroundColor: "rgba(1, 10, 19, 0.85)",
   };
 
-  return (
+  // Find the portal target node
+  const modalRoot = document.getElementById("modal-root");
+
+  if (!isVisible) return null;
+
+  const modalContent = (
     <div className={modalClasses}>
       <div className="modal-background" style={backgroundStyle} onClick={onClose}></div>
       <div className="modal-card hextech-frame" style={modalCardStyle}>
@@ -128,4 +140,6 @@ export function Modal({ children, onClose, isVisible, title, variant = "gold" }:
       </div>
     </div>
   );
+
+  return modalRoot ? ReactDOM.createPortal(modalContent, modalRoot) : modalContent;
 }

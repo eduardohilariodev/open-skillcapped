@@ -1,5 +1,5 @@
 import { roleToString } from "../../model/Role";
-import React, { useState } from "react";
+import React from "react";
 import { getStreamUrl } from "../../utils/UrlUtilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudDownloadAlt } from "@fortawesome/free-solid-svg-icons";
@@ -8,7 +8,7 @@ import { ToggleBookmarkButton } from "../BookmarkToggleButton";
 import { ToggleWatchStatusButton } from "../ToggleWatchStatusButton";
 import { Bookmarkable } from "../../model/Bookmark";
 import { Watchable } from "../../model/WatchStatus";
-import { VideoPlayerDialog } from "../VideoPlayerDialog";
+import { useVideoPlayer } from "../../contexts/VideoPlayerContext";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
 
@@ -24,7 +24,7 @@ export interface CommentarySearchResultProps {
 
 export function CommentarySearchResult(props: CommentarySearchResultProps): React.ReactElement {
   const { commentary, isDownloadEnabled } = props;
-  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const { openVideo } = useVideoPlayer();
   const {
     role,
     uuid,
@@ -48,7 +48,7 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsPlayerOpen(true);
+    openVideo(commentary);
   };
 
   return (
@@ -84,7 +84,7 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
                 src={commentary.imageUrl}
                 alt="Video thumbnail"
                 className="thumbnail"
-                onClick={() => setIsPlayerOpen(true)}
+                onClick={handleVideoClick}
                 style={{ cursor: "pointer" }}
               />
             </figure>
@@ -105,7 +105,6 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
           </div>
         </div>
       </div>
-      <VideoPlayerDialog video={commentary} isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
     </div>
   );
 }
