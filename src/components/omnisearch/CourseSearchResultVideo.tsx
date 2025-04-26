@@ -9,6 +9,7 @@ import { faBookmark, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons
 import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
 import { VideoPlayerDialog } from "../VideoPlayerDialog";
+import "./SearchResult.css";
 
 export interface SearchResultVideoProps {
   matchedStrings: string[];

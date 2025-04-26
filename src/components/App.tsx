@@ -11,6 +11,12 @@ import * as Sentry from "@sentry/react";
 import { Color, Hero, Size } from "./Hero";
 import { ManifestLoader } from "../ManifestLoader";
 import { Parser } from "../parser/Parser";
+import { applyHextechEffects } from "../styles/hextech-index";
+
+// Import Hextech styling
+import "../styles/hextech-global.css";
+import "../styles/hextech-magic.css";
+import "../styles/hextech-animations.css";
 
 export interface AppState {
   content?: Content;
@@ -61,6 +67,30 @@ export default class App extends React.Component<unknown, AppState> {
       bookmarks: bookmarkDatastore.get(),
       watchStatuses: watchStatusesDatastore.get(),
     });
+
+    // Apply Hextech effects to key UI elements once content is loaded
+    this.applyHextechStyling();
+  }
+
+  // Apply Hextech styling effects to various UI elements
+  applyHextechStyling(): void {
+    // Give a small delay to ensure DOM elements are rendered
+    setTimeout(() => {
+      // Apply energy lines to section containers
+      applyHextechEffects(".section", { particles: false, energyLines: true, shimmer: false });
+
+      // Apply shimmer effect to cards
+      applyHextechEffects(".card", { particles: false, energyLines: false, shimmer: true });
+
+      // Apply particles to hero sections
+      applyHextechEffects(".hero", { particles: true, energyLines: false, shimmer: false });
+
+      // Add shimmer to gold buttons
+      applyHextechEffects(".hextech-button.hextech-secondary", { particles: false, energyLines: false, shimmer: true });
+
+      // Add energy lines to main content areas
+      applyHextechEffects(".hextech-main-content", { particles: false, energyLines: true, shimmer: false });
+    }, 500);
   }
 
   onToggleWatchStatus(item: Bookmarkable): void {
@@ -155,7 +185,8 @@ export default class App extends React.Component<unknown, AppState> {
 
   render(): React.ReactNode {
     return (
-      <React.Fragment>
+      <div className="hextech-app">
+        <div className="hextech-energy-lines"></div>
         <Sentry.ErrorBoundary
           fallback={<Hero title="Something went wrong" color={Color.RED} size={Size.FULL} />}
           showDialog={true}
@@ -175,7 +206,7 @@ export default class App extends React.Component<unknown, AppState> {
             onToggleDirectStreamModal={this.onToggleDirectStreamModal.bind(this)}
           />
         </Sentry.ErrorBoundary>
-      </React.Fragment>
+      </div>
     );
   }
 }

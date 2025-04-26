@@ -1,4 +1,6 @@
 import React from "react";
+import { colors, typography } from "../../../styles";
+import HextechFilterPanel from "./HextechFilterPanel";
 
 export interface BookmarkStatusSelectorProps {
   onlyShowBookmarked: boolean;
@@ -11,33 +13,48 @@ export default function BookmarkStatusSelector({
   onlyShowUnbookmarked,
   onSelectionChange,
 }: BookmarkStatusSelectorProps): React.ReactElement {
+  // Hextech styling
+  const checkboxStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "0.5rem",
+    color: colors.white,
+    fontFamily: typography.fontFamily.body,
+    cursor: "pointer",
+  };
+
+  const fieldStyle: React.CSSProperties = {
+    marginBottom: "0.75rem",
+  };
+
+  const labelText = (text: string) => {
+    return <span style={{ marginLeft: "0.5rem" }}>{text}</span>;
+  };
+
   return (
-    <nav className="panel">
-      <p className="panel-heading">Bookmark Status</p>
-      <div className="panel-block">
-        <div className="control">
-          <div className="field">
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={onlyShowBookmarked}
-                onChange={() => onSelectionChange(!onlyShowBookmarked, onlyShowUnbookmarked)}
-              />{" "}
-              Only show bookmarked
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={onlyShowUnbookmarked}
-                onChange={() => onSelectionChange(onlyShowBookmarked, !onlyShowUnbookmarked)}
-              />{" "}
-              Only show unbookmarked
-            </label>
-          </div>
+    <HextechFilterPanel title="Bookmark Status" variant="blue">
+      <div className="hextech-filter-controls">
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input
+              type="checkbox"
+              checked={onlyShowBookmarked}
+              onChange={() => onSelectionChange(!onlyShowBookmarked, onlyShowUnbookmarked)}
+            />
+            {labelText("Only show bookmarked")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input
+              type="checkbox"
+              checked={onlyShowUnbookmarked}
+              onChange={() => onSelectionChange(onlyShowBookmarked, !onlyShowUnbookmarked)}
+            />
+            {labelText("Only show unbookmarked")}
+          </label>
         </div>
       </div>
-    </nav>
+    </HextechFilterPanel>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import Hls from "hls.js";
 import { Video } from "../model/Video";
 import { Course } from "../model/Course";
@@ -75,6 +75,19 @@ export function VideoPlayerDialog({
     return storageUtils.getItem(STORAGE_KEYS.VIDEO_QUEUE, []);
   });
   const [currentQueueIndex, setCurrentQueueIndex] = useState(-1);
+
+  // Filter queue to only show videos from the current course if a course is available
+  const filteredQueue = useMemo(() => {
+    if (course && course.videos) {
+      // If we have a course, only show videos from this course
+      const courseVideoIds = course.videos.map((cv) => cv.video.uuid);
+      return videoQueue.filter((v) => courseVideoIds.includes(v.uuid));
+    }
+    return videoQueue;
+  }, [course, videoQueue]);
+
+  // Use filtered queue for display
+  const displayQueue = course ? filteredQueue : videoQueue;
 
   // Get initial playback speed from localStorage or default to 1
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(() => {
@@ -342,7 +355,7 @@ Duration=${calculatedDuration}`;
   };
 
   const playNextInQueue = () => {
-    if (currentQueueIndex < videoQueue.length - 1) {
+    if (currentQueueIndex >= 0 && currentQueueIndex < displayQueue.length - 1) {
       playQueueItem(currentQueueIndex + 1);
     }
   };
@@ -355,7 +368,7 @@ Duration=${calculatedDuration}`;
 
   // Video ended handler to auto-play next in queue
   const handleVideoEnded = () => {
-    if (currentQueueIndex >= 0 && currentQueueIndex < videoQueue.length - 1) {
+    if (currentQueueIndex >= 0 && currentQueueIndex < displayQueue.length - 1) {
       playNextInQueue();
     }
   };
@@ -841,7 +854,7 @@ Duration=${calculatedDuration}`;
               <button
                 className="queue-control-button"
                 onClick={playNextInQueue}
-                disabled={currentQueueIndex >= videoQueue.length - 1}
+                disabled={currentQueueIndex >= displayQueue.length - 1}
                 title="Play next video (Alt+Right Arrow)"
               >
                 Next → <span className="keyboard-shortcut">Alt+→</span>
@@ -849,10 +862,10 @@ Duration=${calculatedDuration}`;
             </div>
           </div>
           <div className="queue-list">
-            {videoQueue.length === 0 ? (
+            {displayQueue.length === 0 ? (
               <div className="empty-queue-message">No videos in queue</div>
             ) : (
-              videoQueue.map((queuedVideo, index) => (
+              displayQueue.map((queuedVideo, index) => (
                 <div
                   key={queuedVideo.uuid}
                   className={`queue-item ${index === currentQueueIndex ? "active" : ""}`}

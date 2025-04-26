@@ -1,5 +1,5 @@
 /**
- * League of Legends Fixed Layout Styles
+ * League of Legends Hextech Fixed Layout Styles
  */
 
 /* Fixed Layout Styles */
@@ -10,14 +10,31 @@
   overflow: hidden;
   background-color: #010a13; /* LoL background dark */
   color: #f0e6d2; /* LoL gold light */
+  position: relative;
 }
 
 /* Fixed searchbar */
 .fixed-layout-search {
   flex-shrink: 0;
   background-color: #0a1428; /* LoL background medium */
-  padding: 1rem;
-  border-bottom: 1px solid #785a28; /* LoL gold dark */
+  border-bottom: 2px solid #785a28; /* LoL gold dark */
+  position: relative;
+  z-index: 10;
+}
+
+/* Hextech searchbar styles */
+.hextech-searchbar {
+  position: relative;
+  overflow: hidden;
+}
+
+.hextech-search-input {
+  transition: all 0.3s ease;
+}
+
+.hextech-search-input:focus {
+  box-shadow: 0 0 10px rgba(12, 200, 185, 0.3);
+  border-color: #0ac8b9; /* Hextech blue */
 }
 
 /* Main content area with fixed sidebar */
@@ -25,6 +42,7 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
 /* Fixed sidebar */
@@ -35,34 +53,54 @@
   overflow-y: auto;
   flex: 0 0 20%; /* Fixed width */
   padding: 1rem;
-  border-right: 1px solid #785a28; /* LoL gold dark */
+  border-right: 2px solid #785a28; /* LoL gold dark */
   background-color: #0a1428; /* LoL background medium */
+  position: relative;
+  z-index: 5;
 }
 
-/* Filter panels in sidebar */
-.fixed-layout-sidebar .panel {
-  margin-bottom: 1rem;
-  border: 1px solid #785a28; /* LoL gold dark */
-  background-color: #0a323c; /* LoL background light */
-  border-radius: 4px;
+/* Hextech filter panels */
+.hextech-filter-panel {
+  margin-bottom: 1.5rem;
+  position: relative;
+  transition: transform 0.2s ease;
 }
 
-.fixed-layout-sidebar .panel-heading {
-  background-color: #0a323c; /* LoL background light */
-  color: #c8aa6e; /* LoL gold medium */
-  font-family: "Beaufort for LOL", serif;
-  font-weight: 700;
-  border-bottom: 1px solid #785a28; /* LoL gold dark */
-  padding: 0.75rem;
+.hextech-filter-panel:hover {
+  transform: translateY(-2px);
 }
 
-.fixed-layout-sidebar .panel-block {
-  border-bottom: 1px solid #3d424d; /* LoL grey */
-  color: #a09b8c; /* LoL light grey */
+.hextech-filter-controls {
+  padding: 0.5rem 0;
 }
 
-.fixed-layout-sidebar .panel-block:last-child {
-  border-bottom: none;
+/* Hextech checkbox styling */
+.hextech-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background-color: #0a1428;
+  border: 1px solid #785a28;
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+}
+
+.hextech-checkbox input[type="checkbox"]:checked {
+  background-color: #0ac8b9;
+  border-color: #0ac8b9;
+}
+
+.hextech-checkbox input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: #010a13;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
 }
 
 /* Scrollable results area */
@@ -72,6 +110,23 @@
   height: calc(100vh - 80px); /* Adjust based on searchbar height */
   padding: 1rem;
   background-color: #010a13; /* LoL background dark */
+  position: relative;
+}
+
+/* Add subtle energy lines to results area */
+.fixed-layout-results::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(12, 200, 185, 0) 0%,
+    rgba(12, 200, 185, 0.3) 50%,
+    rgba(12, 200, 185, 0) 100%
+  );
 }
 
 /* Pagination controls at bottom of results */
@@ -82,7 +137,7 @@
   padding: 1rem 0;
   margin-top: 1rem;
   z-index: 10;
-  border-top: 1px solid #785a28; /* LoL gold dark */
+  border-top: 2px solid #785a28; /* LoL gold dark */
 }
 
 .fixed-layout-results .pagination {
@@ -95,12 +150,46 @@
   background-color: #0a323c; /* LoL background light */
   border-color: #785a28; /* LoL gold dark */
   color: #c8aa6e; /* LoL gold medium */
+  transition: all 0.2s ease;
+}
+
+.fixed-layout-results .pagination-link:hover,
+.fixed-layout-results .pagination-previous:hover,
+.fixed-layout-results .pagination-next:hover {
+  background-color: #0a323c; /* LoL background light */
+  border-color: #c8aa6e; /* LoL gold medium */
+  color: #f0e6d2; /* LoL gold light */
+  box-shadow: 0 0 5px rgba(200, 170, 110, 0.3);
+  transform: translateY(-1px);
 }
 
 .fixed-layout-results .pagination-link.is-current {
-  background-color: #c8aa6e; /* LoL gold medium */
-  border-color: #785a28; /* LoL gold dark */
+  background-color: #0ac8b9; /* Hextech blue */
+  border-color: #cdfafa; /* Hextech blue light */
   color: #010a13; /* LoL background dark */
+  box-shadow: 0 0 8px rgba(12, 200, 185, 0.5);
+}
+
+/* Scrollbar styling */
+.fixed-layout-sidebar::-webkit-scrollbar,
+.fixed-layout-results::-webkit-scrollbar {
+  width: 8px;
+}
+
+.fixed-layout-sidebar::-webkit-scrollbar-track,
+.fixed-layout-results::-webkit-scrollbar-track {
+  background: #0a1428;
+}
+
+.fixed-layout-sidebar::-webkit-scrollbar-thumb,
+.fixed-layout-results::-webkit-scrollbar-thumb {
+  background-color: #785a28;
+  border-radius: 4px;
+}
+
+.fixed-layout-sidebar::-webkit-scrollbar-thumb:hover,
+.fixed-layout-results::-webkit-scrollbar-thumb:hover {
+  background-color: #c8aa6e;
 }
 
 /* Responsive adjustments */
@@ -114,7 +203,7 @@
     height: auto;
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid #785a28; /* LoL gold dark */
+    border-bottom: 2px solid #785a28; /* LoL gold dark */
   }
 
   .fixed-layout-results {

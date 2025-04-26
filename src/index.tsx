@@ -6,6 +6,10 @@ import "./bulma.sass";
 import "./index.css";
 // Import Bulma overrides
 import "./styles/bulma-overrides.css";
+// Import Hextech styling
+import "./styles/hextech-global.css";
+import "./styles/hextech-magic.css";
+import "./styles/hextech-animations.css";
 // Import the style guide
 import "./styles";
 import * as Sentry from "@sentry/react";
@@ -37,6 +41,9 @@ Sentry.init({
   // release: process.env.REACT_APP_TRAVIS_COMMIT,
   // environment: process.env.NODE_ENV,
 });
+
+// Add a class to body to enable Hextech styling
+document.body.classList.add("hextech-theme");
 
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);

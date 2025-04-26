@@ -1,6 +1,6 @@
 /**
- * League of Legends Theme Helper
- * This file provides utilities to convert existing UI elements to League of Legends styling
+ * League of Legends Hextech Theme Helper
+ * This file provides utilities to convert existing UI elements to League of Legends Hextech styling
  */
 
 import colors from "./colors";
@@ -42,7 +42,7 @@ export const bulmaToLeagueColors = {
   },
 };
 
-// Apply League of Legends styling to common UI patterns
+// Apply League of Legends Hextech styling to common UI patterns
 export const leagueify = {
   // Convert hero/banner components
   hero: (color: string, isLarge = false) => ({
@@ -58,18 +58,22 @@ export const leagueify = {
     padding: isLarge ? "3rem 1.5rem" : "1.5rem",
   }),
 
-  // Convert buttons to League of Legends style
-  button: (type: "primary" | "secondary" | "danger" | "default" = "default") => {
+  // Convert buttons to League of Legends Hextech style
+  button: (type: "primary" | "secondary" | "utility" | "danger" | "default" = "default") => {
+    // Primary/Gameplay Layer - blue magical buttons
     if (type === "primary") {
       return {
-        backgroundColor: colors.gold.medium,
-        color: colors.black,
-        borderColor: colors.gold.dark,
+        backgroundColor: colors.blue.medium,
+        color: colors.background.dark,
+        borderColor: colors.blue.light,
+        boxShadow: `0 0 6px ${colors.blue.light}`,
         fontFamily: typography.fontFamily.display,
         fontWeight: typography.fontWeight.bold,
         textTransform: "uppercase",
       };
-    } else if (type === "secondary") {
+    }
+    // Secondary Layer - gold buttons for navigation
+    else if (type === "secondary") {
       return {
         backgroundColor: "transparent",
         color: colors.gold.medium,
@@ -78,7 +82,19 @@ export const leagueify = {
         fontWeight: typography.fontWeight.medium,
         textTransform: "uppercase",
       };
-    } else if (type === "danger") {
+    }
+    // Utility Layer - interface elements
+    else if (type === "utility") {
+      return {
+        backgroundColor: colors.background.medium,
+        color: colors.gold.light,
+        borderColor: colors.gold.dark,
+        fontFamily: typography.fontFamily.body,
+        fontWeight: typography.fontWeight.regular,
+      };
+    }
+    // Danger buttons
+    else if (type === "danger") {
       return {
         backgroundColor: colors.status.error,
         color: colors.white,
@@ -87,26 +103,28 @@ export const leagueify = {
         fontWeight: typography.fontWeight.bold,
         textTransform: "uppercase",
       };
-    } else {
+    }
+    // Default/fallback
+    else {
       return {
-        backgroundColor: colors.darkGrey,
-        color: colors.white,
-        borderColor: colors.grey,
-        fontFamily: typography.fontFamily.display,
+        backgroundColor: colors.background.medium,
+        color: colors.gold.light,
+        borderColor: colors.gold.dark,
+        fontFamily: typography.fontFamily.body,
         fontWeight: typography.fontWeight.medium,
-        textTransform: "uppercase",
       };
     }
   },
 
-  // Convert cards/panels to League of Legends style
+  // Convert cards/panels to League of Legends Hextech style
   card: {
     backgroundColor: colors.background.medium,
     borderColor: colors.gold.dark,
     color: colors.white,
     borderWidth: "1px",
     borderStyle: "solid",
-    borderRadius: "4px",
+    borderRadius: "2px",
+    position: "relative",
   },
 
   // Header styling

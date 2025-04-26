@@ -8,6 +8,7 @@ import { isCourse } from "../../model/Course";
 import { isVideo, Video } from "../../model/Video";
 import { Commentary, isCommentary } from "../../model/Commentary";
 import { CommentarySearchResult } from "./CommentarySearchResult";
+import "./SearchResult.css";
 
 export interface OmniSearchResultProps {
   item: OmniSearchable;

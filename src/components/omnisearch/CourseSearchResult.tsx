@@ -1,7 +1,7 @@
 import { Course } from "../../model/Course";
 import React from "react";
 import Highlighter from "react-highlight-words";
-import "./CourseSearchResult.css";
+import "./SearchResult.css";
 import { Watchable } from "../../model/WatchStatus";
 import { FuseSearchResult } from "./search/FuseSearch";
 import { CourseSearchResultVideo } from "./CourseSearchResultVideo";

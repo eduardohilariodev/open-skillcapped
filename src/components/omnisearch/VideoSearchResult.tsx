@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudDownloadAlt } from "@fortawesome/free-solid-svg-icons";
 import Highlighter from "react-highlight-words";
 import { VideoPlayerDialog } from "../VideoPlayerDialog";
+import "./SearchResult.css";
 
 export interface VideoSearchResultProps {
   video: Video;

@@ -1,5 +1,7 @@
 import React from "react";
+import { colors, typography } from "../../../styles";
 import { Role } from "../../../model/Role";
+import HextechFilterPanel from "./HextechFilterPanel";
 
 export interface RoleSelectorProps {
   selectedRoles: Role[];
@@ -27,46 +29,64 @@ export default function RoleSelector({ selectedRoles, onRolesUpdate }: RoleSelec
     onRolesUpdate(newRoles);
   };
 
+  // Hextech styling
+  const checkboxStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "0.5rem",
+    color: colors.white,
+    fontFamily: typography.fontFamily.body,
+    cursor: "pointer",
+  };
+
+  const fieldStyle: React.CSSProperties = {
+    marginBottom: "0.75rem",
+  };
+
+  const labelText = (role: string) => {
+    return <span style={{ marginLeft: "0.5rem" }}>{role}</span>;
+  };
+
   return (
-    <nav className="panel">
-      <p className="panel-heading">Roles</p>
-      <div className="panel-block">
-        <div className="control">
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" checked={isChecked(Role.TOP)} onChange={() => getNewRoles(Role.TOP)} /> Top
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" checked={isChecked(Role.JUNGLE)} onChange={() => getNewRoles(Role.JUNGLE)} />{" "}
-              Jungle
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" checked={isChecked(Role.MID)} onChange={() => getNewRoles(Role.MID)} /> Mid
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" checked={isChecked(Role.ADC)} onChange={() => getNewRoles(Role.ADC)} /> ADC
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" checked={isChecked(Role.SUPPORT)} onChange={() => getNewRoles(Role.SUPPORT)} />{" "}
-              Support
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" checked={isChecked(Role.ALL)} onChange={() => getNewRoles(Role.ALL)} /> Not Role
-              Specific
-            </label>
-          </div>
+    <HextechFilterPanel title="Roles" variant="gold">
+      <div className="hextech-filter-controls">
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" checked={isChecked(Role.TOP)} onChange={() => getNewRoles(Role.TOP)} />
+            {labelText("Top")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" checked={isChecked(Role.JUNGLE)} onChange={() => getNewRoles(Role.JUNGLE)} />
+            {labelText("Jungle")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" checked={isChecked(Role.MID)} onChange={() => getNewRoles(Role.MID)} />
+            {labelText("Mid")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" checked={isChecked(Role.ADC)} onChange={() => getNewRoles(Role.ADC)} />
+            {labelText("ADC")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" checked={isChecked(Role.SUPPORT)} onChange={() => getNewRoles(Role.SUPPORT)} />
+            {labelText("Support")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" checked={isChecked(Role.ALL)} onChange={() => getNewRoles(Role.ALL)} />
+            {labelText("Not Role Specific")}
+          </label>
         </div>
       </div>
-    </nav>
+    </HextechFilterPanel>
   );
 }

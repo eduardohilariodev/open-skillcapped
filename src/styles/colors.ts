@@ -1,5 +1,5 @@
 /**
- * League of Legends Color Palette
+ * League of Legends Hextech Color Palette
  * Based on: https://brand.riotgames.com/en-us/league-of-legends/color
  */
 
@@ -32,18 +32,24 @@ export const colors = {
   lightGrey: "#A09B8C",
   white: "#F0E6D2",
 
-  // Additional UI colors
+  // Background colors
   background: {
     dark: "#010A13",
     medium: "#0A1428",
     light: "#0A323C",
   },
 
+  // Magic accent colors
+  magic: {
+    blue: "#0AC8B9",
+    gold: "#C89B3C",
+  },
+
   // Status colors
   status: {
-    error: "#BE3144",
-    warning: "#D6B23E",
-    success: "#1CA64C",
+    error: "#BE1E37", // Hextech red
+    warning: "#F0A93A", // Hextech amber
+    success: "#1EA27D", // Hextech green
     info: "#0AC8B9",
   },
 };

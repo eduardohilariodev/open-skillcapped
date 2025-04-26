@@ -9,6 +9,7 @@ import { ToggleWatchStatusButton } from "../ToggleWatchStatusButton";
 import { Bookmarkable } from "../../model/Bookmark";
 import { Watchable } from "../../model/WatchStatus";
 import { VideoPlayerDialog } from "../VideoPlayerDialog";
+import "./SearchResult.css";
 
 export interface CommentarySearchResultProps {
   commentary: Commentary;

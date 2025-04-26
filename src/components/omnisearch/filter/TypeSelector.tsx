@@ -1,5 +1,7 @@
 import React from "react";
+import { colors, typography } from "../../../styles";
 import Type from "../../../model/Type";
+import HextechFilterPanel from "./HextechFilterPanel";
 
 export interface TypeSelectorProps {
   selectedTypes: Type[];
@@ -27,34 +29,46 @@ export default function TypeSelector({ selectedTypes, onTypesUpdate }: TypeSelec
     onTypesUpdate(newTypes);
   };
 
+  // Hextech styling
+  const checkboxStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "0.5rem",
+    color: colors.white,
+    fontFamily: typography.fontFamily.body,
+    cursor: "pointer",
+  };
+
+  const fieldStyle: React.CSSProperties = {
+    marginBottom: "0.75rem",
+  };
+
+  const labelText = (text: string) => {
+    return <span style={{ marginLeft: "0.5rem" }}>{text}</span>;
+  };
+
   return (
-    <nav className="panel">
-      <p className="panel-heading">Type</p>
-      <div className="panel-block">
-        <div className="control">
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" onChange={() => getNewTypes(Type.VIDEO)} checked={isChecked(Type.VIDEO)} /> Video
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                onChange={() => getNewTypes(Type.COMMENTARY)}
-                checked={isChecked(Type.COMMENTARY)}
-              />{" "}
-              Commentary
-            </label>
-          </div>
-          <div className="field">
-            <label className="checkbox">
-              <input type="checkbox" onChange={() => getNewTypes(Type.COURSE)} checked={isChecked(Type.COURSE)} />{" "}
-              Course
-            </label>
-          </div>
+    <HextechFilterPanel title="Type" variant="blue">
+      <div className="hextech-filter-controls">
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" onChange={() => getNewTypes(Type.VIDEO)} checked={isChecked(Type.VIDEO)} />
+            {labelText("Video")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" onChange={() => getNewTypes(Type.COMMENTARY)} checked={isChecked(Type.COMMENTARY)} />
+            {labelText("Commentary")}
+          </label>
+        </div>
+        <div className="field" style={fieldStyle}>
+          <label className="checkbox hextech-checkbox" style={checkboxStyle}>
+            <input type="checkbox" onChange={() => getNewTypes(Type.COURSE)} checked={isChecked(Type.COURSE)} />
+            {labelText("Course")}
+          </label>
         </div>
       </div>
-    </nav>
+    </HextechFilterPanel>
   );
 }

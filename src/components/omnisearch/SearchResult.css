@@ -1,0 +1,277 @@
+/**
+ * League of Legends Search Result Common Styling
+ */
+
+/* Base styles for all search result boxes */
+.box {
+  background-color: #0a1428; /* LoL background medium */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 4px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.box:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(200, 170, 110, 0.2);
+}
+
+/* Hextech energy line effect */
+.box::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(to bottom, #0ac8b9, #cdfafa, #0ac8b9); /* Hextech blue gradient */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.box:hover::before {
+  opacity: 1;
+}
+
+/* Content styling */
+.box-content {
+  color: #f0e6d2; /* LoL gold light */
+  font-family: "Spiegel", "Spiegel Regular", sans-serif;
+}
+
+/* Title styling */
+.box-content h3.title {
+  font-family: "Beaufort for LOL", serif;
+  color: #c8aa6e; /* LoL gold medium */
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.box-content h3.title a {
+  color: #c8aa6e; /* LoL gold medium */
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.box-content h3.title a:hover {
+  color: #f0e6d2; /* LoL gold light */
+  text-shadow: 0 0 5px rgba(200, 170, 110, 0.5);
+}
+
+/* Paragraph styling */
+.box-content p {
+  margin-bottom: 1rem;
+  color: #a09b8c; /* LoL text muted */
+  line-height: 1.5;
+}
+
+/* Tags styling */
+.tags {
+  margin-bottom: 1rem;
+}
+
+.tag {
+  background-color: #010a13; /* LoL background dark */
+  color: #a09b8c; /* LoL text muted */
+  border: 1px solid #3d424d; /* LoL grey */
+  border-radius: 2px;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.75rem;
+}
+
+.tag.is-primary {
+  background-color: #0a323c; /* LoL background light */
+  color: #cdfafa; /* Hextech blue light */
+  border-color: #0ac8b9; /* Hextech blue */
+}
+
+.tag.is-primary.is-light {
+  background-color: #091428; /* LoL blue dark */
+  color: #5b5a56; /* LoL text */
+  border-color: #0a323c; /* LoL background light */
+}
+
+/* Button styling */
+.buttons {
+  margin-top: 1rem;
+}
+
+.button {
+  background-color: #0a323c; /* LoL background light */
+  color: #c8aa6e; /* LoL gold medium */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 2px;
+  font-family: "Spiegel", "Spiegel Regular", sans-serif;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: #091428; /* LoL blue dark */
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #c8aa6e; /* LoL gold medium */
+  box-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
+}
+
+.button.is-small {
+  font-size: 0.75rem;
+}
+
+/* Thumbnail styling */
+.thumbnail {
+  border-radius: 4px;
+  border: 1px solid #785a28; /* LoL gold dark */
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+  width: 100%;
+  height: auto;
+}
+
+.thumbnail:hover {
+  transform: scale(1.02);
+  border-color: #c8aa6e; /* LoL gold medium */
+  cursor: pointer;
+}
+
+/* Highlight styling for search matches */
+mark {
+  background-color: rgba(12, 200, 185, 0.2); /* Hextech blue with transparency */
+  color: #cdfafa; /* Hextech blue light */
+  padding: 0.1rem 0.2rem;
+  border-radius: 2px;
+  text-shadow: 0 0 5px rgba(12, 200, 185, 0.5);
+  position: relative;
+  font-weight: 500;
+}
+
+mark::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #0ac8b9; /* Hextech blue */
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease;
+}
+
+mark:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Video watched and bookmark buttons */
+.video-watched-button,
+.bookmark-button {
+  background: none;
+  border: none;
+  color: #c8aa6e; /* LoL gold medium */
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.video-watched-button:hover,
+.bookmark-button:hover {
+  color: #f0e6d2; /* LoL gold light */
+}
+
+/* Course video list styling */
+.box-content ol {
+  margin-left: 25px;
+  margin-right: 25px;
+  margin-top: 1rem;
+  padding-left: 1rem;
+  list-style-type: decimal;
+  border-left: 1px solid #3d424d; /* LoL grey */
+}
+
+.box-content ol li {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.box-content ol li:hover {
+  background-color: rgba(12, 200, 185, 0.05); /* Hextech blue with transparency */
+}
+
+.box-content ol li a {
+  color: #c8aa6e; /* LoL gold medium */
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: inline-block;
+  max-width: calc(100% - 60px); /* Make room for the buttons */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.box-content ol li a:hover {
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.box-content ol li a.has-text-grey-lighter {
+  color: #5b5a56; /* LoL text */
+  text-decoration: line-through;
+  text-decoration-color: rgba(200, 170, 110, 0.3);
+  text-decoration-thickness: 1px;
+}
+
+/* Style for watched video buttons */
+.video-watched-button {
+  background: none;
+  color: #c8aa6e; /* LoL gold medium */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.25rem;
+  transition: all 0.2s ease;
+  float: none;
+}
+
+.video-watched-button:hover {
+  background-color: #091428; /* LoL blue dark */
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #c8aa6e; /* LoL gold medium */
+  transform: translateY(-1px);
+}
+
+.video-watched-button.is-warning {
+  background-color: rgba(200, 170, 110, 0.1);
+  color: #f0e6d2; /* LoL gold light */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .box {
+    padding: 1rem;
+  }
+
+  .columns.is-multiline {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
+
+  .column {
+    padding: 0.5rem;
+  }
+}
