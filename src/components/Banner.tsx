@@ -1,9 +1,10 @@
 import React from "react";
-import { colors, typography } from "../styles";
+import "../styles/components/_banner.css";
 
 export interface BannerProps {
   children: React.ReactNode;
   type: BannerType;
+  title?: string;
 }
 
 export enum BannerType {
@@ -11,44 +12,18 @@ export enum BannerType {
   Primary,
 }
 
-export default function Banner({ children, type }: BannerProps): React.ReactElement {
-  // Base styles using League of Legends styling
-  const baseStyle = {
-    padding: "1rem 1.25rem",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderRadius: "4px",
-    fontFamily: typography.fontFamily.body,
-    marginBottom: "1rem",
-  };
-
-  let bannerStyle;
+export default function Banner({ children, type, title }: BannerProps): React.ReactElement {
+  let bannerClass = "hextech-banner";
 
   if (type === BannerType.Info) {
-    bannerStyle = {
-      ...baseStyle,
-      backgroundColor: colors.blue.dark,
-      color: colors.white,
-      borderColor: colors.blue.medium,
-    };
+    bannerClass += " hextech-banner--info";
   } else if (type === BannerType.Primary) {
-    bannerStyle = {
-      ...baseStyle,
-      backgroundColor: colors.gold.dark,
-      color: colors.gold.light,
-      borderColor: colors.gold.medium,
-    };
-  } else {
-    bannerStyle = {
-      ...baseStyle,
-      backgroundColor: colors.background.medium,
-      color: colors.white,
-      borderColor: colors.darkGrey,
-    };
+    bannerClass += " hextech-banner--primary";
   }
 
   return (
-    <div className="notification" style={bannerStyle}>
+    <div className={bannerClass}>
+      {title && <h3 className="hextech-banner__title">{title}</h3>}
       {children}
     </div>
   );

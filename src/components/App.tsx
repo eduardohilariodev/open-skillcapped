@@ -11,7 +11,6 @@ import * as Sentry from "@sentry/react";
 import { Color, Hero, Size } from "./Hero";
 import { ManifestLoader } from "../ManifestLoader";
 import { Parser } from "../parser/Parser";
-import { applyHextechEffects } from "../styles/hextech-index";
 import { VideoPlayerProvider } from "./VideoPlayerPortal";
 
 // Import Hextech styling
@@ -28,6 +27,7 @@ export interface AppState {
   isDownloadEnabled: boolean;
   isTipsModalVisible: boolean;
   isDirectStreamModalVisible: boolean;
+  error?: Error;
 }
 
 export default class App extends React.Component<unknown, AppState> {
@@ -57,8 +57,11 @@ export default class App extends React.Component<unknown, AppState> {
     this.setState({
       content: {
         ...content,
+        // Sort courses with newest first based on release date
         courses: content.courses.sort((left, right) => right.releaseDate.getTime() - left.releaseDate.getTime()),
+        // Sort videos with newest first based on release date
         videos: content.videos.sort((left, right) => right.releaseDate.getTime() - left.releaseDate.getTime()),
+        // Sort commentaries with newest first based on release date
         commentaries: content.commentaries.sort(
           (left, right) => right.releaseDate.getTime() - left.releaseDate.getTime(),
         ),
@@ -68,30 +71,6 @@ export default class App extends React.Component<unknown, AppState> {
       bookmarks: bookmarkDatastore.get(),
       watchStatuses: watchStatusesDatastore.get(),
     });
-
-    // Apply Hextech effects to key UI elements once content is loaded
-    this.applyHextechStyling();
-  }
-
-  // Apply Hextech styling effects to various UI elements
-  applyHextechStyling(): void {
-    // Give a small delay to ensure DOM elements are rendered
-    setTimeout(() => {
-      // Apply energy lines to section containers
-      applyHextechEffects(".section", { particles: false, energyLines: true, shimmer: false });
-
-      // Apply shimmer effect to cards
-      applyHextechEffects(".card", { particles: false, energyLines: false, shimmer: true });
-
-      // Apply particles to hero sections
-      applyHextechEffects(".hero", { particles: true, energyLines: false, shimmer: false });
-
-      // Add shimmer to gold buttons
-      applyHextechEffects(".hextech-button.hextech-secondary", { particles: false, energyLines: false, shimmer: true });
-
-      // Add energy lines to main content areas
-      applyHextechEffects(".hextech-main-content", { particles: false, energyLines: true, shimmer: false });
-    }, 500);
   }
 
   onToggleWatchStatus(item: Bookmarkable): void {
@@ -185,12 +164,25 @@ export default class App extends React.Component<unknown, AppState> {
   }
 
   render(): React.ReactNode {
+    if (this.state.error) {
+      return (
+        <div>
+          <Hero
+            title="Oops!"
+            subtitle={`Something went wrong: ${this.state.error.message}`}
+            color={Color.RED}
+            size={Size.MEDIUM}
+          />
+        </div>
+      );
+    }
+
     return (
       <VideoPlayerProvider>
         <div className="hextech-app">
           <div className="hextech-energy-lines"></div>
           <Sentry.ErrorBoundary
-            fallback={<Hero title="Something went wrong" color={Color.STATUS_ERROR} size={Size.FULL} />}
+            fallback={<Hero title="Something went wrong" color={Color.RED} size={Size.FULL} />}
             showDialog={true}
           >
             <Router

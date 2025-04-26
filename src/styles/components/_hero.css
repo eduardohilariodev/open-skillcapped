@@ -1,0 +1,180 @@
+/**
+ * League of Legends Hextech Hero Component
+ * Based on Riot Games' UI design patterns
+ */
+
+.hextech-hero {
+  position: relative;
+  padding: var(--hextech-spacing-10) var(--hextech-spacing-4);
+  background-color: var(--hextech-color-background-medium);
+  background-image: linear-gradient(
+    to bottom,
+    var(--hextech-color-background-dark),
+    var(--hextech-color-background-medium)
+  );
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-bottom: 2px solid var(--hextech-color-gold-dark);
+}
+
+/* Hero variants */
+.hextech-hero--gold,
+.hextech-hero--primary {
+  background-image: linear-gradient(to bottom, rgba(120, 90, 40, 0.2), var(--hextech-color-background-medium));
+  border-bottom-color: var(--hextech-color-gold-medium);
+}
+
+.hextech-hero--blue,
+.hextech-hero--accent {
+  background-image: linear-gradient(to bottom, rgba(10, 50, 60, 0.3), var(--hextech-color-background-medium));
+  border-bottom-color: var(--hextech-color-blue-medium);
+}
+
+.hextech-hero--danger {
+  background-image: linear-gradient(to bottom, rgba(175, 49, 49, 0.2), var(--hextech-color-background-medium));
+  border-bottom-color: var(--hextech-color-red);
+}
+
+.hextech-hero--success {
+  background-image: linear-gradient(to bottom, rgba(28, 166, 76, 0.2), var(--hextech-color-background-medium));
+  border-bottom-color: var(--hextech-color-green);
+}
+
+/* Hero sizes */
+.hextech-hero--sm {
+  padding: var(--hextech-spacing-6) var(--hextech-spacing-4);
+  min-height: 150px;
+}
+
+.hextech-hero--md {
+  padding: var(--hextech-spacing-8) var(--hextech-spacing-4);
+  min-height: 250px;
+}
+
+.hextech-hero--lg {
+  padding: var(--hextech-spacing-16) var(--hextech-spacing-4);
+  min-height: 350px;
+}
+
+.hextech-hero--fullheight {
+  min-height: 100vh;
+}
+
+.hextech-hero--fullheight-with-navbar {
+  min-height: calc(100vh - 60px); /* Adjust based on navbar height */
+}
+
+/* Hero content */
+.hextech-hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hextech-hero__title {
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  color: var(--hextech-color-gold-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+  margin-bottom: var(--hextech-spacing-4);
+  line-height: var(--hextech-line-height-tight);
+  font-size: var(--hextech-font-size-4xl);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hextech-hero--sm .hextech-hero__title {
+  font-size: var(--hextech-font-size-2xl);
+  margin-bottom: var(--hextech-spacing-2);
+}
+
+.hextech-hero--blue .hextech-hero__title,
+.hextech-hero--accent .hextech-hero__title {
+  color: var(--hextech-color-blue-medium);
+}
+
+.hextech-hero--danger .hextech-hero__title {
+  color: var(--hextech-color-red);
+}
+
+.hextech-hero--success .hextech-hero__title {
+  color: var(--hextech-color-green);
+}
+
+.hextech-hero__subtitle {
+  font-family: var(--hextech-font-family-body);
+  font-weight: var(--hextech-font-weight-medium);
+  color: var(--hextech-color-gold-light);
+  font-size: var(--hextech-font-size-lg);
+  line-height: var(--hextech-line-height-relaxed);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hextech-hero--sm .hextech-hero__subtitle {
+  font-size: var(--hextech-font-size-base);
+}
+
+.hextech-hero--blue .hextech-hero__subtitle,
+.hextech-hero--accent .hextech-hero__subtitle {
+  color: var(--hextech-color-blue-light);
+}
+
+.hextech-hero--danger .hextech-hero__subtitle {
+  color: var(--hextech-color-red);
+  opacity: 0.9;
+}
+
+.hextech-hero--success .hextech-hero__subtitle {
+  color: var(--hextech-color-green);
+  opacity: 0.9;
+}
+
+/* Decorative elements */
+.hextech-hero::before,
+.hextech-hero::after {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  opacity: 0.05;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.hextech-hero::before {
+  top: 20px;
+  left: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,0 100,25 100,75 50,100 0,75 0,25' fill='%23c8aa6e'/%3E%3C/svg%3E");
+}
+
+.hextech-hero::after {
+  bottom: 20px;
+  right: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,0 100,25 100,75 50,100 0,75 0,25' fill='%23c8aa6e'/%3E%3C/svg%3E");
+  transform: rotate(45deg);
+}
+
+.hextech-hero--blue::before,
+.hextech-hero--accent::before,
+.hextech-hero--blue::after,
+.hextech-hero--accent::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,0 100,25 100,75 50,100 0,75 0,25' fill='%230ac8b9'/%3E%3C/svg%3E");
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hextech-hero__title {
+    font-size: var(--hextech-font-size-3xl);
+  }
+
+  .hextech-hero--lg {
+    padding: var(--hextech-spacing-12) var(--hextech-spacing-4);
+  }
+}

@@ -23,6 +23,9 @@
 @import "./components/_input.css";
 @import "./components/_checkbox.css";
 @import "./components/_tag.css";
+@import "./components/_banner.css";
+@import "./components/_footer.css";
+@import "./components/_hero.css";
 @import "./components/_example-page.css";
 
 /* Animations */

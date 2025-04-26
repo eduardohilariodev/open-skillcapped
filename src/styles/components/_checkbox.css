@@ -39,12 +39,14 @@
   transition: all var(--hextech-transition-duration) var(--hextech-easing-standard);
 }
 
-/* Gold variant */
+/* Gold/Primary variant */
+.hextech-checkbox--primary .hextech-checkbox__box,
 .hextech-checkbox--gold .hextech-checkbox__box {
   border-color: var(--hextech-color-gold-dark);
 }
 
-/* Blue variant */
+/* Blue/Accent variant */
+.hextech-checkbox--accent .hextech-checkbox__box,
 .hextech-checkbox--blue .hextech-checkbox__box {
   border-color: var(--hextech-color-blue-dark);
 }
@@ -55,22 +57,24 @@
   box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.3);
 }
 
+.hextech-checkbox--accent:hover .hextech-checkbox__box,
 .hextech-checkbox--blue:hover .hextech-checkbox__box {
   border-color: var(--hextech-color-blue-medium);
   box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.3);
 }
 
-/* Checked state */
+/* Checked state - Use Blue for better visual feedback */
 .hextech-checkbox__input:checked ~ .hextech-checkbox__box {
-  background-color: var(--hextech-color-gold-medium);
-  border-color: var(--hextech-color-gold-light);
-  box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.5);
-}
-
-.hextech-checkbox--blue .hextech-checkbox__input:checked ~ .hextech-checkbox__box {
   background-color: var(--hextech-color-blue-medium);
   border-color: var(--hextech-color-blue-light);
   box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.5);
+}
+
+.hextech-checkbox--primary .hextech-checkbox__input:checked ~ .hextech-checkbox__box,
+.hextech-checkbox--gold .hextech-checkbox__input:checked ~ .hextech-checkbox__box {
+  background-color: var(--hextech-color-gold-medium);
+  border-color: var(--hextech-color-gold-light);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.5);
 }
 
 /* Checkmark */
@@ -91,12 +95,13 @@
   display: block;
 }
 
-/* Focus state */
+/* Focus state - Use Gold for focus */
 .hextech-checkbox__input:focus-visible ~ .hextech-checkbox__box {
   border-color: var(--hextech-color-gold-medium);
   box-shadow: 0 0 0 2px rgba(200, 170, 110, 0.3);
 }
 
+.hextech-checkbox--accent .hextech-checkbox__input:focus-visible ~ .hextech-checkbox__box,
 .hextech-checkbox--blue .hextech-checkbox__input:focus-visible ~ .hextech-checkbox__box {
   border-color: var(--hextech-color-blue-medium);
   box-shadow: 0 0 0 2px rgba(10, 200, 185, 0.3);

@@ -1,7 +1,5 @@
 import React from "react";
-import classNames from "classnames/bind";
-import { colors, typography } from "../styles";
-import leagueify from "../styles/theme";
+import "../styles/components/_hero.css";
 
 export interface HeroProps {
   title: string;
@@ -10,113 +8,83 @@ export interface HeroProps {
   size?: Size;
 }
 
-export enum Color {
-  NONE,
-  TEAL,
-  RED,
-  STATUS_ERROR,
+export enum Size {
+  SMALL = "small",
+  MEDIUM = "medium",
+  LARGE = "large",
+  FULL = "full",
+  FULL_WITH_NAVBAR = "full-with-navbar",
 }
 
-export enum Size {
-  SMALL,
-  MEDIUM,
-  LARGE,
-  FULL,
-  FULL_WITH_NAVBAR,
+export enum Color {
+  NONE = "none",
+  RED = "danger",
+  GREEN = "success",
+  BLUE = "blue",
+  GOLD = "gold",
+  TEAL = "teal",
 }
 
 export class Hero extends React.PureComponent<HeroProps, unknown> {
-  getClassNameForColor(color: Color): string {
-    switch (color) {
-      case Color.NONE:
-        return "";
-      case Color.RED:
-        return "is-danger";
-      case Color.TEAL:
-        return "is-primary";
-      case Color.STATUS_ERROR:
-        return "is-danger hextech-status-error";
-    }
-  }
+  getHeroClass(): string {
+    const { color = Color.NONE, size = Size.SMALL } = this.props;
 
-  getClassNameForSize(size: Size): string {
+    let heroClass = "hextech-hero";
+
+    // Add color class
+    switch (color) {
+      case Color.RED:
+        heroClass += " hextech-hero--danger";
+        break;
+      case Color.GREEN:
+        heroClass += " hextech-hero--success";
+        break;
+      case Color.BLUE:
+        heroClass += " hextech-hero--accent hextech-hero--blue";
+        break;
+      case Color.GOLD:
+        heroClass += " hextech-hero--primary hextech-hero--gold";
+        break;
+      case Color.TEAL:
+        heroClass += " hextech-hero--accent"; // Using blue accent for teal (could add specific if needed)
+        break;
+      default:
+        break;
+    }
+
+    // Add size class
     switch (size) {
       case Size.SMALL:
-        return "is-small";
+        heroClass += " hextech-hero--sm";
+        break;
       case Size.MEDIUM:
-        return "is-medium";
+        heroClass += " hextech-hero--md";
+        break;
       case Size.LARGE:
-        return "is-large";
+        heroClass += " hextech-hero--lg";
+        break;
       case Size.FULL:
-        return "is-fullheight";
+        heroClass += " hextech-hero--fullheight";
+        break;
       case Size.FULL_WITH_NAVBAR:
-        return "is-fullheight-with-navbar";
-    }
-  }
-
-  getBackgroundColorFromColor(color: Color): string {
-    switch (color) {
-      case Color.NONE:
-        return colors.background.medium;
-      case Color.RED:
-        return colors.status.error;
-      case Color.TEAL:
-        return colors.gold.medium;
-      case Color.STATUS_ERROR:
-        return colors.status.error;
-    }
-  }
-
-  getTextColorFromColor(color: Color): string {
-    switch (color) {
-      case Color.TEAL:
-        return colors.black;
+        heroClass += " hextech-hero--fullheight-with-navbar";
+        break;
       default:
-        return colors.white;
+        heroClass += " hextech-hero--sm";
+        break;
     }
+
+    return heroClass;
   }
 
   render(): React.ReactNode {
-    const cx = classNames.bind({});
-    const colorClass = this.getClassNameForColor(this.props.color || Color.NONE);
-    const sizeClass = this.getClassNameForSize(this.props.size || Size.SMALL);
-    const isLarge =
-      this.props.size === Size.LARGE || this.props.size === Size.FULL || this.props.size === Size.FULL_WITH_NAVBAR;
-
-    // Apply League of Legends styling with inline styles
-    const heroStyle = {
-      ...leagueify.hero(colorClass, isLarge),
-      height: sizeClass.includes("fullheight") ? "100vh" : "auto",
-    };
-
-    const titleStyle = {
-      fontFamily: typography.fontFamily.display,
-      color: this.props.color === Color.TEAL ? colors.black : colors.gold.medium,
-      fontSize: isLarge ? typography.fontSize["4xl"] : typography.fontSize["2xl"],
-      fontWeight: typography.fontWeight.bold,
-      marginBottom: "0.5rem",
-    };
-
-    const subtitleStyle = {
-      fontFamily: typography.fontFamily.body,
-      color: this.props.color === Color.TEAL ? colors.black : colors.gold.light,
-      fontSize: isLarge ? typography.fontSize.xl : typography.fontSize.lg,
-      fontWeight: typography.fontWeight.medium,
-    };
+    const heroClass = this.getHeroClass();
 
     return (
-      <section className={cx({ hero: true })} style={heroStyle}>
-        <div className="hero-body">
-          <div className="container">
-            <h1 className="title" style={titleStyle}>
-              {this.props.title}
-            </h1>
-            {this.props.subtitle && (
-              <h2 className="subtitle" style={subtitleStyle}>
-                {this.props.subtitle}
-              </h2>
-            )}
-          </div>
+      <section className={heroClass}>
+        <div className="hextech-hero__content">
+          <h1 className="hextech-hero__title">{this.props.title}</h1>
+          {this.props.subtitle && <h2 className="hextech-hero__subtitle">{this.props.subtitle}</h2>}
         </div>
       </section>
     );

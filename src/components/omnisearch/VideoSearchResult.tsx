@@ -9,7 +9,7 @@ import { getStreamUrl } from "../../utils/UrlUtilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudDownloadAlt } from "@fortawesome/free-solid-svg-icons";
 import Highlighter from "react-highlight-words";
-import { useVideoPlayer } from "../../contexts/VideoPlayerContext";
+import { useVideoPlayer } from "../../components/VideoPlayerPortal";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
 
@@ -25,7 +25,7 @@ export interface VideoSearchResultProps {
 
 export function VideoSearchResult(props: VideoSearchResultProps): React.ReactElement {
   const { video, matchedStrings, isDownloadEnabled } = props;
-  const { openVideo } = useVideoPlayer();
+  const { showVideoPlayer } = useVideoPlayer();
   const buttonProps = {
     ...props,
     item: video,
@@ -33,7 +33,7 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    openVideo(video);
+    showVideoPlayer(video);
   };
 
   return (

@@ -8,7 +8,7 @@ import { ToggleBookmarkButton } from "../BookmarkToggleButton";
 import { ToggleWatchStatusButton } from "../ToggleWatchStatusButton";
 import { Bookmarkable } from "../../model/Bookmark";
 import { Watchable } from "../../model/WatchStatus";
-import { useVideoPlayer } from "../../contexts/VideoPlayerContext";
+import { useVideoPlayer } from "../../components/VideoPlayerPortal";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
 
@@ -24,7 +24,7 @@ export interface CommentarySearchResultProps {
 
 export function CommentarySearchResult(props: CommentarySearchResultProps): React.ReactElement {
   const { commentary, isDownloadEnabled } = props;
-  const { openVideo } = useVideoPlayer();
+  const { showVideoPlayer } = useVideoPlayer();
   const {
     role,
     uuid,
@@ -48,7 +48,7 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    openVideo(commentary);
+    showVideoPlayer(commentary);
   };
 
   return (

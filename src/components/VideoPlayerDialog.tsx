@@ -4,7 +4,24 @@ import Hls from "hls.js";
 import { Video } from "../model/Video";
 import { Course } from "../model/Course";
 import { VideoUtils } from "../utils/VideoUtils";
-import "../styles/VideoPlayerDialog.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faStepForward,
+  faStepBackward,
+  faTimes,
+  faTrash,
+  faSpinner,
+  faSave,
+  faClock,
+  faCalendarAlt,
+  faUserAlt,
+  faListAlt,
+  faTachometerAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import "../styles/components/_button.css";
+import "../styles/components/_modal.css";
+import "../styles/components/_tag.css";
+import "./VideoPlayerDialog.css";
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -282,7 +299,24 @@ Duration=${calculatedDuration}`;
             // Apply the stored playback speed to the video
             videoRef.current.playbackRate = playbackSpeed;
 
-            videoRef.current.play().catch((err) => console.error("Failed to autoplay:", err));
+            // Try to play the video normally first
+            const playPromise = videoRef.current.play();
+
+            if (playPromise !== undefined) {
+              playPromise.catch((err) => {
+                console.warn("Initial autoplay was prevented:", err);
+                setStatus("Autoplay blocked. Trying with muted audio...");
+
+                // Try again with muted audio - more likely to be allowed by browsers
+                if (videoRef.current) {
+                  videoRef.current.muted = true;
+                  videoRef.current.play().catch((muteErr) => {
+                    console.error("Muted autoplay also failed:", muteErr);
+                    setStatus("Autoplay blocked. Press play to start video.");
+                  });
+                }
+              });
+            }
           }
         });
 
@@ -363,7 +397,23 @@ Duration=${calculatedDuration}`;
         videoRef.current.playbackRate = playbackSpeed;
       }
 
-      videoRef.current?.play().catch((err) => console.error("Failed to autoplay:", err));
+      // Try to play with the same fallback approach
+      const playPromise = videoRef.current?.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Safari autoplay was prevented:", err);
+          setStatus("Autoplay blocked in Safari. Trying with muted audio...");
+
+          // Try again with muted audio
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch((muteErr) => {
+              console.error("Safari muted autoplay also failed:", muteErr);
+              setStatus("Autoplay blocked. Press play to start video.");
+            });
+          }
+        });
+      }
     });
   };
 
@@ -765,26 +815,29 @@ Duration=${calculatedDuration}`;
 
   // Use Portal to render the dialog
   return ReactDOM.createPortal(
-    <div className="video-player-overlay" onClick={onClose}>
-      <div className="video-player-dialog" onClick={(e) => e.stopPropagation()}>
-        <div className="video-player-header">
-          <h2>
+    <div className="hextech-modal-backdrop is-active" onClick={onClose}>
+      <div className="hextech-modal hextech-modal--large hextech-modal--primary" onClick={(e) => e.stopPropagation()}>
+        <div className="hextech-modal__header">
+          <h2 className="hextech-modal__title">
             {course && <span className="course-name">{course.title}</span>}
             {getVideoIndex() && <span className="episode-number">#{getVideoIndex()}:</span>}
             <span className="video-title">{video.title}</span>
           </h2>
-          <button className="close-button" onClick={onClose}>
-            ×
+          <button className="hextech-modal__close" onClick={onClose} aria-label="Close">
+            <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
-        <div className="video-player-content">
+        <div className="hextech-modal__content">
           {isLoading && (
-            <div className="loading-indicator">
-              <div className="spinner"></div> {status}
+            <div className="hextech-loading">
+              <span className="loading-icon">
+                <FontAwesomeIcon icon={faSpinner} spin />
+              </span>
+              {status}
             </div>
           )}
           {errorMessage && !errorMessage.includes("CORS") && !errorMessage.includes("403") && (
-            <div className="error-message">
+            <div className="hextech-banner hextech-banner--error">
               <p>{errorMessage}</p>
             </div>
           )}
@@ -840,30 +893,40 @@ Duration=${calculatedDuration}`;
         </div>
 
         {/* New Video Footer */}
-        <div className="video-player-footer">
+        <div className="hextech-modal__footer video-player-footer">
           <div className="video-metadata">
             <div className="metadata-item">
-              <span className="metadata-label">Duration:</span>
+              <span className="metadata-label">
+                <FontAwesomeIcon icon={faClock} className="metadata-icon" /> Duration:
+              </span>
               <span className="metadata-value">{actualDuration ? formatDuration(actualDuration) : "Loading..."}</span>
             </div>
             <div className="metadata-item">
-              <span className="metadata-label">Released:</span>
+              <span className="metadata-label">
+                <FontAwesomeIcon icon={faCalendarAlt} className="metadata-icon" /> Released:
+              </span>
               <span className="metadata-value">{video.releaseDate.toLocaleDateString()}</span>
             </div>
             <div className="metadata-item">
-              <span className="metadata-label">Role:</span>
+              <span className="metadata-label">
+                <FontAwesomeIcon icon={faUserAlt} className="metadata-icon" /> Role:
+              </span>
               <span className="metadata-value">{video.role}</span>
             </div>
           </div>
 
           {/* Playback Speed Controls in Footer */}
           <div className="footer-playback-controls">
-            <div className="speed-label">Playback Speed:</div>
+            <div className="speed-label">
+              <FontAwesomeIcon icon={faTachometerAlt} className="speed-icon" /> Playback Speed:
+            </div>
             <div className="speed-buttons">
               {[1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
                 <button
                   key={speed}
-                  className={`speed-button ${playbackSpeed === speed ? "active" : ""}`}
+                  className={`hextech-button hextech-button--sm ${
+                    playbackSpeed === speed ? "hextech-button--primary" : "hextech-button--secondary"
+                  }`}
                   onClick={() => changePlaybackSpeed(speed)}
                   title={`Set ${speed}x speed for all videos`}
                 >
@@ -871,7 +934,7 @@ Duration=${calculatedDuration}`;
                 </button>
               ))}
               <div className="speed-saved-indicator" title="This speed will be used for all videos">
-                <span className="save-icon">💾</span>
+                <FontAwesomeIcon icon={faSave} />
               </div>
             </div>
           </div>
@@ -880,27 +943,32 @@ Duration=${calculatedDuration}`;
         {/* Video Queue */}
         <div className="video-queue-container">
           <div className="queue-header">
-            <h3>{course ? `${course.title} Videos` : "Video Queue"}</h3>
+            <h3 className="hextech-title hextech-title--sm">
+              <FontAwesomeIcon icon={faListAlt} className="queue-icon" />
+              {course ? `${course.title} Videos` : "Video Queue"}
+            </h3>
             <div className="queue-controls">
               <button
-                className="queue-control-button"
+                className="hextech-button hextech-button--secondary hextech-button--sm"
                 onClick={playPreviousInQueue}
                 disabled={currentQueueIndex <= 0}
                 title="Play previous video (Alt+Left Arrow)"
               >
-                ← Previous <span className="keyboard-shortcut">Alt+←</span>
+                <FontAwesomeIcon icon={faStepBackward} /> <span>Previous</span>{" "}
+                <span className="keyboard-shortcut">Alt+←</span>
               </button>
               <button
-                className="queue-control-button"
+                className="hextech-button hextech-button--secondary hextech-button--sm"
                 onClick={playNextInQueue}
                 disabled={currentQueueIndex >= displayQueue.length - 1}
                 title="Play next video (Alt+Right Arrow)"
               >
-                Next → <span className="keyboard-shortcut">Alt+→</span>
+                <span>Next</span> <FontAwesomeIcon icon={faStepForward} />{" "}
+                <span className="keyboard-shortcut">Alt+→</span>
               </button>
             </div>
           </div>
-          <div className="queue-list">
+          <div className="queue-list hextech-scrollbar">
             {displayQueue.length === 0 ? (
               <div className="empty-queue-message">
                 {course ? `No videos available in "${course.title}"` : "No videos in queue"}
@@ -918,14 +986,14 @@ Duration=${calculatedDuration}`;
                     {queuedVideo.durationInSeconds ? formatDuration(queuedVideo.durationInSeconds) : "Unknown"}
                   </div>
                   <button
-                    className="queue-item-remove"
+                    className="queue-item-remove hextech-button hextech-button--icon hextech-button--danger"
                     onClick={(e) => {
                       e.stopPropagation();
                       removeFromQueue(index);
                     }}
                     title="Remove from queue"
                   >
-                    ×
+                    <FontAwesomeIcon icon={faTrash} />
                   </button>
                 </div>
               ))

@@ -18,10 +18,12 @@
 }
 
 /* Frame variants */
+.hextech-frame--primary,
 .hextech-frame--gold {
   border-color: var(--hextech-color-gold-medium);
 }
 
+.hextech-frame--accent,
 .hextech-frame--blue {
   border-color: var(--hextech-color-blue-medium);
 }
@@ -47,6 +49,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+.hextech-frame--accent .hextech-frame__title,
 .hextech-frame--blue .hextech-frame__title {
   background-color: var(--hextech-color-blue-dark);
   color: var(--hextech-color-blue-light);
@@ -75,13 +78,15 @@
   box-shadow: var(--hextech-shadow-lg);
 }
 
-.hextech-frame--gold.hextech-frame--interactive:hover {
+.hextech-frame--gold.hextech-frame--interactive:hover,
+.hextech-frame--primary.hextech-frame--interactive:hover {
   box-shadow:
     0 6px 12px rgba(200, 170, 110, 0.2),
     var(--hextech-shadow-md);
 }
 
-.hextech-frame--blue.hextech-frame--interactive:hover {
+.hextech-frame--blue.hextech-frame--interactive:hover,
+.hextech-frame--accent.hextech-frame--interactive:hover {
   box-shadow:
     0 6px 12px rgba(10, 200, 185, 0.2),
     var(--hextech-shadow-md);

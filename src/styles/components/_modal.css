@@ -49,6 +49,7 @@
 }
 
 /* Modal variants */
+.hextech-modal--primary,
 .hextech-modal--gold {
   border-color: var(--hextech-color-gold-medium);
   box-shadow:
@@ -56,6 +57,7 @@
     0 0 30px rgba(200, 170, 110, 0.2);
 }
 
+.hextech-modal--accent,
 .hextech-modal--blue {
   border-color: var(--hextech-color-blue-medium);
   box-shadow:
@@ -78,6 +80,7 @@
   justify-content: space-between;
 }
 
+.hextech-modal--accent .hextech-modal__header,
 .hextech-modal--blue .hextech-modal__header {
   background-color: var(--hextech-color-blue-dark);
   border-bottom-color: var(--hextech-color-blue-medium);
@@ -98,6 +101,7 @@
   margin: 0;
 }
 
+.hextech-modal--accent .hextech-modal__title,
 .hextech-modal--blue .hextech-modal__title {
   color: var(--hextech-color-blue-light);
 }
@@ -128,10 +132,12 @@
   transform: scale(1.1);
 }
 
+.hextech-modal--accent .hextech-modal__close,
 .hextech-modal--blue .hextech-modal__close {
   color: var(--hextech-color-blue-light);
 }
 
+.hextech-modal--accent .hextech-modal__close:hover,
 .hextech-modal--blue .hextech-modal__close:hover {
   color: var(--hextech-color-white);
 }
@@ -153,6 +159,7 @@
   gap: var(--hextech-spacing-2);
 }
 
+.hextech-modal--accent .hextech-modal__footer,
 .hextech-modal--blue .hextech-modal__footer {
   border-top-color: var(--hextech-color-blue-dark);
 }

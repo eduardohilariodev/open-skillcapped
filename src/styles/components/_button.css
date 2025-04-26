@@ -40,34 +40,8 @@
   min-width: 120px;
 }
 
-/* Primary (Blue) - Used for gameplay actions */
+/* Primary (Gold) - Used for navigation, key elements, primary actions */
 .hextech-button--primary {
-  background-color: var(--hextech-color-blue-medium);
-  border-color: var(--hextech-color-blue-dark);
-  color: var(--hextech-color-black);
-  box-shadow:
-    0 0 var(--hextech-spacing-2) rgba(10, 200, 185, 0.4),
-    inset 0 0 var(--hextech-spacing-1) var(--hextech-color-blue-light);
-}
-
-.hextech-button--primary:hover,
-.hextech-button--primary:focus {
-  background-color: var(--hextech-color-blue-light);
-  border-color: var(--hextech-color-blue-medium);
-  transform: translateY(-2px);
-  box-shadow:
-    0 var(--hextech-spacing-1) var(--hextech-spacing-3) rgba(10, 200, 185, 0.5),
-    inset 0 0 var(--hextech-spacing-2) var(--hextech-color-blue-medium);
-}
-
-.hextech-button--primary:active {
-  transform: translateY(0);
-  background-color: var(--hextech-color-blue-dark);
-  box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.3);
-}
-
-/* Secondary (Gold) - Used for navigation and modal actions */
-.hextech-button--secondary {
   background-color: var(--hextech-color-gold-medium);
   border-color: var(--hextech-color-gold-dark);
   color: var(--hextech-color-black);
@@ -76,8 +50,8 @@
     inset 0 0 var(--hextech-spacing-1) var(--hextech-color-gold-light);
 }
 
-.hextech-button--secondary:hover,
-.hextech-button--secondary:focus {
+.hextech-button--primary:hover,
+.hextech-button--primary:focus {
   background-color: var(--hextech-color-gold-light);
   border-color: var(--hextech-color-gold-medium);
   transform: translateY(-2px);
@@ -86,11 +60,38 @@
     inset 0 0 var(--hextech-spacing-2) var(--hextech-color-gold-medium);
 }
 
-.hextech-button--secondary:active {
+.hextech-button--primary:active {
   transform: translateY(0);
   background-color: var(--hextech-color-gold-dark);
   color: var(--hextech-color-gold-light);
   box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.3);
+}
+
+/* Secondary (Blue) - Used for special interactions, highlights, secondary actions */
+.hextech-button--secondary {
+  background-color: var(--hextech-color-blue-medium);
+  border-color: var(--hextech-color-blue-dark);
+  color: var(--hextech-color-black);
+  box-shadow:
+    0 0 var(--hextech-spacing-2) rgba(10, 200, 185, 0.4),
+    inset 0 0 var(--hextech-spacing-1) var(--hextech-color-blue-light);
+}
+
+.hextech-button--secondary:hover,
+.hextech-button--secondary:focus {
+  background-color: var(--hextech-color-blue-light);
+  border-color: var(--hextech-color-blue-medium);
+  transform: translateY(-2px);
+  box-shadow:
+    0 var(--hextech-spacing-1) var(--hextech-spacing-3) rgba(10, 200, 185, 0.5),
+    inset 0 0 var(--hextech-spacing-2) var(--hextech-color-blue-medium);
+}
+
+.hextech-button--secondary:active {
+  transform: translateY(0);
+  background-color: var(--hextech-color-blue-dark);
+  color: var(--hextech-color-blue-light);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.3);
 }
 
 /* Utility (Grey) - Used for filters, info */
@@ -184,7 +185,7 @@
   position: relative;
 }
 
-.hextech-button--toggle.is-active.hextech-button--secondary {
+.hextech-button--toggle.is-active.hextech-button--primary {
   background-color: var(--hextech-color-gold-dark);
   color: var(--hextech-color-gold-light);
   box-shadow:
@@ -192,7 +193,7 @@
     0 0 var(--hextech-spacing-2) rgba(200, 170, 110, 0.5);
 }
 
-.hextech-button--toggle.is-active.hextech-button--primary {
+.hextech-button--toggle.is-active.hextech-button--secondary {
   background-color: var(--hextech-color-blue-dark);
   color: var(--hextech-color-blue-light);
   box-shadow:

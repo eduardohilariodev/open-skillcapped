@@ -817,3 +817,52 @@ video::-webkit-media-controls-time-remaining-display {
   border-radius: 3px;
   margin-left: 5px;
 }
+
+/* FontAwesome icon styling */
+.metadata-icon {
+  margin-right: 0.5rem;
+  color: var(--hextech-color-gold);
+}
+
+.loading-icon {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  color: var(--hextech-color-gold);
+}
+
+.queue-item-remove {
+  color: var(--hextech-color-text-muted);
+  transition: color 0.2s ease;
+}
+
+.queue-item-remove:hover {
+  color: var(--hextech-color-danger);
+}
+
+.hextech-modal__close {
+  color: var(--hextech-color-text-muted);
+  transition: color 0.2s ease;
+}
+
+.hextech-modal__close:hover {
+  color: var(--hextech-color-danger);
+}
+
+/* Add some spacing for icons in buttons */
+.hextech-button svg {
+  margin-right: 0.3rem;
+}
+
+.hextech-button--icon svg {
+  margin-right: 0;
+}
+
+.queue-icon {
+  margin-right: 0.5rem;
+  color: var(--hextech-color-gold);
+}
+
+.speed-icon {
+  margin-right: 0.5rem;
+  color: var(--hextech-color-gold);
+}

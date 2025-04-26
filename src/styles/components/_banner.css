@@ -1,0 +1,129 @@
+/**
+ * League of Legends Hextech Banner Component
+ * Based on Riot Games' UI design patterns
+ */
+
+.hextech-banner {
+  padding: var(--hextech-spacing-4);
+  border-width: 2px;
+  border-style: solid;
+  border-radius: var(--hextech-border-radius-sm);
+  font-family: var(--hextech-font-family-body);
+  margin-bottom: var(--hextech-spacing-4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Primary variant (Gold) */
+.hextech-banner--primary {
+  background-color: var(--hextech-color-background-medium);
+  color: var(--hextech-color-gold-light);
+  border-color: var(--hextech-color-gold-medium);
+  box-shadow: 0 0 var(--hextech-spacing-2) rgba(200, 170, 110, 0.2);
+}
+
+.hextech-banner--primary .hextech-banner__title {
+  color: var(--hextech-color-gold-medium);
+  margin-bottom: var(--hextech-spacing-2);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+/* Info variant (Blue) */
+.hextech-banner--info {
+  background-color: var(--hextech-color-background-light);
+  color: var(--hextech-color-blue-light);
+  border-color: var(--hextech-color-blue-medium);
+  box-shadow: 0 0 var(--hextech-spacing-2) rgba(10, 200, 185, 0.2);
+}
+
+.hextech-banner--info .hextech-banner__title {
+  color: var(--hextech-color-blue-medium);
+  margin-bottom: var(--hextech-spacing-2);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+/* Warning variant (Yellow/Orange) */
+.hextech-banner--warning {
+  background-color: rgba(218, 114, 43, 0.1);
+  color: var(--hextech-color-orange);
+  border-color: var(--hextech-color-orange);
+  box-shadow: 0 0 var(--hextech-spacing-2) rgba(218, 114, 43, 0.2);
+}
+
+.hextech-banner--warning .hextech-banner__title {
+  color: var(--hextech-color-orange);
+  margin-bottom: var(--hextech-spacing-2);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+/* Error variant (Red) */
+.hextech-banner--error {
+  background-color: rgba(175, 49, 49, 0.1);
+  color: var(--hextech-color-red);
+  border-color: var(--hextech-color-red);
+  box-shadow: 0 0 var(--hextech-spacing-2) rgba(175, 49, 49, 0.2);
+}
+
+.hextech-banner--error .hextech-banner__title {
+  color: var(--hextech-color-red);
+  margin-bottom: var(--hextech-spacing-2);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+/* Success variant (Green) */
+.hextech-banner--success {
+  background-color: rgba(28, 166, 76, 0.1);
+  color: var(--hextech-color-green);
+  border-color: var(--hextech-color-green);
+  box-shadow: 0 0 var(--hextech-spacing-2) rgba(28, 166, 76, 0.2);
+}
+
+.hextech-banner--success .hextech-banner__title {
+  color: var(--hextech-color-green);
+  margin-bottom: var(--hextech-spacing-2);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+/* Corner accents */
+.hextech-banner::before,
+.hextech-banner::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Top left corner */
+.hextech-banner::before {
+  top: 0;
+  left: 0;
+  border-top: 2px solid;
+  border-left: 2px solid;
+  border-color: inherit;
+}
+
+/* Bottom right corner */
+.hextech-banner::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+  border-color: inherit;
+}

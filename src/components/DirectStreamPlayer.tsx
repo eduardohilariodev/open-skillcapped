@@ -3,6 +3,9 @@ import ReactDOM from "react-dom";
 import Hls from "hls.js";
 import { VideoUtils } from "../utils/VideoUtils";
 import "./VideoPlayerDialog.css"; // Reusing existing styles
+import "../styles/components/_button.css";
+import "../styles/components/_input.css";
+import "../styles/components/_modal.css";
 
 interface DirectStreamPlayerProps {
   isOpen: boolean;
@@ -112,7 +115,24 @@ export function DirectStreamPlayer({ isOpen, onClose }: DirectStreamPlayerProps)
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         if (videoRef.current) {
-          videoRef.current.play().catch((err) => console.error("Failed to autoplay:", err));
+          // Try to play the video normally first
+          const playPromise = videoRef.current.play();
+
+          if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+              console.warn("Initial autoplay was prevented:", err);
+              setStatus("Autoplay blocked. Trying with muted audio...");
+
+              // Try again with muted audio - more likely to be allowed by browsers
+              if (videoRef.current) {
+                videoRef.current.muted = true;
+                videoRef.current.play().catch((muteErr) => {
+                  console.error("Muted autoplay also failed:", muteErr);
+                  setStatus("Autoplay blocked. Press play to start video.");
+                });
+              }
+            });
+          }
         }
       });
 
@@ -148,42 +168,33 @@ export function DirectStreamPlayer({ isOpen, onClose }: DirectStreamPlayerProps)
   if (!isOpen) return null;
 
   const content = (
-    <div className="video-player-overlay" onClick={onClose}>
-      <div className="video-player-dialog" style={{ maxWidth: "800px" }} onClick={(e) => e.stopPropagation()}>
-        <div className="video-player-header">
-          <h2>Direct Stream</h2>
-          <button className="close-button" onClick={onClose}>
+    <div className="hextech-modal-backdrop is-active" onClick={onClose}>
+      <div
+        className="hextech-modal hextech-modal--primary"
+        style={{ maxWidth: "800px" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="hextech-modal__header">
+          <h3 className="hextech-modal__title">Direct Stream</h3>
+          <button className="hextech-modal__close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
-        <div className="video-player-content">
-          <form onSubmit={handleSubmit} style={{ marginBottom: "1rem" }}>
-            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+        <div className="hextech-modal__content">
+          <form onSubmit={handleSubmit} className="direct-stream-form">
+            <div className="hextech-input-group" style={{ marginBottom: "1rem" }}>
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://www.skill-capped.com/lol/browse/course/52mp48wf42/rbqhsjtg89"
-                style={{
-                  flex: 1,
-                  padding: "0.5rem",
-                  borderRadius: "0.25rem",
-                  border: "1px solid #333",
-                  backgroundColor: "#111",
-                  color: "white",
-                }}
+                className="hextech-input"
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                style={{
-                  padding: "0.5rem 1rem",
-                  backgroundColor: "#e53e3e",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.25rem",
-                  cursor: isLoading ? "not-allowed" : "pointer",
-                }}
+                className="hextech-button hextech-button--primary"
+                style={{ marginLeft: "0.5rem" }}
               >
                 Stream
               </button>
@@ -191,7 +202,10 @@ export function DirectStreamPlayer({ isOpen, onClose }: DirectStreamPlayerProps)
           </form>
 
           {status && (
-            <div style={{ textAlign: "center", margin: "0.5rem 0", color: "#e53e3e" }}>
+            <div
+              className="status-message"
+              style={{ textAlign: "center", margin: "0.5rem 0", color: "var(--hextech-color-red)" }}
+            >
               {status}
               {isLoading && (
                 <div style={{ display: "inline-block", marginLeft: "0.5rem" }}>
@@ -202,13 +216,13 @@ export function DirectStreamPlayer({ isOpen, onClose }: DirectStreamPlayerProps)
           )}
 
           {videoVisible && (
-            <div>
+            <div className="video-container">
               <video
                 ref={videoRef}
                 controls
                 autoPlay
                 playsInline
-                className="video-player"
+                className="video-player lol-hextech-player"
                 style={{ width: "100%", maxHeight: "500px" }}
               />
             </div>
