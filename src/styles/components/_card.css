@@ -33,6 +33,25 @@
   background-color: var(--hextech-color-background-dark);
 }
 
+/* Course variant - darker gold */
+.hextech-card--course {
+  border-color: var(--hextech-color-gold-dark);
+  background-color: var(--hextech-color-background-dark);
+}
+
+/* Commentary variant - lighter gold */
+.hextech-card--commentary {
+  border-color: var(--hextech-color-gold-light);
+  background-color: var(--hextech-color-background-medium);
+}
+
+/* Video variant - outlined style */
+.hextech-card--video {
+  border-color: var(--hextech-color-blue-medium);
+  border-width: 3px;
+  background-color: rgba(10, 50, 60, 0.7);
+}
+
 /* Interactive card */
 .hextech-card--interactive {
   cursor: pointer;
@@ -70,6 +89,22 @@
   border-bottom-color: var(--hextech-color-grey);
 }
 
+.hextech-card--course .hextech-card__header {
+  background-color: var(--hextech-color-black);
+  border-bottom-color: var(--hextech-color-gold-dark);
+}
+
+.hextech-card--commentary .hextech-card__header {
+  background-color: var(--hextech-color-background-light);
+  border-bottom-color: var(--hextech-color-gold-light);
+}
+
+.hextech-card--video .hextech-card__header {
+  background-color: var(--hextech-color-blue-dark);
+  border-bottom-color: var(--hextech-color-blue-medium);
+  border-bottom-width: 3px;
+}
+
 .hextech-card__title {
   margin: 0;
   font-family: var(--hextech-font-family-display);
@@ -86,6 +121,22 @@
 
 .hextech-card--dark .hextech-card__title {
   color: var(--hextech-color-light-grey);
+}
+
+.hextech-card--course .hextech-card__title {
+  color: var(--hextech-color-gold-dark);
+  font-weight: var(--hextech-font-weight-heavy);
+}
+
+.hextech-card--commentary .hextech-card__title {
+  color: var(--hextech-color-gold-light);
+  font-style: italic;
+}
+
+.hextech-card--video .hextech-card__title {
+  color: var(--hextech-color-blue-light);
+  text-decoration: underline;
+  text-decoration-color: var(--hextech-color-blue-medium);
 }
 
 /* Card media */
@@ -141,6 +192,22 @@
   border-top-color: var(--hextech-color-grey);
 }
 
+.hextech-card--course .hextech-card__footer {
+  border-top-color: var(--hextech-color-gold-dark);
+  border-top-width: 2px;
+}
+
+.hextech-card--commentary .hextech-card__footer {
+  border-top-color: var(--hextech-color-gold-light);
+  border-top-style: dashed;
+}
+
+.hextech-card--video .hextech-card__footer {
+  border-top-color: var(--hextech-color-blue-medium);
+  border-top-width: 2px;
+  border-top-style: dotted;
+}
+
 /* Card meta info */
 .hextech-card__meta {
   display: flex;
@@ -163,6 +230,21 @@
 
 .hextech-card--blue .hextech-card__meta-item-icon {
   color: var(--hextech-color-blue-medium);
+}
+
+.hextech-card--course .hextech-card__meta-item-icon {
+  color: var(--hextech-color-gold-dark);
+  font-weight: var(--hextech-font-weight-bold);
+}
+
+.hextech-card--commentary .hextech-card__meta-item-icon {
+  color: var(--hextech-color-gold-light);
+  font-style: italic;
+}
+
+.hextech-card--video .hextech-card__meta-item-icon {
+  color: var(--hextech-color-blue-light);
+  text-decoration: underline;
 }
 
 /* Corner accents for cards */
@@ -234,6 +316,32 @@
   border: 1px solid var(--hextech-color-gold-dark);
 }
 
+.hextech-card--blue .hextech-search-result__image img {
+  border-color: var(--hextech-color-blue-medium);
+}
+
+.hextech-card--dark .hextech-search-result__image img {
+  border-color: var(--hextech-color-grey);
+}
+
+.hextech-card--course .hextech-search-result__image img {
+  border-color: var(--hextech-color-gold-dark);
+  border-width: 2px;
+  filter: contrast(1.2);
+}
+
+.hextech-card--commentary .hextech-search-result__image img {
+  border-color: var(--hextech-color-gold-light);
+  filter: brightness(1.2);
+}
+
+.hextech-card--video .hextech-search-result__image img {
+  border-color: var(--hextech-color-blue-medium);
+  border-width: 3px;
+  border-style: dashed;
+  filter: saturate(1.2);
+}
+
 .hextech-search-result__content {
   flex: 1;
   display: flex;
@@ -249,11 +357,61 @@
   margin-bottom: var(--hextech-spacing-2);
 }
 
+.hextech-card--blue .hextech-search-result__title {
+  color: var(--hextech-color-blue-medium);
+}
+
+.hextech-card--dark .hextech-search-result__title {
+  color: var(--hextech-color-light-grey);
+}
+
+.hextech-card--course .hextech-search-result__title {
+  color: var(--hextech-color-gold-dark);
+  font-weight: var(--hextech-font-weight-heavy);
+  text-transform: uppercase;
+}
+
+.hextech-card--commentary .hextech-search-result__title {
+  color: var(--hextech-color-gold-light);
+  font-style: italic;
+}
+
+.hextech-card--video .hextech-search-result__title {
+  color: var(--hextech-color-blue-light);
+  font-weight: var(--hextech-font-weight-bold);
+  text-decoration: underline;
+  text-decoration-color: var(--hextech-color-blue-medium);
+}
+
 .hextech-search-result__description {
   font-size: var(--hextech-font-size-base);
   color: var(--hextech-color-gold-light);
   margin-bottom: var(--hextech-spacing-3);
   line-height: var(--hextech-line-height-normal);
+}
+
+.hextech-card--blue .hextech-search-result__description {
+  color: var(--hextech-color-blue-light);
+}
+
+.hextech-card--dark .hextech-search-result__description {
+  color: var(--hextech-color-light-grey);
+}
+
+.hextech-card--course .hextech-search-result__description {
+  color: var(--hextech-color-gold-light);
+  font-weight: var(--hextech-font-weight-medium);
+}
+
+.hextech-card--commentary .hextech-search-result__description {
+  color: var(--hextech-color-white);
+  font-style: italic;
+}
+
+.hextech-card--video .hextech-search-result__description {
+  color: var(--hextech-color-blue-light);
+  border-left: 2px solid var(--hextech-color-blue-medium);
+  padding-left: var(--hextech-spacing-2);
 }
 
 .hextech-search-result__meta {
@@ -274,6 +432,32 @@
 .hextech-search-result--highlight {
   border-color: var(--hextech-color-gold-medium);
   box-shadow: 0 0 var(--hextech-spacing-3) rgba(200, 170, 110, 0.3);
+}
+
+.hextech-card--blue.hextech-search-result--highlight {
+  border-color: var(--hextech-color-blue-medium);
+  box-shadow: 0 0 var(--hextech-spacing-3) rgba(10, 200, 185, 0.3);
+}
+
+.hextech-card--dark.hextech-search-result--highlight {
+  border-color: var(--hextech-color-grey);
+  box-shadow: 0 0 var(--hextech-spacing-3) rgba(61, 66, 77, 0.3);
+}
+
+.hextech-card--course.hextech-search-result--highlight {
+  border-color: var(--hextech-color-gold-dark);
+  box-shadow: 0 0 var(--hextech-spacing-3) rgba(120, 90, 40, 0.5);
+}
+
+.hextech-card--commentary.hextech-search-result--highlight {
+  border-color: var(--hextech-color-gold-light);
+  box-shadow: 0 0 var(--hextech-spacing-3) rgba(240, 230, 210, 0.4);
+}
+
+.hextech-card--video.hextech-search-result--highlight {
+  border-color: var(--hextech-color-blue-light);
+  box-shadow: 0 0 var(--hextech-spacing-3) rgba(10, 200, 185, 0.5);
+  border-width: 3px;
 }
 
 /* Responsive for mobile */

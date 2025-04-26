@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "./Button";
 
-export type SearchResultVariant = "gold" | "blue" | "dark";
+export type SearchResultVariant = "gold" | "blue" | "dark" | "course" | "commentary" | "video";
 
 export interface SearchResultProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /**
@@ -126,7 +126,19 @@ export const SearchResult: React.FC<SearchResultProps> = ({
             )}
 
             {primaryAction && (
-              <Button variant={variant === "blue" ? "primary" : "secondary"} size="sm" onClick={onPrimaryAction}>
+              <Button
+                variant={
+                  variant === "blue" || variant === "video"
+                    ? "primary"
+                    : variant === "course"
+                      ? "secondary"
+                      : variant === "commentary"
+                        ? "utility"
+                        : "secondary"
+                }
+                size="sm"
+                onClick={onPrimaryAction}
+              >
                 {primaryAction}
               </Button>
             )}
