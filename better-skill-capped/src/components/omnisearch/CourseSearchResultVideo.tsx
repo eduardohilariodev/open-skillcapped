@@ -2,10 +2,10 @@ import { Video } from "../../model/Video";
 import { Course } from "../../model/Course";
 import Highlighter from "react-highlight-words";
 import React, { useState } from "react";
-import { getCourseVideoUrl, getStreamUrl } from "../../utils/UrlUtilities";
+import { getCourseVideoUrl } from "../../utils/UrlUtilities";
 import { Bookmarkable } from "../../model/Bookmark";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark, faCloudDownloadAlt, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
 import { VideoPlayerDialog } from "../VideoPlayerDialog";
@@ -22,7 +22,7 @@ export interface SearchResultVideoProps {
 }
 
 export function CourseSearchResultVideo(props: SearchResultVideoProps): React.ReactElement {
-  const { course, video, matchedStrings, isWatched, isBookmarked, isDownloadEnabled } = props;
+  const { course, video, matchedStrings, isWatched, isBookmarked } = props;
   const { title } = video;
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
@@ -59,15 +59,6 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
       >
         <FontAwesomeIcon icon={watchToggleIcon} />
       </button>
-      {isDownloadEnabled && (
-        <a
-          href={getStreamUrl(video)}
-          className="video-watched-button tag is-small is-outlined is-inverted is-rounded"
-          title="Download video stream"
-        >
-          <FontAwesomeIcon icon={faCloudDownloadAlt} />
-        </a>
-      )}
       <VideoPlayerDialog video={video} course={course} isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
     </li>
   );

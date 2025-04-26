@@ -1,5 +1,30 @@
 .tips-button {
   position: fixed;
-  bottom: 10px;
-  right: 20px;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1.5rem;
+  border: none;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  color: white;
+  background-color: rgb(234, 179, 8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  transition: transform 0.2s;
+}
+
+.tips-button:hover {
+  transform: scale(1.1);
+}
+
+.tips-button:active {
+  transform: scale(0.95);
+}
+
+.tips-button + .tips-button {
+  bottom: 6rem;
 }

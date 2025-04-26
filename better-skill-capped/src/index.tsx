@@ -7,11 +7,21 @@ import ReactGA4 from "react-ga4";
 
 // Initialize Google Analytics 4 with a more reliable library
 try {
-  ReactGA4.initialize("G-JPTQRHF6LZ");
-  ReactGA4.send({
-    hitType: "pageview",
-    page: window.location.pathname + window.location.search,
+  // Initialize with debug mode off to prevent console errors
+  ReactGA4.initialize("G-JPTQRHF6LZ", {
+    gaOptions: {
+      debug_mode: false,
+    },
+    testMode: process.env.NODE_ENV !== "production",
   });
+
+  // Only send pageview if initialization was successful
+  if (typeof window !== "undefined") {
+    ReactGA4.send({
+      hitType: "pageview",
+      page: window.location.pathname + window.location.search,
+    });
+  }
 } catch (error) {
   console.warn("Failed to initialize Google Analytics:", error);
 }

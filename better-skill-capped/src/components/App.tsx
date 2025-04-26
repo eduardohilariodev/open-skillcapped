@@ -20,6 +20,7 @@ export interface AppState {
   watchStatuses: WatchStatus[];
   isDownloadEnabled: boolean;
   isTipsModalVisible: boolean;
+  isDirectStreamModalVisible: boolean;
 }
 
 export default class App extends React.Component<unknown, AppState> {
@@ -32,6 +33,7 @@ export default class App extends React.Component<unknown, AppState> {
       watchStatuses: [],
       isDownloadEnabled: window.localStorage.getItem("download") === "true" || false,
       isTipsModalVisible: false,
+      isDirectStreamModalVisible: false,
     };
   }
 
@@ -100,6 +102,14 @@ export default class App extends React.Component<unknown, AppState> {
     });
   }
 
+  onToggleDirectStreamModal(): void {
+    this.setState((prevState) => {
+      return {
+        isDirectStreamModalVisible: !prevState.isDirectStreamModalVisible,
+      };
+    });
+  }
+
   onToggleBookmark(item: Bookmarkable): void {
     const { bookmarkDatastore, bookmarks } = this.state;
     const currentBookmark = this.getBookmark(item, bookmarks);
@@ -161,6 +171,8 @@ export default class App extends React.Component<unknown, AppState> {
             isDownloadEnabled={this.state.isDownloadEnabled}
             isTipsModalVisible={this.state.isTipsModalVisible}
             onToggleTipsModal={this.onToggleTipsModal.bind(this)}
+            isDirectStreamModalVisible={this.state.isDirectStreamModalVisible}
+            onToggleDirectStreamModal={this.onToggleDirectStreamModal.bind(this)}
           />
         </Sentry.ErrorBoundary>
       </React.Fragment>

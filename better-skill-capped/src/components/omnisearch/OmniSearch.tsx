@@ -6,6 +6,7 @@ import OmniSearchable, { searchableFields } from "./OmniSearchable";
 import { OmniSearchResult } from "./OmniSearchResult";
 import { TipsButton } from "../TipsButton";
 import { TipsModal } from "../modal/TipsModal";
+import { DirectStreamPlayer } from "../DirectStreamPlayer";
 
 export interface OmniSearchProps {
   items: OmniSearchable[];
@@ -16,6 +17,8 @@ export interface OmniSearchProps {
   isDownloadEnabled: boolean;
   onToggleTipsModal: () => void;
   isTipsModalVisible: boolean;
+  onToggleDirectStreamModal: () => void;
+  isDirectStreamModalVisible: boolean;
 }
 
 export function OmniSearch({
@@ -27,6 +30,8 @@ export function OmniSearch({
   isDownloadEnabled,
   onToggleTipsModal,
   isTipsModalVisible,
+  onToggleDirectStreamModal,
+  isDirectStreamModalVisible,
 }: OmniSearchProps): React.ReactElement {
   const fuseOptions = {
     keys: searchableFields,
@@ -41,6 +46,7 @@ export function OmniSearch({
   return (
     <>
       <TipsModal isVisible={isTipsModalVisible} onClose={onToggleTipsModal} />
+      <DirectStreamPlayer isOpen={isDirectStreamModalVisible} onClose={onToggleDirectStreamModal} />
       <TipsButton onClick={onToggleTipsModal} />
       <Search
         items={items}

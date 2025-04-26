@@ -21,6 +21,8 @@ export interface RouterProps {
   isDownloadEnabled: boolean;
   isTipsModalVisible: boolean;
   onToggleTipsModal: () => void;
+  isDirectStreamModalVisible: boolean;
+  onToggleDirectStreamModal: () => void;
 }
 
 export function Router(props: RouterProps): React.ReactElement {
@@ -56,6 +58,8 @@ export function Router(props: RouterProps): React.ReactElement {
                         isDownloadEnabled={isDownloadEnabled}
                         onToggleTipsModal={props.onToggleTipsModal}
                         isTipsModalVisible={props.isTipsModalVisible}
+                        onToggleDirectStreamModal={props.onToggleDirectStreamModal}
+                        isDirectStreamModalVisible={props.isDirectStreamModalVisible}
                       />
                     }
                   />

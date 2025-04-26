@@ -2,8 +2,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
@@ -12,15 +12,14 @@
 }
 
 .video-player-dialog {
-  background-color: #222;
+  background-color: #1e1e1e;
   border-radius: 8px;
   width: 90%;
-  max-width: 1200px;
+  max-width: 960px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .video-player-header {
@@ -28,41 +27,216 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background-color: #333;
-  border-bottom: 1px solid #444;
+  background-color: #2d2d2d;
+  border-bottom: 1px solid #3d3d3d;
 }
 
 .video-player-header h2 {
   margin: 0;
-  font-size: 1.2rem;
-  color: #fff;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 18px;
+  color: white;
+  flex: 1;
+}
+
+.video-duration {
+  color: #aaa;
+  margin-right: 12px;
+  font-size: 14px;
+  padding: 2px 6px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }
 
 .close-button {
   background: none;
   border: none;
-  color: #ccc;
+  color: #aaa;
   font-size: 24px;
   cursor: pointer;
   padding: 0 8px;
 }
 
 .close-button:hover {
-  color: #fff;
+  color: white;
 }
 
 .video-player-content {
-  flex: 1;
+  padding: 16px;
+  position: relative;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  background-color: #000;
+  border-radius: 4px;
   overflow: hidden;
-  aspect-ratio: 16/9;
-  max-height: calc(90vh - 54px);
 }
 
 .video-player {
   width: 100%;
-  height: 100%;
-  background-color: #000;
+  max-height: 70vh;
+  background-color: black;
+}
+
+/* Custom video controls */
+.custom-video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.video-container:hover .custom-video-controls {
+  opacity: 1;
+}
+
+.progress-container {
+  width: 100%;
+  height: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.custom-progress {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.custom-progress::-webkit-progress-bar {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.custom-progress::-webkit-progress-value {
+  background-color: #e53e3e;
+  border-radius: 4px;
+}
+
+.custom-progress::-moz-progress-bar {
+  background-color: #e53e3e;
+  border-radius: 4px;
+}
+
+.time-display {
+  color: white;
+  font-size: 12px;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Hide the native video controls when our custom controls are active */
+.video-container:has(.custom-video-controls) video::-webkit-media-controls {
+  display: none !important;
+}
+
+/* Override the duration that's shown in the native controls as a fallback */
+.video-player[data-actual-duration]::-webkit-media-controls-time-remaining-display::after {
+  content: attr(data-actual-duration);
+}
+
+.loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 4px;
+  z-index: 2;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 6px;
+  z-index: 3;
+  text-align: center;
+  width: 80%;
+  max-width: 400px;
+  border: 1px solid #e53e3e;
+}
+
+.error-message p {
+  margin: 8px 0;
+}
+
+.error-message .info-message {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 12px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid rgba(229, 62, 62, 0.3);
+  border-radius: 50%;
+  border-top-color: #e53e3e;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.control-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.control-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.control-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Ensure video doesn't show native controls when our custom ones are present */
+.video-container:has(.custom-video-controls) video::-webkit-media-controls-panel {
+  display: none !important;
 }
