@@ -98,9 +98,8 @@ export function VideoPlayerDialog({
   // Filter queue to only show videos from the current course if a course is available
   const filteredQueue = useMemo(() => {
     if (course && course.videos) {
-      // If we have a course, only show videos from this course
-      const courseVideoIds = course.videos.map((cv) => cv.video.uuid);
-      return videoQueue.filter((v) => courseVideoIds.includes(v.uuid));
+      // If we have a course, return all videos from this course
+      return course.videos.map((cv) => cv.video);
     }
     return videoQueue;
   }, [course, videoQueue]);
@@ -144,6 +143,9 @@ export function VideoPlayerDialog({
   };
 
   const removeFromQueue = (index: number) => {
+    // Don't allow removing videos if we're in course context
+    if (course) return;
+
     // If using filtered queue, find the actual video in the main queue
     const videoToRemove = displayQueue[index];
     if (!videoToRemove) return;
@@ -156,20 +158,15 @@ export function VideoPlayerDialog({
     setVideoQueue(newQueue);
     storageUtils.setItem(STORAGE_KEYS.VIDEO_QUEUE, newQueue);
 
-    // Get the updated filtered queue after removal
-    const updatedFilteredQueue = course?.videos
-      ? newQueue.filter((v) => course.videos.some((cv) => cv.video.uuid === v.uuid))
-      : newQueue;
-
     // Adjust current index if needed
-    if (index === currentQueueIndex && updatedFilteredQueue.length > 0) {
+    if (index === currentQueueIndex && displayQueue.length > 0) {
       // If we removed the current video, play the next one
-      if (index < updatedFilteredQueue.length) {
+      if (index < displayQueue.length) {
         // Keep index the same to play next video
         playQueueItem(index);
       } else {
         // We removed the last item, play the new last item
-        playQueueItem(updatedFilteredQueue.length - 1);
+        playQueueItem(displayQueue.length - 1);
       }
     } else if (index < currentQueueIndex) {
       // We removed a video before the current one, adjust index
@@ -440,25 +437,18 @@ Duration=${calculatedDuration}`;
   // Add this video to queue when opened
   useEffect(() => {
     if (isOpen && video) {
-      // Always add to the main queue if not already there
-      if (!videoQueue.some((v) => v.uuid === video.uuid)) {
+      // Always add to the main queue if not already there and we're not in a course
+      if (!course && !videoQueue.some((v) => v.uuid === video.uuid)) {
         addToQueue(video);
       }
 
-      // For showing the correct active item in the display queue
-      if (course) {
-        // Find the index of this video in the filtered queue
-        const filteredIndex = displayQueue.findIndex((v) => v.uuid === video.uuid);
-        if (filteredIndex !== -1) {
-          setCurrentQueueIndex(filteredIndex);
-        }
-      } else {
-        // Find this video in the main queue
-        const index = videoQueue.findIndex((v) => v.uuid === video.uuid);
+      // Find the index of this video in the display queue
+      const index = displayQueue.findIndex((v) => v.uuid === video.uuid);
+      if (index !== -1) {
         setCurrentQueueIndex(index);
       }
     }
-  }, [isOpen, video, videoQueue.length, displayQueue]);
+  }, [isOpen, video, videoQueue.length, displayQueue, course]);
 
   // When the dialog opens, play the currently selected video
   useEffect(() => {
@@ -942,11 +932,18 @@ Duration=${calculatedDuration}`;
         </div>
 
         {/* Video Queue */}
-        <div className="video-queue-container">
+        <div className={`video-queue-container ${course ? "course-queue" : ""}`}>
           <div className="queue-header">
             <h3 className="hextech-title hextech-title--sm">
               <FontAwesomeIcon icon={faListAlt} className="queue-icon" />
-              {course ? `${course.title} Videos` : "Video Queue"}
+              {course ? (
+                <>
+                  Course Videos
+                  {course.title && <span className="course-name-badge">{course.title}</span>}
+                </>
+              ) : (
+                "Video Queue"
+              )}
             </h3>
             <div className="queue-controls">
               <button
@@ -986,16 +983,18 @@ Duration=${calculatedDuration}`;
                   <div className="queue-item-duration">
                     {queuedVideo.durationInSeconds ? formatDuration(queuedVideo.durationInSeconds) : "Unknown"}
                   </div>
-                  <button
-                    className="queue-item-remove hextech-button hextech-button--icon hextech-button--danger"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFromQueue(index);
-                    }}
-                    title="Remove from queue"
-                  >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
+                  {!course && (
+                    <button
+                      className="queue-item-remove hextech-button hextech-button--icon hextech-button--danger"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFromQueue(index);
+                      }}
+                      title="Remove from queue"
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  )}
                 </div>
               ))
             )}

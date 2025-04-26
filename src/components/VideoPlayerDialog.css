@@ -881,3 +881,55 @@ video::-webkit-media-controls-time-remaining-display {
 .hextech-modal-backdrop {
   padding: 24px;
 }
+
+/* Add course-specific queue styling */
+.queue-header .queue-icon {
+  margin-right: 8px;
+  color: var(--hextech-color-gold-medium);
+}
+
+.course-queue-container {
+  border-top: 1px solid var(--hextech-color-gold-dark);
+  background-color: rgba(16, 31, 45, 0.9);
+}
+
+.course-queue .queue-header {
+  background-color: rgba(56, 40, 17, 0.3);
+  border-bottom-color: var(--hextech-color-gold-dark);
+}
+
+.course-queue .queue-header h3 {
+  display: flex;
+  align-items: center;
+}
+
+.course-name-badge {
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-background-dark);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+/* Course queue item styling */
+.course-queue .queue-item.active {
+  background-color: rgba(10, 130, 155, 0.25);
+  border-left: 3px solid var(--hextech-color-blue-medium);
+}
+
+.course-queue .queue-item:hover {
+  background-color: rgba(120, 90, 40, 0.25);
+}
+
+.course-queue .queue-item-index {
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-background-dark);
+  font-weight: 600;
+}
+
+.course-queue .queue-item.active .queue-item-index {
+  background-color: var(--hextech-color-blue-medium);
+  color: var(--hextech-color-background-dark);
+}
