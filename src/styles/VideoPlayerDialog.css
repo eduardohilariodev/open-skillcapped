@@ -363,16 +363,14 @@
 }
 
 /* Hextech-styled video controls */
-video::-webkit-media-controls-panel {
-  background-color: rgba(10, 20, 40, 0.7) !important; /* LoL background medium with opacity */
-}
 
 video::-webkit-media-controls-play-button,
 video::-webkit-media-controls-volume-slider-container,
 video::-webkit-media-controls-mute-button,
 video::-webkit-media-controls-timeline,
 video::-webkit-media-controls-fullscreen-button {
-  filter: hue-rotate(210deg) saturate(70%) brightness(130%);
+  /* No filters to avoid overlay issues */
+  filter: none !important;
 }
 
 video::-webkit-media-controls-current-time-display::after,
@@ -434,19 +432,17 @@ video::-webkit-media-controls-time-remaining-display::after {
   --lol-gold-dark: #785a28;
   --lol-background-dark: #010a13;
   --lol-background-medium: #0a1428;
+  /* Remove any filter that might be applied to the video itself */
+  filter: none !important;
 }
 
-.lol-hextech-player::-webkit-media-controls-play-button {
-  filter: sepia(100%) hue-rotate(170deg) saturate(250%) brightness(90%);
-}
-
-.lol-hextech-player::-webkit-media-controls-timeline {
-  height: 8px;
-  filter: sepia(100%) hue-rotate(170deg) saturate(250%) brightness(90%);
-}
-
-.lol-hextech-player::-webkit-media-controls-volume-slider {
-  filter: sepia(100%) hue-rotate(170deg) saturate(250%) brightness(90%);
+.lol-hextech-player::-webkit-media-controls-play-button,
+.lol-hextech-player::-webkit-media-controls-timeline,
+.lol-hextech-player::-webkit-media-controls-volume-slider,
+.lol-hextech-player::-webkit-media-controls-mute-button,
+.lol-hextech-player::-webkit-media-controls-fullscreen-button {
+  /* Remove any filters to prevent overlay issues */
+  filter: none !important;
 }
 
 .lol-hextech-player::-webkit-media-controls-current-time-display,
@@ -560,6 +556,8 @@ video::-webkit-media-controls-mute-button,
 video::-webkit-media-controls-fullscreen-button {
   background-color: transparent !important;
   color: #c8aa6e !important; /* LoL gold medium */
+  /* Remove any filters that may cause overlay issues */
+  filter: none !important;
 }
 
 /* Style the scrubber/timeline */

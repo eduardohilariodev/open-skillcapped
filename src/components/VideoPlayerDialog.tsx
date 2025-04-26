@@ -5,10 +5,11 @@ import { Video } from "../model/Video";
 import { Course } from "../model/Course";
 import { VideoUtils } from "../utils/VideoUtils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faSpinner, faClock, faCalendarAlt, faUserAlt, faListAlt } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faSpinner, faClock, faCalendarAlt, faUserAlt } from "@fortawesome/free-solid-svg-icons";
 import "../styles/components/_button.css";
 import "../styles/components/_modal.css";
 import "../styles/components/_tag.css";
+import "../styles/VideoPlayerDialog.css";
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -449,7 +450,7 @@ export function VideoPlayerDialog({
         position: absolute;
         bottom: 50px;
         right: 20px;
-        background-color: rgba(0, 0, 0, 0.7);
+     
         border-radius: 8px;
         padding: 6px;
         display: flex;
@@ -468,6 +469,16 @@ export function VideoPlayerDialog({
       
       video::-webkit-media-controls-time-remaining-display::after {
         content: "${formatDuration(actualDuration)}" !important;
+      }
+      
+      /* Fix for media controls overlay */
+      video::-webkit-media-controls-panel,
+      video::-webkit-media-controls-play-button,
+      video::-webkit-media-controls-volume-slider-container,
+      video::-webkit-media-controls-mute-button,
+      video::-webkit-media-controls-timeline,
+      video::-webkit-media-controls-fullscreen-button {
+        filter: none !important;
       }
     `;
     document.head.appendChild(styleEl);
@@ -543,9 +554,9 @@ export function VideoPlayerDialog({
         onClick={stopPropagation}
       >
         {/* Left panel - Video and info */}
-        <div className="w-7/10 h-full flex flex-col border-r border-[var(--hextech-color-gold-dark)]">
+        <div className="w-7/10 h-full flex flex-col border-r border-[var(--hextech-color-gold-dark)] flex-1">
           {/* Video player area */}
-          <div className="relative flex-1">
+          <div>
             {isLoading && (
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white p-3 rounded flex items-center gap-2 z-2">
                 <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
@@ -560,7 +571,7 @@ export function VideoPlayerDialog({
             )}
             <video
               ref={videoRef}
-              className="w-full h-full object-contain bg-black"
+              className="w-full h-full object-contain lol-hextech-player"
               controls
               autoPlay
               playsInline
@@ -613,13 +624,6 @@ export function VideoPlayerDialog({
                 <span className="text-gray-400 text-sm">Role:</span>
                 <span className="text-white text-sm font-medium">{video.role}</span>
               </div>
-              {course && (
-                <div className="flex items-center gap-2">
-                  <FontAwesomeIcon icon={faListAlt} className="text-[var(--hextech-color-gold)] mr-2" />
-                  <span className="text-gray-400 text-sm">Course:</span>
-                  <span className="text-white text-sm font-medium">{course.title}</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -650,12 +654,6 @@ export function VideoPlayerDialog({
 
           {/* Video list */}
           <div className="flex-1 overflow-y-auto bg-[rgba(16,31,45,0.9)]">
-            <div className="sticky top-0 z-10 flex justify-between items-center p-3 bg-[rgba(56,40,17,0.3)] border-b border-[var(--hextech-color-gold-dark)]">
-              <h3 className="m-0 text-base font-semibold text-[var(--hextech-color-gold-light)] flex items-center">
-                <FontAwesomeIcon icon={faListAlt} className="text-[var(--hextech-color-gold-medium)] mr-2" />
-                Course Videos
-              </h3>
-            </div>
             <div className="overflow-y-auto">
               {displayQueue.map((queueVideo, index) => (
                 <div
