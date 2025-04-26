@@ -38,6 +38,12 @@
   flex: 1;
 }
 
+.course-name {
+  color: #aaa;
+  opacity: 0.7;
+  font-weight: normal;
+}
+
 .video-duration {
   color: #aaa;
   margin-right: 12px;
@@ -134,8 +140,9 @@
 .time-display {
   color: white;
   font-size: 12px;
-  text-align: right;
-  margin-top: 4px;
+  margin-left: 10px;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Hide the native video controls when our custom controls are active */
@@ -212,6 +219,12 @@
   justify-content: space-between;
   width: 100%;
   margin-top: 8px;
+}
+
+.left-controls,
+.right-controls {
+  display: flex;
+  align-items: center;
 }
 
 .control-button {

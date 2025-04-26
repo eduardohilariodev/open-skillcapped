@@ -12,7 +12,12 @@ interface VideoPlayerDialogProps {
   onClose: () => void;
 }
 
-export function VideoPlayerDialog({ video, isOpen, onClose }: VideoPlayerDialogProps): React.ReactElement | null {
+export function VideoPlayerDialog({
+  video,
+  course,
+  isOpen,
+  onClose,
+}: VideoPlayerDialogProps): React.ReactElement | null {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const progressBarRef = useRef<HTMLProgressElement | null>(null);
@@ -194,6 +199,14 @@ export function VideoPlayerDialog({ video, isOpen, onClose }: VideoPlayerDialogP
       const controlButtons = document.createElement("div");
       controlButtons.className = "control-buttons";
 
+      // Create left controls container
+      const leftControls = document.createElement("div");
+      leftControls.className = "left-controls";
+
+      // Create right controls container
+      const rightControls = document.createElement("div");
+      rightControls.className = "right-controls";
+
       // Create play/pause button
       const playPauseButton = document.createElement("button");
       playPauseButton.className = "control-button play-pause";
@@ -207,12 +220,17 @@ export function VideoPlayerDialog({ video, isOpen, onClose }: VideoPlayerDialogP
         }
       });
 
-      // Create volume button
+      // Create time display and move to the left
+      const timeDisplay = document.createElement("span");
+      timeDisplay.className = "time-display";
+      timeDisplay.textContent = `0:00 / ${formatDuration(actualDuration)}`;
+      timeDisplayRef.current = timeDisplay;
+
+      // Create volume button and move to the right
       const volumeButton = document.createElement("button");
       volumeButton.className = "control-button volume";
       volumeButton.innerHTML =
         '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
-      const volumeControls = false;
       volumeButton.addEventListener("click", () => {
         if (videoElement.muted) {
           videoElement.muted = false;
@@ -238,17 +256,16 @@ export function VideoPlayerDialog({ video, isOpen, onClose }: VideoPlayerDialogP
         }
       });
 
-      // Create time display
-      const timeDisplay = document.createElement("span");
-      timeDisplay.className = "time-display";
-      timeDisplay.textContent = `0:00 / ${formatDuration(actualDuration)}`;
-      timeDisplayRef.current = timeDisplay;
+      // Add controls to the containers
+      leftControls.appendChild(playPauseButton);
+      leftControls.appendChild(timeDisplay);
 
-      // Add controls to the container
-      controlButtons.appendChild(playPauseButton);
-      controlButtons.appendChild(volumeButton);
-      controlButtons.appendChild(timeDisplay);
-      controlButtons.appendChild(fullscreenButton);
+      rightControls.appendChild(volumeButton);
+      rightControls.appendChild(fullscreenButton);
+
+      // Add containers to main controls
+      controlButtons.appendChild(leftControls);
+      controlButtons.appendChild(rightControls);
 
       // Append elements
       progressContainer.appendChild(progressBar);
@@ -375,12 +392,28 @@ export function VideoPlayerDialog({ video, isOpen, onClose }: VideoPlayerDialogP
 
   if (!isOpen) return null;
 
+  // Find video index in course videos (for episode number)
+  const getVideoIndex = (): number | undefined => {
+    if (!course || !course.videos) return undefined;
+
+    const index = course.videos.findIndex((cv) => cv.video.uuid === video.uuid);
+    return index !== -1 ? index + 1 : undefined;
+  };
+
+  // Format title with course name and episode number
+  const formattedTitle = (): string => {
+    const videoIndex = getVideoIndex();
+    const episodeText = videoIndex ? `#${videoIndex}: ` : "";
+    const courseName = course ? `<span class="course-name">${course.title}</span> ` : "";
+
+    return `${courseName}${episodeText}${video.title}`;
+  };
+
   return (
     <div className="video-player-overlay">
       <div className="video-player-dialog">
         <div className="video-player-header">
-          <h2>{video.title}</h2>
-          {actualDuration && <span className="video-duration">{formatDuration(actualDuration)}</span>}
+          <h2 dangerouslySetInnerHTML={{ __html: formattedTitle() }}></h2>
           <button className="close-button" onClick={onClose}>
             ×
           </button>

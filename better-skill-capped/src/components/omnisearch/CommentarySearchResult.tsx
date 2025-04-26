@@ -1,5 +1,5 @@
 import { roleToString } from "../../model/Role";
-import React from "react";
+import React, { useState } from "react";
 import { getStreamUrl } from "../../utils/UrlUtilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudDownloadAlt } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +8,7 @@ import { ToggleBookmarkButton } from "../BookmarkToggleButton";
 import { ToggleWatchStatusButton } from "../ToggleWatchStatusButton";
 import { Bookmarkable } from "../../model/Bookmark";
 import { Watchable } from "../../model/WatchStatus";
+import { VideoPlayerDialog } from "../VideoPlayerDialog";
 
 export interface CommentarySearchResultProps {
   commentary: Commentary;
@@ -21,6 +22,7 @@ export interface CommentarySearchResultProps {
 
 export function CommentarySearchResult(props: CommentarySearchResultProps): React.ReactElement {
   const { commentary, isDownloadEnabled } = props;
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const {
     role,
     uuid,
@@ -42,13 +44,18 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
     item: commentary,
   };
 
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsPlayerOpen(true);
+  };
+
   return (
     <div key={uuid} className="box">
       <div className="box-content">
         <div className="columns is-multiline">
           <div className="column 7">
             <h3 className="title is-5">
-              <a href={skillCappedUrl}>
+              <a href={skillCappedUrl} onClick={handleVideoClick}>
                 {champion} vs {opponent}
               </a>
             </h3>
@@ -69,7 +76,13 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
           </div>
           <div className="column is-5">
             <figure className="image is-16by9">
-              <img src={commentary.imageUrl} alt="Video thumbnail" className="thumbnail" />
+              <img
+                src={commentary.imageUrl}
+                alt="Video thumbnail"
+                className="thumbnail"
+                onClick={() => setIsPlayerOpen(true)}
+                style={{ cursor: "pointer" }}
+              />
             </figure>
           </div>
           <div className="column is-12">
@@ -88,6 +101,7 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
           </div>
         </div>
       </div>
+      <VideoPlayerDialog video={commentary} isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
     </div>
   );
 }

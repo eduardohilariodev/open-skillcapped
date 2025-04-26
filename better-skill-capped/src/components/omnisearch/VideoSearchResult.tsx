@@ -1,5 +1,5 @@
 import { roleToString } from "../../model/Role";
-import React from "react";
+import React, { useState } from "react";
 import { Video } from "../../model/Video";
 import { ToggleWatchStatusButton } from "../ToggleWatchStatusButton";
 import { ToggleBookmarkButton } from "../BookmarkToggleButton";
@@ -9,6 +9,7 @@ import { getStreamUrl } from "../../utils/UrlUtilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudDownloadAlt } from "@fortawesome/free-solid-svg-icons";
 import Highlighter from "react-highlight-words";
+import { VideoPlayerDialog } from "../VideoPlayerDialog";
 
 export interface VideoSearchResultProps {
   video: Video;
@@ -22,9 +23,15 @@ export interface VideoSearchResultProps {
 
 export function VideoSearchResult(props: VideoSearchResultProps): React.ReactElement {
   const { video, matchedStrings, isDownloadEnabled } = props;
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const buttonProps = {
     ...props,
     item: video,
+  };
+
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsPlayerOpen(true);
   };
 
   return (
@@ -33,7 +40,7 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
         <div className="columns is-multiline">
           <div className="column is-7">
             <h3 className="title is-5">
-              <a href={video.skillCappedUrl}>
+              <a href={video.skillCappedUrl} onClick={handleVideoClick}>
                 <Highlighter searchWords={matchedStrings} textToHighlight={video.title} autoEscape={true} />
               </a>
             </h3>
@@ -62,11 +69,18 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
           </div>
           <div className="column is-5">
             <figure className="image is-16by9">
-              <img src={video.imageUrl} alt="Video thumbnail" className="thumbnail" />
+              <img
+                src={video.imageUrl}
+                alt="Video thumbnail"
+                className="thumbnail"
+                onClick={() => setIsPlayerOpen(true)}
+                style={{ cursor: "pointer" }}
+              />
             </figure>
           </div>
         </div>
       </div>
+      <VideoPlayerDialog video={video} isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
     </div>
   );
 }
