@@ -26,5 +26,6 @@ export function getCommentaryUrl(commentary: Commentary): string {
 }
 
 export function getStreamUrl(video: Video | Commentary): string {
-  return `https://www.skill-capped.com/lol/api/new/video/${video.uuid}/4500.m3u8`;
+  // Use our local proxy instead of direct access to bypass CORS
+  return `/skillcapped-api/lol/api/new/video/${video.uuid}/4500.m3u8`;
 }

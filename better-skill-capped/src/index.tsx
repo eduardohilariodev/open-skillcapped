@@ -3,18 +3,18 @@ import { createRoot } from "react-dom/client";
 import App from "./components/App";
 import "./bulma.sass";
 import * as Sentry from "@sentry/react";
-import { GA4React } from "ga-4-react";
-import { GA4ReactResolveInterface } from "ga-4-react/dist/models/gtagModels";
+import ReactGA4 from "react-ga4";
 
-const ga4react = new GA4React("G-JPTQRHF6LZ");
-ga4react.initialize().then(
-  (ga4: GA4ReactResolveInterface) => {
-    ga4.pageview(window.location);
-  },
-  (err) => {
-    console.error(err);
-  },
-);
+// Initialize Google Analytics 4 with a more reliable library
+try {
+  ReactGA4.initialize("G-JPTQRHF6LZ");
+  ReactGA4.send({
+    hitType: "pageview",
+    page: window.location.pathname + window.location.search,
+  });
+} catch (error) {
+  console.warn("Failed to initialize Google Analytics:", error);
+}
 
 Sentry.init({
   dsn: "https://7822525c2ffb4c61a436c1dfdfa14be8@o92742.ingest.sentry.io/5364733",
