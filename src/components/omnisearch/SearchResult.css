@@ -101,6 +101,15 @@
   border-color: #0a323c; /* LoL background light */
 }
 
+.tag.is-outline {
+  background-color: transparent;
+  color: #c8aa6e; /* LoL gold medium */
+  border: 1px solid #c8aa6e; /* LoL gold medium */
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
 /* Button styling */
 .buttons {
   margin-top: 1rem;

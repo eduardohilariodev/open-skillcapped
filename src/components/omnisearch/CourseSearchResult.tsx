@@ -69,7 +69,7 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
 
           {/* Second column - Title, metadata, and builds list */}
           <div className="column is-9">
-            <span className="tag is-primary">Course</span>
+            <span className="tag is-outline">Course</span>
             <h3 className="title is-4 mb-2">
               <Highlighter searchWords={props.result.matchedStrings} textToHighlight={course.title} autoEscape={true} />
             </h3>
