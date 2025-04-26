@@ -483,12 +483,11 @@ export function VideoPlayerDialog({
     const fixSeekBar = () => {
       // Ensure the seek bar shows the correct duration
       if (videoElement.seekable && videoElement.seekable.length > 0) {
-        // Force update of control UI by dispatching events
-        const durationChangeEvent = new Event("durationchange");
-        videoElement.dispatchEvent(durationChangeEvent);
+        // Don't dispatch events that will trigger the event listeners
+        // that call fixSeekBar again, which creates an infinite loop
 
-        const timeUpdateEvent = new Event("timeupdate");
-        videoElement.dispatchEvent(timeUpdateEvent);
+        // Instead, just update UI elements directly if needed
+        updateTimeDisplay();
       }
     };
 
@@ -505,15 +504,11 @@ export function VideoPlayerDialog({
     videoRef.current?.addEventListener("timeupdate", updateTimeDisplay);
     videoRef.current?.addEventListener("loadedmetadata", () => {
       updateTimeDisplay();
-      fixSeekBar();
       if (videoRef.current) {
         videoRef.current.playbackRate = playbackSpeed;
       }
     });
-    videoRef.current?.addEventListener("durationchange", () => {
-      updateTimeDisplay();
-      fixSeekBar();
-    });
+    videoRef.current?.addEventListener("durationchange", updateTimeDisplay);
     videoRef.current?.addEventListener("playing", updateTimeDisplay);
     videoRef.current?.addEventListener("canplay", () => {
       if (videoRef.current) {
