@@ -10,6 +10,7 @@ import { Bookmarkable } from "../../model/Bookmark";
 import { Watchable } from "../../model/WatchStatus";
 import { VideoPlayerDialog } from "../VideoPlayerDialog";
 import "./SearchResult.css";
+import "../../styles/card-states.css";
 
 export interface CommentarySearchResultProps {
   commentary: Commentary;
@@ -51,7 +52,9 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
   };
 
   return (
-    <div key={uuid} className="box">
+    <div key={uuid} className="box hextech-card">
+      <div className="corner-top-right"></div>
+      <div className="corner-bottom-left"></div>
       <div className="box-content">
         <div className="columns is-multiline">
           <div className="column 7">

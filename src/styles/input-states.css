@@ -1,0 +1,165 @@
+/**
+ * League of Legends Hextech Input States
+ */
+
+/* Base input styling */
+.hextech-input {
+  position: relative;
+  background-color: #0a1428; /* LoL background medium */
+  color: #f0e6d2; /* LoL gold light */
+  border: 2px solid #785a28; /* LoL gold dark */
+  border-radius: 2px;
+  font-family: "Spiegel", sans-serif;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  padding: 0.75rem 1rem;
+  width: 100%;
+}
+
+/* Input states */
+.hextech-input:hover {
+  border-color: #c8aa6e; /* LoL gold medium */
+}
+
+.hextech-input:focus {
+  outline: none;
+  border-color: #0ac8b9; /* Hextech blue */
+  box-shadow: 0 0 10px rgba(12, 200, 185, 0.3);
+}
+
+.hextech-input:disabled {
+  background-color: rgba(10, 20, 40, 0.7);
+  color: rgba(240, 230, 210, 0.4);
+  border-color: rgba(120, 90, 40, 0.5);
+  cursor: not-allowed;
+}
+
+/* Error state */
+.hextech-input.is-error {
+  border-color: #be3144; /* LoL status error */
+}
+
+.hextech-input.is-error:focus {
+  box-shadow: 0 0 10px rgba(190, 49, 68, 0.3);
+}
+
+/* Filled state - subtle indicator */
+.hextech-input:not(:placeholder-shown) {
+  background-color: #091428; /* LoL blue dark */
+}
+
+/* Input with icon */
+.hextech-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.hextech-input-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c8aa6e; /* LoL gold medium */
+  transition: color 0.3s ease;
+}
+
+.hextech-input-icon.is-left {
+  left: 1rem;
+}
+
+.hextech-input-icon.is-right {
+  right: 1rem;
+}
+
+/* Icon changes color on focus */
+.hextech-input:focus ~ .hextech-input-icon {
+  color: #0ac8b9; /* Hextech blue */
+}
+
+/* Input with custom border animation */
+.hextech-search-input {
+  position: relative;
+  overflow: hidden;
+}
+
+.hextech-search-input::before,
+.hextech-search-input::after {
+  content: "";
+  position: absolute;
+  background: #0ac8b9; /* Hextech blue */
+  transition: transform 0.3s ease;
+}
+
+/* Top border */
+.hextech-search-input::before {
+  height: 2px;
+  width: 100%;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+}
+
+/* Bottom border */
+.hextech-search-input::after {
+  height: 2px;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  transform: translateX(100%);
+}
+
+.hextech-search-input:focus::before,
+.hextech-search-input:focus::after {
+  transform: translateX(0);
+}
+
+/* Input with left padding for icon */
+.hextech-input.has-icon-left {
+  padding-left: 2.5rem;
+}
+
+.hextech-input.has-icon-right {
+  padding-right: 2.5rem;
+}
+
+/* Energy lines for search input */
+.hextech-energy-lines {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(12, 200, 185, 0) 0%,
+    rgba(12, 200, 185, 0.5) 50%,
+    rgba(12, 200, 185, 0) 100%
+  );
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.hextech-search-container:hover .hextech-energy-lines,
+.hextech-input:focus + .hextech-energy-lines {
+  opacity: 0.5 !important;
+}
+
+/* Searchbar container */
+.hextech-search-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Hextech search animation */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(12, 200, 185, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(12, 200, 185, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(12, 200, 185, 0.2);
+  }
+}

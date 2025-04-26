@@ -1,0 +1,222 @@
+/**
+ * League of Legends Hextech Button States
+ */
+
+/* Base Hextech Button */
+.hextech-button {
+  position: relative;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
+}
+
+/* Button Types */
+
+/* Primary Button (Hextech Blue) */
+.hextech-primary {
+  background-color: #0a323c; /* LoL background light */
+  color: #cdfafa; /* Hextech blue light */
+  border-color: #0ac8b9; /* Hextech blue */
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Primary State Transitions */
+.hextech-primary:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(12, 200, 185, 0) 0%, rgba(12, 200, 185, 0.2) 50%, rgba(12, 200, 185, 0) 100%);
+  transition: left 0.8s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hextech-primary:hover {
+  background-color: #0a3c42;
+  box-shadow:
+    0 0 10px rgba(12, 200, 185, 0.4),
+    inset 0 0 5px rgba(12, 200, 185, 0.2);
+  transform: translateY(-1px);
+}
+
+.hextech-primary:hover:before {
+  left: 100%;
+}
+
+.hextech-primary:active {
+  background-color: #091428; /* LoL blue dark */
+  box-shadow:
+    0 0 5px rgba(12, 200, 185, 0.3),
+    inset 0 0 10px rgba(1, 10, 19, 0.3);
+  transform: translateY(1px);
+}
+
+.hextech-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(12, 200, 185, 0.5);
+}
+
+.hextech-primary:disabled {
+  background-color: #0a1428; /* LoL background medium */
+  color: rgba(205, 250, 250, 0.4);
+  border-color: rgba(12, 200, 185, 0.3);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary Button (Gold) */
+.hextech-secondary {
+  background-color: #091428; /* LoL blue dark */
+  color: #c8aa6e; /* LoL gold medium */
+  border-color: #785a28; /* LoL gold dark */
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 500;
+}
+
+/* Secondary State Transitions */
+.hextech-secondary:hover {
+  background-color: #0a1e3c;
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #c8aa6e; /* LoL gold medium */
+  box-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
+  transform: translateY(-1px);
+}
+
+.hextech-secondary:active {
+  background-color: #0a1428; /* LoL background medium */
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  transform: translateY(1px);
+}
+
+.hextech-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(200, 170, 110, 0.3);
+}
+
+.hextech-secondary:disabled {
+  background-color: #0a1428; /* LoL background medium */
+  color: rgba(200, 170, 110, 0.4);
+  border-color: rgba(120, 90, 40, 0.4);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Utility Button */
+.hextech-utility {
+  background-color: #0a1428; /* LoL background medium */
+  color: #a09b8c; /* LoL text muted */
+  border-color: #3d424d; /* LoL grey */
+  font-family: "Spiegel", sans-serif;
+  font-weight: normal;
+}
+
+/* Utility State Transitions */
+.hextech-utility:hover {
+  background-color: #0a1e36;
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #5b5a56; /* LoL text */
+  box-shadow: 0 0 4px rgba(61, 66, 77, 0.5);
+  transform: translateY(-1px);
+}
+
+.hextech-utility:active {
+  background-color: #010a13; /* LoL background dark */
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  transform: translateY(1px);
+}
+
+.hextech-utility:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(61, 66, 77, 0.3);
+}
+
+.hextech-utility:disabled {
+  background-color: #0a1428; /* LoL background medium */
+  color: rgba(160, 155, 140, 0.4);
+  border-color: rgba(61, 66, 77, 0.3);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Default Button */
+.hextech-default {
+  background-color: #010a13; /* LoL background dark */
+  color: #c8aa6e; /* LoL gold medium */
+  border-color: #5b5a56; /* LoL text */
+  font-family: "Spiegel", sans-serif;
+}
+
+/* Default State Transitions */
+.hextech-default:hover {
+  background-color: #0a1428; /* LoL background medium */
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #a09b8c; /* LoL text muted */
+  transform: translateY(-1px);
+}
+
+.hextech-default:active {
+  background-color: #010a13; /* LoL background dark */
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  transform: translateY(1px);
+}
+
+.hextech-default:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(91, 90, 86, 0.3);
+}
+
+.hextech-default:disabled {
+  background-color: #010a13; /* LoL background dark */
+  color: rgba(200, 170, 110, 0.4);
+  border-color: rgba(91, 90, 86, 0.3);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Corner accents for primary buttons */
+.hextech-primary:after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-top: 1px solid #0ac8b9; /* Hextech blue */
+  border-left: 1px solid #0ac8b9; /* Hextech blue */
+  top: 2px;
+  left: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hextech-primary:before {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-bottom: 1px solid #0ac8b9; /* Hextech blue */
+  border-right: 1px solid #0ac8b9; /* Hextech blue */
+  bottom: 2px;
+  right: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hextech-primary:hover:after,
+.hextech-primary:hover:before,
+.hextech-primary:focus:after,
+.hextech-primary:focus:before {
+  opacity: 1;
+}

@@ -14,6 +14,7 @@ export enum Color {
   NONE,
   TEAL,
   RED,
+  STATUS_ERROR,
 }
 
 export enum Size {
@@ -33,6 +34,8 @@ export class Hero extends React.PureComponent<HeroProps, unknown> {
         return "is-danger";
       case Color.TEAL:
         return "is-primary";
+      case Color.STATUS_ERROR:
+        return "is-danger hextech-status-error";
     }
   }
 
@@ -59,6 +62,8 @@ export class Hero extends React.PureComponent<HeroProps, unknown> {
         return colors.status.error;
       case Color.TEAL:
         return colors.gold.medium;
+      case Color.STATUS_ERROR:
+        return colors.status.error;
     }
   }
 

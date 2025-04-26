@@ -188,7 +188,7 @@ export default class App extends React.Component<unknown, AppState> {
       <div className="hextech-app">
         <div className="hextech-energy-lines"></div>
         <Sentry.ErrorBoundary
-          fallback={<Hero title="Something went wrong" color={Color.RED} size={Size.FULL} />}
+          fallback={<Hero title="Something went wrong" color={Color.STATUS_ERROR} size={Size.FULL} />}
           showDialog={true}
         >
           <Router

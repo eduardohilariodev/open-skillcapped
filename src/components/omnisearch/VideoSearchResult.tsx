@@ -11,6 +11,7 @@ import { faCloudDownloadAlt } from "@fortawesome/free-solid-svg-icons";
 import Highlighter from "react-highlight-words";
 import { VideoPlayerDialog } from "../VideoPlayerDialog";
 import "./SearchResult.css";
+import "../../styles/card-states.css";
 
 export interface VideoSearchResultProps {
   video: Video;
@@ -36,8 +37,10 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
   };
 
   return (
-    <div key={video.uuid} className="box">
+    <div key={video.uuid} className="box hextech-card">
       <div className="box-content">
+        <div className="corner-top-right"></div>
+        <div className="corner-bottom-left"></div>
         <div className="columns is-multiline">
           <div className="column is-7">
             <h3 className="title is-5">

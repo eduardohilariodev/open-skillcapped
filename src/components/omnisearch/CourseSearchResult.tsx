@@ -2,6 +2,7 @@ import { Course } from "../../model/Course";
 import React from "react";
 import Highlighter from "react-highlight-words";
 import "./SearchResult.css";
+import "../../styles/card-states.css";
 import { Watchable } from "../../model/WatchStatus";
 import { FuseSearchResult } from "./search/FuseSearch";
 import { CourseSearchResultVideo } from "./CourseSearchResultVideo";
@@ -40,8 +41,10 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
   });
 
   return (
-    <div key={course.uuid} className="box">
+    <div key={course.uuid} className="box hextech-card">
       <div className="box-content">
+        <div className="corner-top-right"></div>
+        <div className="corner-bottom-left"></div>
         <div className="columns is-multiline">
           <div className="column is-7">
             <h3 className="title">
@@ -55,8 +58,8 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
                 Released: {props.result.item.releaseDate.toLocaleDateString()}
               </span>
             </div>
-            <div>
-              <ol>{videos}</ol>
+            <div className="course-videos-list">
+              <ol className="video-list">{videos}</ol>
             </div>
           </div>
           <div className="column is-5">

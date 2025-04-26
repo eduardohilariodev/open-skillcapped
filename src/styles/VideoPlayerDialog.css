@@ -9,7 +9,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(1, 10, 19, 0.95); /* LoL background dark with opacity */
-  z-index: 1000;
+  z-index: 9999; /* Ensure dialog appears above all content */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,9 +25,10 @@
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 10px 30px rgba(1, 10, 19, 0.7); /* Use LoL dark background for shadow */
   position: relative;
   overflow: hidden;
+  z-index: 10000; /* Ensure dialog appears above overlay */
 }
 
 .video-player-header {
@@ -96,7 +97,7 @@
 .video-player {
   width: 100%;
   height: 100%;
-  background-color: #000;
+  background-color: #010a13; /* LoL background dark instead of pure black */
 }
 
 .video-player-footer {
@@ -357,7 +358,7 @@
 .keyboard-shortcut {
   opacity: 0.7;
   font-size: 11px;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(1, 10, 19, 0.3); /* Use LoL dark background with opacity */
   padding: 2px 5px;
   border-radius: 3px;
   margin-left: 5px;
@@ -399,7 +400,7 @@
 
 /* Hextech-styled video controls */
 video::-webkit-media-controls-panel {
-  background-color: rgba(10, 32, 60, 0.7) !important; /* LoL background light with opacity */
+  background-color: rgba(10, 20, 40, 0.7) !important; /* LoL background medium with opacity */
 }
 
 video::-webkit-media-controls-play-button,
@@ -408,6 +409,11 @@ video::-webkit-media-controls-mute-button,
 video::-webkit-media-controls-timeline,
 video::-webkit-media-controls-fullscreen-button {
   filter: hue-rotate(210deg) saturate(70%) brightness(130%);
+}
+
+video::-webkit-media-controls-current-time-display::after,
+video::-webkit-media-controls-time-remaining-display::after {
+  color: #f0e6d2 !important; /* LoL gold light instead of white */
 }
 
 /* Custom scrollbar for queue list */
@@ -492,7 +498,7 @@ video::-webkit-media-controls-fullscreen-button {
 
 /* Custom styling for the player when fullscreen */
 .lol-hextech-player:fullscreen {
-  background-color: var(--lol-background-dark);
+  background-color: #010a13; /* LoL background dark */
 }
 
 /* Custom progress bar colors */
@@ -504,4 +510,106 @@ video::-webkit-media-controls-fullscreen-button {
   .lol-hextech-player::-webkit-slider-runnable-track {
     background-color: var(--lol-gold-dark);
   }
+}
+
+/* Video fullscreen styles */
+:fullscreen,
+:-webkit-full-screen,
+:-moz-full-screen,
+:-ms-fullscreen {
+  background-color: #010a13 !important; /* LoL background dark */
+}
+
+:fullscreen .video-container,
+:-webkit-full-screen .video-container,
+:-moz-full-screen .video-container,
+:-ms-fullscreen .video-container {
+  background: #010a13; /* LoL background dark */
+}
+
+/* Modify media control colors to match Hextech theme */
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display,
+video::-webkit-media-controls-mute-button,
+video::-webkit-media-controls-volume-slider-container,
+video::-webkit-media-controls-volume-slider,
+video::-webkit-media-controls-panel {
+  color: #f0e6d2 !important; /* LoL gold light */
+}
+
+/* Add custom Hextech progress bar styling */
+video::-webkit-progress-bar {
+  background-color: rgba(10, 20, 40, 0.7) !important; /* LoL background medium with opacity */
+}
+
+video::-webkit-progress-value {
+  background: linear-gradient(to right, #0ac8b9, #cdfafa) !important; /* Hextech blue gradient */
+}
+
+/* Modify media control text that might be pure white */
+video::-webkit-media-controls-panel *,
+video::-webkit-media-controls-current-time-display *,
+video::-webkit-media-controls-time-remaining-display * {
+  color: #f0e6d2 !important; /* LoL gold light */
+}
+
+/* Make error messages follow the hextech styling */
+.error-message .info-message {
+  color: #a09b8c; /* LoL text muted */
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+/* Error message action buttons */
+.error-message button {
+  background-color: #0a323c; /* LoL background light */
+  color: #c8aa6e; /* LoL gold medium */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 2px;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  font-family: "Spiegel", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.error-message button:hover {
+  background-color: #0a1e36;
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #c8aa6e; /* LoL gold medium */
+  box-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
+}
+
+/* Video controls styling */
+video::-webkit-media-controls {
+  background-color: rgba(1, 10, 19, 0.8) !important; /* LoL background dark with opacity */
+}
+
+video::-webkit-media-controls-enclosure {
+  background-color: rgba(10, 20, 40, 0.7) !important; /* LoL background medium with opacity */
+}
+
+/* Customize play button, volume controls, and other video controls */
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-volume-slider,
+video::-webkit-media-controls-mute-button,
+video::-webkit-media-controls-fullscreen-button {
+  background-color: transparent !important;
+  color: #c8aa6e !important; /* LoL gold medium */
+}
+
+/* Style the scrubber/timeline */
+video::-webkit-slider-thumb {
+  background-color: #0ac8b9 !important; /* Hextech blue */
+}
+
+video::-webkit-slider-runnable-track {
+  background-color: rgba(120, 90, 40, 0.5) !important; /* LoL gold dark with opacity */
+}
+
+/* Customize time indicators */
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display {
+  color: #f0e6d2 !important; /* LoL gold light */
+  font-family: "Spiegel", sans-serif !important;
 }

@@ -1,0 +1,129 @@
+/**
+ * League of Legends Hextech Button Icons
+ */
+
+/* Common icon styling */
+.bookmark-icon,
+.watch-status-icon {
+  display: inline-flex;
+  margin-right: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Animation for bookmark icon */
+.bookmark-icon {
+  position: relative;
+  transform-origin: center;
+}
+
+.bookmark-icon.bookmarked {
+  transform: scale(1.1);
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.bookmark-toggle-button:hover .bookmark-icon {
+  animation: pulse 1s ease infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Add hextech glow effect for primary bookmark button */
+.hextech-primary .bookmark-icon:not(.bookmarked)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(12, 200, 185, 0.4) 0%, rgba(12, 200, 185, 0) 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hextech-primary:hover .bookmark-icon:not(.bookmarked)::after {
+  opacity: 1;
+}
+
+/* Animation for watch status icon */
+.watch-status-icon {
+  position: relative;
+  transform-origin: center;
+}
+
+.watch-status-icon.watched {
+  transform: scale(1.1);
+  color: #f0e6d2; /* LoL gold light */
+}
+
+/* Eye opening/closing animation */
+.watch-status-toggle-button:hover .watch-status-icon:not(.watched) {
+  animation: blink 2s ease infinite;
+}
+
+@keyframes blink {
+  0% {
+    transform: scaleY(1);
+  }
+  15% {
+    transform: scaleY(0.1);
+  }
+  20% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+/* Add pulsing effect for watched items */
+.watch-status-icon.watched {
+  position: relative;
+}
+
+.watch-status-icon.watched::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  right: -30%;
+  bottom: -30%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 170, 110, 0.3) 0%, rgba(200, 170, 110, 0) 70%);
+  animation: fadeInOut 3s ease infinite;
+  z-index: -1;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+/* Common button spacing adjustments */
+.bookmark-toggle-button,
+.watch-status-toggle-button {
+  margin-right: 0.5rem;
+}
+
+/* Make button content vertically aligned */
+.hextech-button > * {
+  vertical-align: middle;
+}

@@ -188,76 +188,27 @@ mark:hover::after {
   color: #f0e6d2; /* LoL gold light */
 }
 
-/* Course video list styling */
-.box-content ol {
-  margin-left: 25px;
-  margin-right: 25px;
+/* Course video list styling - updated */
+.course-videos-list {
   margin-top: 1rem;
-  padding-left: 1rem;
-  list-style-type: decimal;
+}
+
+.video-list {
+  list-style-position: inside;
+  margin: 0;
+  padding: 0.5rem 1rem;
   border-left: 1px solid #3d424d; /* LoL grey */
 }
 
-.box-content ol li {
-  margin-bottom: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 2px;
-  transition: background-color 0.2s ease;
+.video-list li {
+  margin-bottom: 0.5rem;
   position: relative;
 }
 
-.box-content ol li:hover {
-  background-color: rgba(12, 200, 185, 0.05); /* Hextech blue with transparency */
-}
-
-.box-content ol li a {
-  color: #c8aa6e; /* LoL gold medium */
-  text-decoration: none;
-  transition: color 0.2s ease;
-  display: inline-block;
-  max-width: calc(100% - 60px); /* Make room for the buttons */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.box-content ol li a:hover {
-  color: #f0e6d2; /* LoL gold light */
-}
-
-.box-content ol li a.has-text-grey-lighter {
-  color: #5b5a56; /* LoL text */
-  text-decoration: line-through;
-  text-decoration-color: rgba(200, 170, 110, 0.3);
-  text-decoration-thickness: 1px;
-}
-
-/* Style for watched video buttons */
-.video-watched-button {
-  background: none;
-  color: #c8aa6e; /* LoL gold medium */
-  border: 1px solid #785a28; /* LoL gold dark */
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 0.25rem;
-  transition: all 0.2s ease;
-  float: none;
-}
-
-.video-watched-button:hover {
-  background-color: #091428; /* LoL blue dark */
-  color: #f0e6d2; /* LoL gold light */
-  border-color: #c8aa6e; /* LoL gold medium */
-  transform: translateY(-1px);
-}
-
-.video-watched-button.is-warning {
-  background-color: rgba(200, 170, 110, 0.1);
-  color: #f0e6d2; /* LoL gold light */
+/* Reset default list styling */
+.box-content ol.video-list {
+  margin-left: 1rem;
+  list-style-type: decimal;
 }
 
 /* Responsive adjustments */

@@ -10,6 +10,7 @@ import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
 import { VideoPlayerDialog } from "../VideoPlayerDialog";
 import "./SearchResult.css";
+import "../../styles/card-states.css";
 
 export interface SearchResultVideoProps {
   matchedStrings: string[];
@@ -40,26 +41,46 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
   };
 
   return (
-    <li>
-      <a href={link} className={textStyle} onClick={handleVideoClick}>
-        <Highlighter searchWords={matchedStrings} textToHighlight={title} autoEscape={true} />
-      </a>{" "}
-      <button
-        onClick={() => props.onToggleBookmark(video)}
-        className={classNames("video-watched-button tag is-small is-outlined is-inverted is-rounded", {
-          "is-warning": isBookmarked,
-        })}
-        title={bookmarkHint}
+    <li className="mb-2">
+      <div
+        className={classNames(
+          "flex gap-3 m-1 px-3 py-2 rounded-lg cursor-pointer hextech-card-secondary",
+          "hextech-card-hover hextech-card-active",
+        )}
+        onClick={handleVideoClick}
       >
-        <FontAwesomeIcon icon={faBookmark} />
-      </button>
-      <button
-        onClick={() => props.onToggleWatchStatus(video)}
-        className="video-watched-button tag is-small is-outlined is-inverted is-rounded"
-        title={watchToggleHint}
-      >
-        <FontAwesomeIcon icon={watchToggleIcon} />
-      </button>
+        <div className="flex justify-between items-center w-full gap-3">
+          <div className="flex-1">
+            <Highlighter
+              highlightClassName="bg-yellow-300"
+              searchWords={matchedStrings}
+              autoEscape={true}
+              textToHighlight={video.title}
+              className="text-sm"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              className="text-gray-400 hover:text-gray-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onToggleWatchStatus(video);
+              }}
+            >
+              <FontAwesomeIcon icon={isWatched ? faEye : faEyeSlash} />
+            </button>
+            <button
+              className={classNames("hover:text-gray-200", isBookmarked ? "text-yellow-400" : "text-gray-400")}
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onToggleBookmark(video);
+              }}
+            >
+              <FontAwesomeIcon icon={faBookmark} />
+            </button>
+          </div>
+        </div>
+      </div>
       <VideoPlayerDialog video={video} course={course} isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
     </li>
   );

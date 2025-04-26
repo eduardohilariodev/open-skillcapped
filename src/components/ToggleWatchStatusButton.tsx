@@ -3,44 +3,40 @@ import { ToggleButton } from "./ToggleButton";
 import { Watchable } from "../model/WatchStatus";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { colors } from "../styles";
+import "../styles/button-states.css";
+import "../styles/button-icons.css";
 
 export interface ToggleWatchStatusButtonProps {
   item: Watchable;
   isWatched: boolean;
   onToggleWatchStatus: (item: Watchable) => void;
+  disabled?: boolean;
 }
 
 export function ToggleWatchStatusButton(props: ToggleWatchStatusButtonProps): React.ReactElement {
-  const { item, isWatched, onToggleWatchStatus } = props;
+  const { item, isWatched, onToggleWatchStatus, disabled = false } = props;
   const watchToggleIcon = isWatched ? faEyeSlash : faEye;
 
   // Apply League of Legends styling with appropriate button type
-  const buttonType = isWatched ? "secondary" : "primary";
+  const buttonType = isWatched ? "secondary" : "utility";
 
-  // Styling for icon
-  const iconStyle = {
-    marginRight: "0.5rem",
-    color: isWatched ? colors.gold.medium : colors.black,
-  };
-
-  // Styling for text
-  const textStyle = {
-    fontSize: "0.875rem",
-  };
+  // Icon classes with animation
+  const iconClasses = `watch-status-icon ${isWatched ? "watched" : ""}`;
 
   return (
     <ToggleButton
       status={isWatched}
       onToggle={() => onToggleWatchStatus(item)}
       type={buttonType}
+      disabled={disabled}
+      classes="watch-status-toggle-button"
       buttonText={(status) => {
         return (
           <React.Fragment>
-            <span style={iconStyle}>
+            <span className={iconClasses}>
               <FontAwesomeIcon icon={watchToggleIcon} />
             </span>
-            <span style={textStyle}>{status ? "Mark as unwatched" : "Mark as watched"}</span>
+            <span>{status ? "Mark as unwatched" : "Mark as watched"}</span>
           </React.Fragment>
         );
       }}
