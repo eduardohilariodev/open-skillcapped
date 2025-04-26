@@ -1,14 +1,23 @@
+/**
+ * League of Legends Fixed Layout Styles
+ */
+
 /* Fixed Layout Styles */
 .fixed-layout-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  background-color: #010a13; /* LoL background dark */
+  color: #f0e6d2; /* LoL gold light */
 }
 
 /* Fixed searchbar */
 .fixed-layout-search {
   flex-shrink: 0;
+  background-color: #0a1428; /* LoL background medium */
+  padding: 1rem;
+  border-bottom: 1px solid #785a28; /* LoL gold dark */
 }
 
 /* Main content area with fixed sidebar */
@@ -26,12 +35,34 @@
   overflow-y: auto;
   flex: 0 0 20%; /* Fixed width */
   padding: 1rem;
-  border-right: 1px solid #eee;
+  border-right: 1px solid #785a28; /* LoL gold dark */
+  background-color: #0a1428; /* LoL background medium */
 }
 
 /* Filter panels in sidebar */
 .fixed-layout-sidebar .panel {
   margin-bottom: 1rem;
+  border: 1px solid #785a28; /* LoL gold dark */
+  background-color: #0a323c; /* LoL background light */
+  border-radius: 4px;
+}
+
+.fixed-layout-sidebar .panel-heading {
+  background-color: #0a323c; /* LoL background light */
+  color: #c8aa6e; /* LoL gold medium */
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 700;
+  border-bottom: 1px solid #785a28; /* LoL gold dark */
+  padding: 0.75rem;
+}
+
+.fixed-layout-sidebar .panel-block {
+  border-bottom: 1px solid #3d424d; /* LoL grey */
+  color: #a09b8c; /* LoL light grey */
+}
+
+.fixed-layout-sidebar .panel-block:last-child {
+  border-bottom: none;
 }
 
 /* Scrollable results area */
@@ -40,17 +71,36 @@
   overflow-y: auto;
   height: calc(100vh - 80px); /* Adjust based on searchbar height */
   padding: 1rem;
+  background-color: #010a13; /* LoL background dark */
 }
 
 /* Pagination controls at bottom of results */
 .fixed-layout-results .pagination-wrapper {
   position: sticky;
   bottom: 0;
-  background-color: white;
+  background-color: #0a1428; /* LoL background medium */
   padding: 1rem 0;
   margin-top: 1rem;
   z-index: 10;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #785a28; /* LoL gold dark */
+}
+
+.fixed-layout-results .pagination {
+  font-family: "Beaufort for LOL", serif;
+}
+
+.fixed-layout-results .pagination-link,
+.fixed-layout-results .pagination-previous,
+.fixed-layout-results .pagination-next {
+  background-color: #0a323c; /* LoL background light */
+  border-color: #785a28; /* LoL gold dark */
+  color: #c8aa6e; /* LoL gold medium */
+}
+
+.fixed-layout-results .pagination-link.is-current {
+  background-color: #c8aa6e; /* LoL gold medium */
+  border-color: #785a28; /* LoL gold dark */
+  color: #010a13; /* LoL background dark */
 }
 
 /* Responsive adjustments */
@@ -64,7 +114,7 @@
     height: auto;
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #785a28; /* LoL gold dark */
   }
 
   .fixed-layout-results {

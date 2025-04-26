@@ -1,28 +1,26 @@
+/* League of Legends styled TipsButton */
 .tips-button {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
   width: 3rem;
   height: 3rem;
-  border-radius: 1.5rem;
-  border: none;
-  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  color: white;
-  background-color: rgb(234, 179, 8);
+  z-index: 10;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
-  transition: transform 0.2s;
 }
 
-.tips-button:hover {
+.tips-button button:hover {
   transform: scale(1.1);
+  box-shadow: 0 0.3rem 1.5rem rgba(0, 0, 0, 0.4);
+  border-color: #c8aa6e; /* Gold medium */
 }
 
-.tips-button:active {
+.tips-button button:active {
   transform: scale(0.95);
+  background-color: #785a28; /* Gold dark */
+  color: #f0e6d2; /* Gold light */
 }
 
 .tips-button + .tips-button {

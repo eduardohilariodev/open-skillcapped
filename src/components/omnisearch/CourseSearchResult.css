@@ -1,5 +1,11 @@
+/**
+ * League of Legends Course Search Result Styling
+ */
+
 .box-content {
   margin: 0px;
+  font-family: "Spiegel", "Spiegel Regular", sans-serif;
+  color: #f0e6d2; /* LoL gold light */
 }
 
 .box-content p {
@@ -17,7 +23,7 @@
 
 .video-watched-button {
   background: none;
-  color: inherit;
+  color: #c8aa6e; /* LoL gold medium */
   border: none;
   padding: 0;
   font: inherit;
@@ -27,8 +33,42 @@
   margin-left: 5px;
   height: 1.25rem !important;
   float: right;
+  transition: color 0.2s ease;
+}
+
+.video-watched-button:hover {
+  color: #f0e6d2; /* LoL gold light */
 }
 
 .thumbnail {
-  border-radius: 10px;
+  border-radius: 4px;
+  border: 1px solid #785a28; /* LoL gold dark */
+}
+
+/* Course card styling */
+.card {
+  background-color: #0a1428; /* LoL background medium */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: #0a323c; /* LoL background light */
+  border-bottom: 1px solid #785a28; /* LoL gold dark */
+}
+
+.card-header-title {
+  color: #c8aa6e; /* LoL gold medium */
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 700;
+}
+
+.card-content {
+  background-color: #0a1428; /* LoL background medium */
+}
+
+.card-footer {
+  background-color: #010a13; /* LoL background dark */
+  border-top: 1px solid #3d424d; /* LoL grey */
 }

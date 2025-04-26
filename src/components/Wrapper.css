@@ -1,9 +1,44 @@
+/**
+ * League of Legends Page Layout Styling
+ */
+
 .page-wrapper {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
+  background-color: #010a13; /* LoL background dark */
+  color: #f0e6d2; /* LoL gold light */
+  background-image: linear-gradient(to bottom, #0a1428, #010a13);
 }
 
 .content-wrapper {
   flex: 1;
+  position: relative;
+}
+
+/* Add gold accents to horizontal rules */
+hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(120, 90, 40, 0), rgba(200, 170, 110, 0.75), rgba(120, 90, 40, 0));
+  margin: 1.5rem 0;
+}
+
+/* Style scrollbars with LoL theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a1428; /* LoL background medium */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #785a28; /* LoL gold dark */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c8aa6e; /* LoL gold medium */
 }

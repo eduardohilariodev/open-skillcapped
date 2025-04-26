@@ -3,7 +3,7 @@ import Hls from "hls.js";
 import { Video } from "../model/Video";
 import { Course } from "../model/Course";
 import { VideoUtils } from "../utils/VideoUtils";
-import "./VideoPlayerDialog.css";
+import "../styles/VideoPlayerDialog.css";
 
 // Storage keys
 const STORAGE_KEYS = {

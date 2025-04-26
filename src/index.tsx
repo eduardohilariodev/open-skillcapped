@@ -2,6 +2,12 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./components/App";
 import "./bulma.sass";
+// Import our League of Legends styles
+import "./index.css";
+// Import Bulma overrides
+import "./styles/bulma-overrides.css";
+// Import the style guide
+import "./styles";
 import * as Sentry from "@sentry/react";
 import ReactGA4 from "react-ga4";
 

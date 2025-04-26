@@ -1,0 +1,260 @@
+/**
+ * League of Legends Bulma Framework Overrides
+ */
+
+/* Override Bulma colors with League of Legends palette */
+
+/* Box component */
+.box {
+  background-color: #0a1428; /* LoL background medium */
+  color: #f0e6d2; /* LoL gold light */
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid #785a28; /* LoL gold dark */
+}
+
+/* Cards */
+.card {
+  background-color: #0a1428; /* LoL background medium */
+  color: #f0e6d2; /* LoL gold light */
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #785a28; /* LoL gold dark */
+}
+
+.card-header {
+  background-color: #0a323c; /* LoL background light */
+  border-bottom: 1px solid #785a28; /* LoL gold dark */
+}
+
+.card-header-title {
+  color: #c8aa6e; /* LoL gold medium */
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 700;
+}
+
+.card-content {
+  background-color: #0a1428; /* LoL background medium */
+  padding: 1.5rem;
+}
+
+.card-footer {
+  background-color: #010a13; /* LoL background dark */
+  border-top: 1px solid #3d424d; /* LoL grey */
+}
+
+/* Buttons */
+.button {
+  background-color: #3d424d; /* LoL grey */
+  color: #f0e6d2; /* LoL gold light */
+  border: 1px solid #3d424d; /* LoL grey */
+  font-family: "Beaufort for LOL", serif;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: #1e2328; /* LoL dark grey */
+  border-color: #785a28; /* LoL gold dark */
+}
+
+.button.is-primary {
+  background-color: #c8aa6e; /* LoL gold medium */
+  color: #010a13; /* LoL background dark */
+  border-color: #785a28; /* LoL gold dark */
+}
+
+.button.is-primary:hover {
+  background-color: #785a28; /* LoL gold dark */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.button.is-info {
+  background-color: #0ac8b9; /* LoL blue medium */
+  color: #010a13; /* LoL background dark */
+  border-color: #0a323c; /* LoL blue dark */
+}
+
+.button.is-info:hover {
+  background-color: #0a323c; /* LoL blue dark */
+  color: #cdfafa; /* LoL blue light */
+}
+
+.button.is-success {
+  background-color: #1ca64c; /* LoL green */
+  border-color: #008274; /* LoL dark green */
+}
+
+.button.is-warning {
+  background-color: #d6b23e; /* LoL yellow */
+  color: #010a13; /* LoL background dark */
+}
+
+.button.is-danger {
+  background-color: #be3144; /* LoL status error */
+  border-color: #af3131; /* LoL red */
+}
+
+/* Inputs and Form Controls */
+.input,
+.textarea,
+.select select {
+  background-color: #010a13; /* LoL background dark */
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #785a28; /* LoL gold dark */
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.input:focus,
+.textarea:focus,
+.select select:focus {
+  border-color: #c8aa6e; /* LoL gold medium */
+  box-shadow: 0 0 0 0.125em rgba(200, 170, 110, 0.25);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: #a09b8c; /* LoL light grey */
+  opacity: 0.7;
+}
+
+/* Tables */
+.table {
+  background-color: #0a1428; /* LoL background medium */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.table thead {
+  background-color: #0a323c; /* LoL background light */
+}
+
+.table thead th {
+  color: #c8aa6e; /* LoL gold medium */
+  font-family: "Beaufort for LOL", serif;
+  border-bottom: 2px solid #785a28; /* LoL gold dark */
+}
+
+.table td,
+.table th {
+  border: 1px solid #3d424d; /* LoL grey */
+}
+
+.table.is-striped tbody tr:not(.is-selected):nth-child(even) {
+  background-color: #1e2328; /* LoL dark grey */
+}
+
+/* Panels */
+.panel {
+  background-color: #0a1428; /* LoL background medium */
+  border-radius: 4px;
+  border: 1px solid #785a28; /* LoL gold dark */
+}
+
+.panel-heading {
+  background-color: #0a323c; /* LoL background light */
+  color: #c8aa6e; /* LoL gold medium */
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 700;
+  border-bottom: 1px solid #785a28; /* LoL gold dark */
+}
+
+.panel-block {
+  color: #f0e6d2; /* LoL gold light */
+  border-bottom: 1px solid #3d424d; /* LoL grey */
+}
+
+.panel-block:hover {
+  background-color: #0a323c; /* LoL background light */
+}
+
+/* Pagination */
+.pagination-link,
+.pagination-next,
+.pagination-previous {
+  background-color: #1e2328; /* LoL dark grey */
+  border-color: #3d424d; /* LoL grey */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.pagination-link.is-current {
+  background-color: #c8aa6e; /* LoL gold medium */
+  border-color: #785a28; /* LoL gold dark */
+  color: #010a13; /* LoL background dark */
+}
+
+.pagination-link:hover,
+.pagination-next:hover,
+.pagination-previous:hover {
+  background-color: #0a323c; /* LoL background light */
+  border-color: #785a28; /* LoL gold dark */
+  color: #c8aa6e; /* LoL gold medium */
+}
+
+/* Notifications */
+.notification {
+  background-color: #0a323c; /* LoL background light */
+  color: #f0e6d2; /* LoL gold light */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 4px;
+}
+
+.notification.is-primary {
+  background-color: #785a28; /* LoL gold dark */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.notification.is-info {
+  background-color: #0a323c; /* LoL blue dark */
+  color: #cdfafa; /* LoL blue light */
+}
+
+.notification.is-success {
+  background-color: #1ca64c; /* LoL green */
+}
+
+.notification.is-warning {
+  background-color: #d6b23e; /* LoL yellow */
+  color: #010a13; /* LoL background dark */
+}
+
+.notification.is-danger {
+  background-color: #be3144; /* LoL status error */
+}
+
+/* Modals/Dialogs */
+.modal-card-head {
+  background-color: #0a323c; /* LoL background light */
+  border-bottom: 1px solid #785a28; /* LoL gold dark */
+}
+
+.modal-card-title {
+  color: #c8aa6e; /* LoL gold medium */
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 700;
+}
+
+.modal-card-body {
+  background-color: #0a1428; /* LoL background medium */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.modal-card-foot {
+  background-color: #010a13; /* LoL background dark */
+  border-top: 1px solid #3d424d; /* LoL grey */
+}
+
+/* Tabs */
+.tabs li.is-active a {
+  border-bottom-color: #c8aa6e; /* LoL gold medium */
+  color: #c8aa6e; /* LoL gold medium */
+}
+
+.tabs a {
+  color: #a09b8c; /* LoL light grey */
+  border-bottom-color: #3d424d; /* LoL grey */
+}
+
+.tabs a:hover {
+  color: #f0e6d2; /* LoL gold light */
+  border-bottom-color: #785a28; /* LoL gold dark */
+}

@@ -1,5 +1,7 @@
 import React from "react";
 import classNames from "classnames/bind";
+import { colors, typography } from "../styles";
+import leagueify from "../styles/theme";
 
 export interface HeroProps {
   title: string;
@@ -49,21 +51,66 @@ export class Hero extends React.PureComponent<HeroProps, unknown> {
     }
   }
 
+  getBackgroundColorFromColor(color: Color): string {
+    switch (color) {
+      case Color.NONE:
+        return colors.background.medium;
+      case Color.RED:
+        return colors.status.error;
+      case Color.TEAL:
+        return colors.gold.medium;
+    }
+  }
+
+  getTextColorFromColor(color: Color): string {
+    switch (color) {
+      case Color.TEAL:
+        return colors.black;
+      default:
+        return colors.white;
+    }
+  }
+
   render(): React.ReactNode {
     const cx = classNames.bind({});
-    const sectionClasses: string = cx({
-      hero: true,
-      "is-dark": true,
-      [this.getClassNameForColor(this.props.color || Color.NONE)]: true,
-      [this.getClassNameForSize(this.props.size || Size.SMALL)]: true,
-    });
+    const colorClass = this.getClassNameForColor(this.props.color || Color.NONE);
+    const sizeClass = this.getClassNameForSize(this.props.size || Size.SMALL);
+    const isLarge =
+      this.props.size === Size.LARGE || this.props.size === Size.FULL || this.props.size === Size.FULL_WITH_NAVBAR;
+
+    // Apply League of Legends styling with inline styles
+    const heroStyle = {
+      ...leagueify.hero(colorClass, isLarge),
+      height: sizeClass.includes("fullheight") ? "100vh" : "auto",
+    };
+
+    const titleStyle = {
+      fontFamily: typography.fontFamily.display,
+      color: this.props.color === Color.TEAL ? colors.black : colors.gold.medium,
+      fontSize: isLarge ? typography.fontSize["4xl"] : typography.fontSize["2xl"],
+      fontWeight: typography.fontWeight.bold,
+      marginBottom: "0.5rem",
+    };
+
+    const subtitleStyle = {
+      fontFamily: typography.fontFamily.body,
+      color: this.props.color === Color.TEAL ? colors.black : colors.gold.light,
+      fontSize: isLarge ? typography.fontSize.xl : typography.fontSize.lg,
+      fontWeight: typography.fontWeight.medium,
+    };
 
     return (
-      <section className={sectionClasses}>
+      <section className={cx({ hero: true })} style={heroStyle}>
         <div className="hero-body">
           <div className="container">
-            <h1 className="title">{this.props.title}</h1>
-            <h2 className="subtitle">{this.props.subtitle}</h2>
+            <h1 className="title" style={titleStyle}>
+              {this.props.title}
+            </h1>
+            {this.props.subtitle && (
+              <h2 className="subtitle" style={subtitleStyle}>
+                {this.props.subtitle}
+              </h2>
+            )}
           </div>
         </div>
       </section>

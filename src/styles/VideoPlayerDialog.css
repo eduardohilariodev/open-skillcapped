@@ -1,0 +1,416 @@
+/**
+ * League of Legends Video Player Styling
+ */
+
+.video-player-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(1, 10, 19, 0.9); /* using black with high opacity */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.video-player-dialog {
+  background-color: #0a1428; /* LoL background medium */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 4px;
+  width: 90%;
+  max-width: 960px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
+}
+
+.video-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #0a323c; /* LoL background light */
+  border-bottom: 1px solid #785a28; /* LoL gold dark */
+}
+
+.video-player-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #f0e6d2; /* LoL gold light */
+  font-family: "Beaufort for LOL", serif;
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.course-name {
+  color: #a09b8c; /* LoL light grey */
+  opacity: 0.9;
+  font-weight: normal;
+  margin-right: 5px;
+}
+
+.episode-number {
+  color: #c8aa6e; /* LoL gold medium */
+  margin-right: 5px;
+  font-weight: 500;
+}
+
+.video-title {
+  font-weight: bold;
+}
+
+.video-duration {
+  color: #a09b8c; /* LoL light grey */
+  margin-right: 12px;
+  font-size: 14px;
+  padding: 2px 6px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #c8aa6e; /* LoL gold medium */
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 8px;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.video-player-content {
+  padding: 16px;
+  position: relative;
+  background-color: #010a13; /* LoL background dark */
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  background-color: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #3d424d; /* LoL grey */
+}
+
+.video-player {
+  width: 100%;
+  max-height: 70vh;
+  background-color: black;
+}
+
+/* Custom video controls */
+.custom-video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(1, 10, 19, 0.7); /* LoL background dark with opacity */
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  border-top: 1px solid #785a28; /* LoL gold dark */
+}
+
+.video-container:hover .custom-video-controls {
+  opacity: 1;
+}
+
+.progress-container {
+  width: 100%;
+  height: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.custom-progress {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(160, 155, 140, 0.2); /* LoL light grey with opacity */
+  border-radius: 4px;
+  overflow: hidden;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.custom-progress::-webkit-progress-bar {
+  background-color: rgba(160, 155, 140, 0.2); /* LoL light grey with opacity */
+  border-radius: 4px;
+}
+
+.custom-progress::-webkit-progress-value {
+  background-color: #c8aa6e; /* LoL gold medium */
+  border-radius: 4px;
+}
+
+.custom-progress::-moz-progress-bar {
+  background-color: #c8aa6e; /* LoL gold medium */
+  border-radius: 4px;
+}
+
+.time-display {
+  color: #f0e6d2; /* LoL gold light */
+  font-size: 12px;
+  margin-left: 10px;
+  display: inline-flex;
+  align-items: center;
+  font-family: "Spiegel", sans-serif;
+}
+
+/* Control buttons */
+.control-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-controls,
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-button {
+  background: none;
+  border: none;
+  color: #c8aa6e; /* LoL gold medium */
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+
+.control-button:hover {
+  color: #f0e6d2; /* LoL gold light */
+  background-color: rgba(120, 90, 40, 0.3); /* LoL gold dark with opacity */
+}
+
+.control-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Loading indicator */
+.loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.spinner {
+  border: 3px solid rgba(200, 170, 110, 0.3); /* LoL gold medium with opacity */
+  border-radius: 50%;
+  border-top: 3px solid #c8aa6e; /* LoL gold medium */
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Queue related styles */
+.video-queue-container {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 4px;
+  background-color: #0a1428; /* LoL background medium */
+}
+
+.queue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #3d424d; /* LoL grey */
+  padding-bottom: 8px;
+}
+
+.queue-header h3 {
+  margin: 0;
+  font-family: "Beaufort for LOL", serif;
+  color: #c8aa6e; /* LoL gold medium */
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.queue-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.queue-control-button {
+  background: none;
+  border: 1px solid #785a28; /* LoL gold dark */
+  color: #c8aa6e; /* LoL gold medium */
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s;
+  font-family: "Beaufort for LOL", serif;
+}
+
+.queue-control-button:hover {
+  background-color: #785a28; /* LoL gold dark */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.queue-control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.queue-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+  color: #a09b8c; /* LoL light grey */
+}
+
+.queue-item:hover {
+  background-color: #0a323c; /* LoL background light */
+}
+
+.queue-item.active {
+  background-color: #0a323c; /* LoL background light */
+  color: #f0e6d2; /* LoL gold light */
+  border-left: 2px solid #c8aa6e; /* LoL gold medium */
+}
+
+.queue-item-index {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #3d424d; /* LoL grey */
+  color: #f0e6d2; /* LoL gold light */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  font-size: 12px;
+  font-family: "Beaufort for LOL", serif;
+}
+
+.queue-item.active .queue-item-index {
+  background-color: #c8aa6e; /* LoL gold medium */
+  color: #010a13; /* LoL background dark */
+}
+
+.queue-item-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  margin-right: 10px;
+  font-family: "Spiegel", sans-serif;
+}
+
+.queue-item-duration {
+  font-size: 12px;
+  color: #a09b8c; /* LoL light grey */
+  background-color: rgba(1, 10, 19, 0.3); /* LoL background dark with opacity */
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: "Spiegel", sans-serif;
+}
+
+.queue-item-remove {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: #a09b8c; /* LoL light grey */
+  margin-left: 5px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.queue-item-remove:hover {
+  color: #be3144; /* LoL status error */
+  opacity: 1;
+}
+
+.empty-queue-message {
+  text-align: center;
+  color: #a09b8c; /* LoL light grey */
+  padding: 20px;
+  font-style: italic;
+  font-family: "Spiegel", sans-serif;
+}
+
+/* Error message */
+.error-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(190, 49, 68, 0.9); /* LoL status error with opacity */
+  color: #f0e6d2; /* LoL gold light */
+  padding: 20px;
+  border-radius: 4px;
+  max-width: 80%;
+  text-align: center;
+  border: 1px solid #af3131; /* LoL red */
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .video-player-footer {
+    flex-direction: column;
+  }
+
+  .video-metadata {
+    margin-bottom: 15px;
+  }
+
+  .queue-item {
+    padding: 8px;
+  }
+
+  .queue-item-title {
+    font-size: 13px;
+  }
+}

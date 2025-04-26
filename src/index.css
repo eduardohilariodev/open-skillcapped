@@ -1,3 +1,6 @@
+/* Import League of Legends fonts */
+@import "./styles/fonts.css";
+
 html,
 body,
 #root {
@@ -5,8 +8,73 @@ body,
   margin: 0;
   padding: 0;
   overflow: hidden;
+  /* Apply LoL styling defaults */
+  font-family: "Spiegel", "Spiegel Regular", sans-serif;
+  color: #f0e6d2;
+  background-color: #010a13;
 }
 
 #root > div {
   height: 100%;
+}
+
+/* League of Legends typography classes */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Beaufort for LOL", serif;
+  color: #c8aa6e;
+  font-weight: 700;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  letter-spacing: 0.05em;
+}
+
+h2 {
+  font-size: 2rem;
+  letter-spacing: 0.025em;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+/* Button reset with League styling */
+button {
+  font-family: "Beaufort for LOL", serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  background-color: #c8aa6e;
+  color: #010a13;
+  border: 1px solid #785a28;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: #785a28;
+  color: #f0e6d2;
+}
+
+/* Link styling */
+a {
+  color: #0ac8b9;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #cdfafa;
+  text-decoration: underline;
 }
