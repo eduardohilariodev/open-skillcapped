@@ -455,7 +455,7 @@ export function VideoPlayerDialog({
         }
       };
     }
-  }, [videoRef.current, playbackSpeed]);
+  }, [playbackSpeed]);
 
   // Update time display
   useEffect(() => {
@@ -542,7 +542,7 @@ export function VideoPlayerDialog({
         delete videoRef.current._durationObserver;
       }
     };
-  }, [videoRef.current, actualDuration]);
+  }, [actualDuration, playbackSpeed]);
 
   // Handle buffering state
   useEffect(() => {
@@ -570,7 +570,7 @@ export function VideoPlayerDialog({
         videoRef.current.removeEventListener("ratechange", handleRateChange);
       }
     };
-  }, [videoRef.current, playbackSpeed]);
+  }, [playbackSpeed]);
 
   // Find video index in course videos
   const getVideoIndex = (): number | undefined => {
