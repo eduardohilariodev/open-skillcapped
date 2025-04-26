@@ -36,6 +36,7 @@
     "typescript": "^5.8.3"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.4",
     "@types/hls.js": "^0.13.3",
     "@types/node": "^22.15.0",
     "@types/react": "^18.0.0",
@@ -54,6 +55,7 @@
     "lint-staged": "^15.5.1",
     "prettier": "^3.5.3",
     "sass": "^1.78.0",
+    "tailwindcss": "^4.1.4",
     "vite": "^6.3.3"
   },
   "browserslist": {

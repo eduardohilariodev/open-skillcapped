@@ -21,7 +21,6 @@ import "../styles/components/_button.css";
 import "../styles/components/_modal.css";
 import "../styles/components/_tag.css";
 import "../styles/Episode.css";
-import "./VideoPlayerDialog.css";
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -816,88 +815,108 @@ Duration=${calculatedDuration}`;
   const currentModalRoot = document.getElementById("modal-root");
   if (!currentModalRoot) return null;
 
-  // Use Portal to render the dialog
+  // Use Portal to render the dialog with Tailwind classes
   return ReactDOM.createPortal(
-    <div className="video-player-overlay" onClick={handleBackdropClick}>
-      <div className="video-player-dialog" onClick={stopPropagation}>
+    <div className="fixed inset-0 bg-black/95 flex justify-center items-center z-[1000]" onClick={handleBackdropClick}>
+      <div
+        className="bg-[var(--hextech-color-background-medium)] w-full h-full flex flex-row overflow-hidden"
+        onClick={stopPropagation}
+      >
         {/* Left panel (60%) - Video Only */}
-        <div className="video-player-left-panel">
+        <div className="w-3/5 h-full flex flex-col border-r border-[var(--hextech-color-gold-dark)] bg-black">
           {/* Video content takes up full space */}
-          <div className="video-player-content">
-            <div className="video-container">
+          <div className="flex-1 relative flex items-center justify-center w-full h-full p-0">
+            <div className="relative w-full h-full overflow-hidden">
               {isLoading && (
-                <div className="loading-indicator">
-                  <FontAwesomeIcon icon={faSpinner} className="loading-icon" spin />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white p-3 rounded flex items-center gap-2 z-2">
+                  <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
                   <span>{status}</span>
                 </div>
               )}
               {errorMessage && (
-                <div className="error-message">
-                  <h3>Error loading video</h3>
-                  <p>{errorMessage}</p>
-                  <p className="info-message">Please try again later or contact support if the problem persists.</p>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/90 text-white p-4 rounded-lg z-3 text-center w-4/5 max-w-md border border-red-600">
+                  <h3 className="text-lg font-bold mb-2">Error loading video</h3>
+                  <p className="mb-2">{errorMessage}</p>
+                  <p className="text-sm opacity-70 mt-3">
+                    Please try again later or contact support if the problem persists.
+                  </p>
                 </div>
               )}
-              <video ref={videoRef} className="video-player" controls autoPlay playsInline onEnded={handleVideoEnded} />
-              {/* Keep the custom controls */}
-              <div className="custom-video-controls">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-contain bg-black"
+                controls
+                autoPlay
+                playsInline
+                onEnded={handleVideoEnded}
+              />
+              {/* Custom video controls */}
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 flex flex-col gap-2 z-10 opacity-100 transition-opacity duration-300">
                 {/* Progress bar */}
-                <div className="progress-container">
-                  <progress className="custom-progress" value="0" max="100" />
+                <div className="w-full h-2.5 relative cursor-pointer">
+                  <progress
+                    className="w-full h-2 bg-white/20 rounded overflow-hidden appearance-none"
+                    value="0"
+                    max="100"
+                  />
                 </div>
                 {/* Control buttons */}
-                <div className="control-buttons">
-                  <div className="left-controls">
+                <div className="flex items-center justify-between w-full mt-2">
+                  <div className="flex items-center">
                     <button
-                      className="control-button previous-button"
+                      className="bg-transparent border-none text-white cursor-pointer p-1.5 flex items-center justify-center rounded transition-colors hover:bg-white/10"
                       onClick={playPreviousInQueue}
                       title="Previous video"
                     >
-                      <FontAwesomeIcon icon={faStepBackward} />
+                      <FontAwesomeIcon icon={faStepBackward} className="w-5 h-5" />
                     </button>
-                    <button className="control-button next-button" onClick={playNextInQueue} title="Next video">
-                      <FontAwesomeIcon icon={faStepForward} />
+                    <button
+                      className="bg-transparent border-none text-white cursor-pointer p-1.5 flex items-center justify-center rounded transition-colors hover:bg-white/10"
+                      onClick={playNextInQueue}
+                      title="Next video"
+                    >
+                      <FontAwesomeIcon icon={faStepForward} className="w-5 h-5" />
                     </button>
-                    <span className="time-display">
+                    <span className="text-white text-xs ml-2.5">
                       0:00 / {actualDuration ? formatDuration(actualDuration) : "..."}
                     </span>
                   </div>
-                  <div className="right-controls">
-                    <div className="playback-speed-controls">
-                      <span className="speed-label">{playbackSpeed}x</span>
-                      <div className="speed-options">
+                  <div className="flex items-center">
+                    <div className="absolute bottom-[60px] right-5 bg-black/70 rounded-lg p-1.5 flex gap-1.5 z-10 opacity-90 transition-opacity duration-300 items-center hover:opacity-100">
+                      <span className="text-white text-xs mr-1.5">{playbackSpeed}x</span>
+                      <div className="flex gap-1.5">
                         <button
-                          className={`speed-button ${playbackSpeed === 0.5 ? "active" : ""}`}
+                          className={`bg-[rgba(50,50,50,0.6)] text-white border-none rounded p-1 text-xs cursor-pointer transition-all duration-200 min-w-9 font-sans hover:bg-[rgba(80,80,80,0.8)] ${playbackSpeed === 0.5 ? "bg-red-600 font-bold" : ""}`}
                           onClick={() => changePlaybackSpeed(0.5)}
                         >
                           0.5x
                         </button>
                         <button
-                          className={`speed-button ${playbackSpeed === 0.75 ? "active" : ""}`}
+                          className={`bg-[rgba(50,50,50,0.6)] text-white border-none rounded p-1 text-xs cursor-pointer transition-all duration-200 min-w-9 font-sans hover:bg-[rgba(80,80,80,0.8)] ${playbackSpeed === 0.75 ? "bg-red-600 font-bold" : ""}`}
                           onClick={() => changePlaybackSpeed(0.75)}
                         >
                           0.75x
                         </button>
                         <button
-                          className={`speed-button ${playbackSpeed === 1 ? "active" : ""}`}
+                          className={`bg-[rgba(50,50,50,0.6)] text-white border-none rounded p-1 text-xs cursor-pointer transition-all duration-200 min-w-9 font-sans hover:bg-[rgba(80,80,80,0.8)] ${playbackSpeed === 1 ? "bg-red-600 font-bold" : ""}`}
                           onClick={() => changePlaybackSpeed(1)}
                         >
                           1x
                         </button>
                         <button
-                          className={`speed-button ${playbackSpeed === 1.25 ? "active" : ""}`}
+                          className={`bg-[rgba(50,50,50,0.6)] text-white border-none rounded p-1 text-xs cursor-pointer transition-all duration-200 min-w-9 font-sans hover:bg-[rgba(80,80,80,0.8)] ${playbackSpeed === 1.25 ? "bg-red-600 font-bold" : ""}`}
                           onClick={() => changePlaybackSpeed(1.25)}
                         >
                           1.25x
                         </button>
                         <button
-                          className={`speed-button ${playbackSpeed === 1.5 ? "active" : ""}`}
+                          className={`bg-[rgba(50,50,50,0.6)] text-white border-none rounded p-1 text-xs cursor-pointer transition-all duration-200 min-w-9 font-sans hover:bg-[rgba(80,80,80,0.8)] ${playbackSpeed === 1.5 ? "bg-red-600 font-bold" : ""}`}
                           onClick={() => changePlaybackSpeed(1.5)}
                         >
                           1.5x
                         </button>
                         <button
-                          className={`speed-button ${playbackSpeed === 2 ? "active" : ""}`}
+                          className={`bg-[rgba(50,50,50,0.6)] text-white border-none rounded p-1 text-xs cursor-pointer transition-all duration-200 min-w-9 font-sans hover:bg-[rgba(80,80,80,0.8)] ${playbackSpeed === 2 ? "bg-red-600 font-bold" : ""}`}
                           onClick={() => changePlaybackSpeed(2)}
                         >
                           2x
@@ -912,85 +931,100 @@ Duration=${calculatedDuration}`;
         </div>
 
         {/* Right panel (40%) - All metadata and controls */}
-        <div className="video-player-right-panel">
+        <div className="w-2/5 h-full flex flex-col overflow-hidden">
           {/* Right panel header with close button */}
-          <div className="right-panel-header">
-            <h2>
-              {course && <span className="course-name">{course.title}</span>}
-              <button className="close-button" onClick={onClose}>
+          <div className="flex justify-between items-center p-3 bg-[var(--hextech-color-background-dark)] border-b border-[var(--hextech-color-gold-dark)]">
+            <h2 className="m-0 text-[var(--hextech-color-gold-light)] text-lg font-semibold flex justify-between w-full items-center">
+              {course && <span className="text-[var(--hextech-color-gold-medium)] opacity-80">{course.title}</span>}
+              <button
+                className="bg-transparent border-none text-[var(--hextech-color-gold-medium)] text-2xl cursor-pointer p-0 px-2 hover:text-[var(--hextech-color-gold-light)]"
+                onClick={onClose}
+              >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
             </h2>
           </div>
 
           {/* Video title section */}
-          <div className="video-title-container">
-            <h2>
-              {getVideoIndex() && <span className="episode-number">#{getVideoIndex()}</span>}
-              {getVideoIndex() && <span className="episode-separator">|</span>}
-              <span className="video-title">{video.title}</span>
-              <span className="video-duration">{actualDuration ? formatDuration(actualDuration) : "..."}</span>
+          <div className="p-3 bg-black/20 border-b border-[var(--hextech-color-gold-dark)]">
+            <h2 className="m-0 text-lg text-[var(--hextech-color-gold-light)] flex flex-wrap items-center gap-2.5">
+              {getVideoIndex() && (
+                <span className="text-[var(--hextech-color-gold-medium)] font-normal bg-black/30 py-0.5 px-1.5 rounded">
+                  #{getVideoIndex()}
+                </span>
+              )}
+              {getVideoIndex() && <span className="text-[var(--hextech-color-gold-dark)]">|</span>}
+              <span className="font-bold flex-grow">{video.title}</span>
+              <span className="text-[var(--hextech-color-gold-medium)] text-sm py-0.5 px-1.5 bg-black/30 rounded">
+                {actualDuration ? formatDuration(actualDuration) : "..."}
+              </span>
             </h2>
           </div>
 
           {/* Course information if available */}
           {course && course.description && (
-            <div className="course-info">
-              <h3 className="course-title">{course.title}</h3>
-              <div className="course-description">{course.description}</div>
+            <div className="p-4 border-b border-[var(--hextech-color-gold-dark)] bg-[var(--hextech-color-background-dark)]">
+              <h3 className="text-xl text-[var(--hextech-color-gold-medium)] font-serif mb-2">{course.title}</h3>
+              <div className="text-[var(--hextech-color-gold-light)]">{course.description}</div>
             </div>
           )}
 
           {/* Video metadata */}
-          <div className="video-metadata">
-            <div className="metadata-item">
-              <FontAwesomeIcon icon={faClock} className="metadata-icon" />
-              <span className="metadata-label">Duration:</span>
-              <span className="metadata-value">{actualDuration ? formatDuration(actualDuration) : "..."}</span>
+          <div className="p-4 flex flex-wrap gap-3 bg-black/20 border-b border-[var(--hextech-color-gold-dark)]">
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faClock} className="text-[var(--hextech-color-gold)] mr-2" />
+              <span className="text-gray-400 text-sm">Duration:</span>
+              <span className="text-white text-sm font-medium">
+                {actualDuration ? formatDuration(actualDuration) : "..."}
+              </span>
             </div>
-            <div className="metadata-item">
-              <FontAwesomeIcon icon={faCalendarAlt} className="metadata-icon" />
-              <span className="metadata-label">Released:</span>
-              <span className="metadata-value">{video.releaseDate.toLocaleDateString()}</span>
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faCalendarAlt} className="text-[var(--hextech-color-gold)] mr-2" />
+              <span className="text-gray-400 text-sm">Released:</span>
+              <span className="text-white text-sm font-medium">{video.releaseDate.toLocaleDateString()}</span>
             </div>
-            <div className="metadata-item">
-              <FontAwesomeIcon icon={faUserAlt} className="metadata-icon" />
-              <span className="metadata-label">Role:</span>
-              <span className="metadata-value">{video.role}</span>
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faUserAlt} className="text-[var(--hextech-color-gold)] mr-2" />
+              <span className="text-gray-400 text-sm">Role:</span>
+              <span className="text-white text-sm font-medium">{video.role}</span>
             </div>
             {course && (
-              <div className="metadata-item">
-                <FontAwesomeIcon icon={faListAlt} className="metadata-icon" />
-                <span className="metadata-label">Course:</span>
-                <span className="metadata-value">{course.title}</span>
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={faListAlt} className="text-[var(--hextech-color-gold)] mr-2" />
+                <span className="text-gray-400 text-sm">Course:</span>
+                <span className="text-white text-sm font-medium">{course.title}</span>
               </div>
             )}
-            <div className="metadata-item">
-              <FontAwesomeIcon icon={faTachometerAlt} className="metadata-icon" />
-              <span className="metadata-label">Speed:</span>
-              <span className="metadata-value">{playbackSpeed}x</span>
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faTachometerAlt} className="text-[var(--hextech-color-gold)] mr-2" />
+              <span className="text-gray-400 text-sm">Speed:</span>
+              <span className="text-white text-sm font-medium">{playbackSpeed}x</span>
             </div>
           </div>
 
           {/* Video queue - Takes up remaining space */}
           {course ? (
-            <div className="course-queue-container">
-              <div className="queue-header">
-                <h3>
-                  <FontAwesomeIcon icon={faListAlt} className="queue-icon" />
+            <div className="flex-1 overflow-y-auto border-t border-[var(--hextech-color-gold-dark)] bg-[rgba(16,31,45,0.9)]">
+              <div className="sticky top-0 z-10 flex justify-between items-center p-3.5 bg-[rgba(56,40,17,0.3)] border-b border-[var(--hextech-color-gold-dark)]">
+                <h3 className="m-0 text-base font-semibold text-[var(--hextech-color-gold-light)] flex items-center">
+                  <FontAwesomeIcon icon={faListAlt} className="text-[var(--hextech-color-gold-medium)] mr-2" />
                   Course Videos
                 </h3>
               </div>
-              <div className="queue-list">
+              <div className="overflow-y-auto">
                 {displayQueue.map((queueVideo, index) => (
                   <div
                     key={queueVideo.uuid}
-                    className={`queue-item ${queueVideo.uuid === video.uuid ? "active" : ""}`}
+                    className={`flex items-center justify-between p-3 rounded cursor-pointer transition-colors mb-2 hover:bg-[var(--hextech-color-background-medium)] ${queueVideo.uuid === video.uuid ? "bg-[var(--hextech-color-background-light)] border-l-3 border-l-[var(--hextech-color-blue-medium)]" : ""}`}
                     onClick={() => playQueueItem(index)}
                   >
-                    <div className="queue-item-index">{index + 1}</div>
-                    <div className="queue-item-title">{queueVideo.title}</div>
-                    <div className="queue-item-duration">
+                    <div className="flex items-center justify-center min-w-8 h-8 bg-[var(--hextech-color-background-medium)] rounded-full mr-3.5 text-[var(--hextech-color-gold-medium)] text-sm font-medium">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1 text-[var(--hextech-color-gold-light)] text-sm whitespace-nowrap overflow-hidden text-ellipsis mr-4">
+                      {queueVideo.title}
+                    </div>
+                    <div className="text-[var(--hextech-color-gold-medium)] text-xs p-0 px-2 bg-black/30 rounded whitespace-nowrap">
                       {queueVideo.durationInSeconds ? formatDuration(queueVideo.durationInSeconds) : "..."}
                     </div>
                   </div>
@@ -998,29 +1032,33 @@ Duration=${calculatedDuration}`;
               </div>
             </div>
           ) : (
-            <div className="video-queue-container">
-              <div className="queue-header">
-                <h3>
-                  <FontAwesomeIcon icon={faListAlt} className="queue-icon" />
+            <div className="flex-1 overflow-y-auto">
+              <div className="sticky top-0 z-10 flex justify-between items-center p-3.5 bg-[var(--hextech-color-background-medium)] border-b border-[var(--hextech-color-gold-dark)]">
+                <h3 className="m-0 text-base font-semibold text-[var(--hextech-color-gold-light)] flex items-center">
+                  <FontAwesomeIcon icon={faListAlt} className="text-[var(--hextech-color-gold)] mr-2" />
                   Video Queue
                 </h3>
               </div>
-              <div className="queue-list">
+              <div className="overflow-y-auto">
                 {displayQueue.length > 0 ? (
                   displayQueue.map((queueVideo, index) => (
                     <div
                       key={queueVideo.uuid}
-                      className={`queue-item ${queueVideo.uuid === video.uuid ? "active" : ""}`}
+                      className={`flex items-center justify-between p-3 rounded cursor-pointer transition-colors mb-2 hover:bg-[var(--hextech-color-background-medium)] ${queueVideo.uuid === video.uuid ? "bg-[var(--hextech-color-background-light)] border-l-3 border-l-[var(--hextech-color-blue-medium)]" : ""}`}
                       onClick={() => playQueueItem(index)}
                     >
-                      <div className="queue-item-index">{index + 1}</div>
-                      <div className="queue-item-title">{queueVideo.title}</div>
-                      <div className="queue-item-duration">
+                      <div className="flex items-center justify-center min-w-8 h-8 bg-[var(--hextech-color-background-medium)] rounded-full mr-3.5 text-[var(--hextech-color-gold-medium)] text-sm font-medium">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 text-[var(--hextech-color-gold-light)] text-sm whitespace-nowrap overflow-hidden text-ellipsis mr-4">
+                        {queueVideo.title}
+                      </div>
+                      <div className="text-[var(--hextech-color-gold-medium)] text-xs p-0 px-2 bg-black/30 rounded whitespace-nowrap">
                         {queueVideo.durationInSeconds ? formatDuration(queueVideo.durationInSeconds) : "..."}
                       </div>
                       {!course && (
                         <button
-                          className="queue-item-remove"
+                          className="bg-transparent border-none text-[var(--hextech-color-gold-medium)] text-lg cursor-pointer p-0 px-1 ml-2 flex items-center justify-center w-6 h-6 rounded-full transition-all hover:text-[var(--hextech-color-gold-light)] hover:bg-[rgba(190,49,68,0.2)]"
                           onClick={(e) => {
                             e.stopPropagation();
                             removeFromQueue(index);
@@ -1033,7 +1071,9 @@ Duration=${calculatedDuration}`;
                     </div>
                   ))
                 ) : (
-                  <div className="empty-queue-message">No videos in queue. Add videos to watch them in sequence.</div>
+                  <div className="text-center text-[var(--hextech-color-gold-medium)] p-4 italic">
+                    No videos in queue. Add videos to watch them in sequence.
+                  </div>
                 )}
               </div>
             </div>

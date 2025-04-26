@@ -4,6 +4,8 @@ import App from "./components/App";
 import "./bulma.sass";
 // Import our centralized League of Legends Hextech styles
 import "./styles/main.css";
+// Import Tailwind CSS
+import "./styles/tailwind.css";
 import * as Sentry from "@sentry/react";
 import ReactGA4 from "react-ga4";
 
