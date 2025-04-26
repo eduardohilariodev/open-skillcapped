@@ -5,7 +5,17 @@ import { Video } from "../model/Video";
 import { Course } from "../model/Course";
 import { VideoUtils } from "../utils/VideoUtils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faSpinner, faClock, faCalendarAlt, faUserAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTimes,
+  faSpinner,
+  faClock,
+  faCalendarAlt,
+  faUserAlt,
+  faStepForward,
+  faToggleOn,
+  faToggleOff,
+} from "@fortawesome/free-solid-svg-icons";
+import { roleToString } from "../model/Role";
 import "../styles/components/_button.css";
 import "../styles/components/_modal.css";
 import "../styles/components/_tag.css";
@@ -15,6 +25,7 @@ import "../styles/VideoPlayerDialog.css";
 const STORAGE_KEYS = {
   PLAYBACK_SPEED: "better-skill-capped-playback-speed",
   VIDEO_QUEUE: "better-skill-capped-video-queue",
+  AUTOPLAY_ENABLED: "better-skill-capped-autoplay-enabled",
 };
 
 // Local storage utilities
@@ -38,6 +49,18 @@ const storageUtils = {
       return false;
     }
   },
+};
+
+// Role translation mapping for additional cases not covered by roleToString
+const ADDITIONAL_ROLE_MAPPINGS: Record<string, string> = {
+  general: "General",
+  guide: "Guide",
+  tutorial: "Tutorial",
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+  proguide: "Pro Guide",
+  fundamentals: "Fundamentals",
 };
 
 // Extend HTMLVideoElement type
@@ -68,12 +91,18 @@ export function VideoPlayerDialog({
   const [actualDuration, setActualDuration] = useState<number | null>(null);
   const [formattedCurrentTime, setFormattedCurrentTime] = useState<string>("0:00");
   const [currentVideo, setCurrentVideo] = useState<Video>(initialVideo);
+  const [isBuffering, setIsBuffering] = useState(false);
 
   // Video queue state
   const [videoQueue, setVideoQueue] = useState<Video[]>(() => {
     return storageUtils.getItem(STORAGE_KEYS.VIDEO_QUEUE, []);
   });
   const [currentQueueIndex, setCurrentQueueIndex] = useState(-1);
+
+  // Autoplay setting
+  const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(() => {
+    return storageUtils.getItem(STORAGE_KEYS.AUTOPLAY_ENABLED, true);
+  });
 
   // Playback speed state
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(() => {
@@ -102,6 +131,25 @@ export function VideoPlayerDialog({
     }
     storageUtils.setItem(STORAGE_KEYS.PLAYBACK_SPEED, playbackSpeed);
   }, [playbackSpeed]);
+
+  // Listen for playback speed changes in the video element
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    const handleRateChange = () => {
+      const currentRate = videoElement.playbackRate;
+      if (currentRate !== playbackSpeed) {
+        setPlaybackSpeed(currentRate);
+      }
+    };
+
+    videoElement.addEventListener("ratechange", handleRateChange);
+
+    return () => {
+      videoElement.removeEventListener("ratechange", handleRateChange);
+    };
+  }, [videoRef.current, playbackSpeed]);
 
   // Format duration for display
   const formatDuration = (seconds: number): string => {
@@ -191,9 +239,16 @@ export function VideoPlayerDialog({
     }
   };
 
+  // Toggle autoplay
+  const toggleAutoplay = () => {
+    const newValue = !autoplayEnabled;
+    setAutoplayEnabled(newValue);
+    storageUtils.setItem(STORAGE_KEYS.AUTOPLAY_ENABLED, newValue);
+  };
+
   // Handle video ended to autoplay next
   const handleVideoEnded = () => {
-    if (currentQueueIndex >= 0 && currentQueueIndex < displayQueue.length - 1) {
+    if (autoplayEnabled && currentQueueIndex >= 0 && currentQueueIndex < displayQueue.length - 1) {
       playNextInQueue();
     }
   };
@@ -270,23 +325,8 @@ export function VideoPlayerDialog({
             // Apply playback speed
             videoRef.current.playbackRate = playbackSpeed;
 
-            // Try to play the video
-            const playPromise = videoRef.current.play();
-
-            if (playPromise !== undefined) {
-              playPromise.catch((err) => {
-                console.warn("Initial autoplay was prevented:", err);
-                setStatus("Autoplay blocked. Trying with muted audio...");
-
-                if (videoRef.current) {
-                  videoRef.current.muted = true;
-                  videoRef.current.play().catch((muteErr) => {
-                    console.error("Muted autoplay also failed:", muteErr);
-                    setStatus("Autoplay blocked. Press play to start video.");
-                  });
-                }
-              });
-            }
+            // Remove autoplay attempts
+            setStatus("Video ready. Click play to start.");
           }
         });
 
@@ -332,18 +372,7 @@ export function VideoPlayerDialog({
 
           if (videoRef.current) {
             videoRef.current.playbackRate = playbackSpeed;
-            const playPromise = videoRef.current.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(() => {
-                setStatus("Autoplay blocked in Safari. Trying with muted audio...");
-                if (videoRef.current) {
-                  videoRef.current.muted = true;
-                  videoRef.current.play().catch(() => {
-                    setStatus("Autoplay blocked. Press play to start video.");
-                  });
-                }
-              });
-            }
+            setStatus("Video ready. Click play to start.");
           }
         });
       }
@@ -442,7 +471,7 @@ export function VideoPlayerDialog({
       videoElement.dataset.currentTime = formatDuration(currentTime);
     };
 
-    // Set duration property
+    // Override duration property to fix seek bar
     Object.defineProperty(videoElement, "duration", {
       configurable: true,
       get: function () {
@@ -450,69 +479,98 @@ export function VideoPlayerDialog({
       },
     });
 
-    // Apply styles for duration display
-    const styleEl = document.createElement("style");
-    styleEl.textContent = `
-      .playback-speed-controls {
-        position: absolute;
-        bottom: 50px;
-        right: 20px;
-     
-        border-radius: 8px;
-        padding: 6px;
-        display: flex;
-        gap: 5px;
-        z-index: 100;
-        opacity: 0.9;
-        transition: opacity 0.3s ease;
+    // Fix seek bar by ensuring metadata properly loads
+    const fixSeekBar = () => {
+      // Ensure the seek bar shows the correct duration
+      if (videoElement.seekable && videoElement.seekable.length > 0) {
+        // Force update of control UI by dispatching events
+        const durationChangeEvent = new Event("durationchange");
+        videoElement.dispatchEvent(durationChangeEvent);
+
+        const timeUpdateEvent = new Event("timeupdate");
+        videoElement.dispatchEvent(timeUpdateEvent);
       }
-      
-      video::-webkit-media-controls-current-time-display,
-      video::-webkit-media-controls-time-remaining-display {
-        visibility: visible !important;
-        opacity: 1 !important;
-        display: inline-block !important;
-      }
-      
-      video::-webkit-media-controls-time-remaining-display::after {
-        content: "${formatDuration(actualDuration)}" !important;
-      }
-      
-      video::-webkit-media-controls,
-      video::-webkit-media-controls-enclosure,
-      video::-webkit-media-controls-panel {
-        background-color: transparent !important;
-      }
-    `;
-    document.head.appendChild(styleEl);
+    };
 
     // Trigger duration change event
     setTimeout(() => {
       updateTimeDisplay();
-      const durationEvent = new Event("durationchange");
-      videoElement.dispatchEvent(durationEvent);
+      fixSeekBar();
     }, 100);
 
+    // Set up periodic check to ensure seekbar is correctly sized
+    const seekBarInterval = setInterval(fixSeekBar, 500);
+
     // Update time display on relevant events
-    videoElement.addEventListener("timeupdate", updateTimeDisplay);
-    videoElement.addEventListener("loadedmetadata", updateTimeDisplay);
-    videoElement.addEventListener("durationchange", updateTimeDisplay);
-    videoElement.addEventListener("playing", updateTimeDisplay);
+    videoRef.current?.addEventListener("timeupdate", updateTimeDisplay);
+    videoRef.current?.addEventListener("loadedmetadata", () => {
+      updateTimeDisplay();
+      fixSeekBar();
+      if (videoRef.current) {
+        videoRef.current.playbackRate = playbackSpeed;
+      }
+    });
+    videoRef.current?.addEventListener("durationchange", () => {
+      updateTimeDisplay();
+      fixSeekBar();
+    });
+    videoRef.current?.addEventListener("playing", updateTimeDisplay);
+    videoRef.current?.addEventListener("canplay", () => {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = playbackSpeed;
+      }
+    });
+
+    // Handle seek operations
+    const handleSeeked = () => {
+      updateTimeDisplay();
+      // Ensure time display is updated after seeking
+      setTimeout(updateTimeDisplay, 50);
+    };
+    videoRef.current?.addEventListener("seeked", handleSeeked);
 
     return () => {
-      videoElement.removeEventListener("timeupdate", updateTimeDisplay);
-      videoElement.removeEventListener("loadedmetadata", updateTimeDisplay);
-      videoElement.removeEventListener("durationchange", updateTimeDisplay);
-      videoElement.removeEventListener("playing", updateTimeDisplay);
+      clearInterval(seekBarInterval);
+      videoRef.current?.removeEventListener("timeupdate", updateTimeDisplay);
+      videoRef.current?.removeEventListener("loadedmetadata", updateTimeDisplay);
+      videoRef.current?.removeEventListener("durationchange", updateTimeDisplay);
+      videoRef.current?.removeEventListener("playing", updateTimeDisplay);
+      videoRef.current?.removeEventListener("seeked", handleSeeked);
 
-      if (videoElement._durationObserver) {
-        videoElement._durationObserver.disconnect();
-        delete videoElement._durationObserver;
+      if (videoRef.current?._durationObserver) {
+        videoRef.current._durationObserver.disconnect();
+        delete videoRef.current._durationObserver;
       }
-
-      document.head.removeChild(styleEl);
     };
   }, [videoRef.current, actualDuration]);
+
+  // Handle buffering state
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const handleWaiting = () => setIsBuffering(true);
+    const handlePlaying = () => setIsBuffering(false);
+    const handleCanPlay = () => setIsBuffering(false);
+    const handleRateChange = () => {
+      if (videoRef.current && videoRef.current.playbackRate !== playbackSpeed) {
+        setPlaybackSpeed(videoRef.current.playbackRate);
+      }
+    };
+
+    videoRef.current.addEventListener("waiting", handleWaiting);
+    videoRef.current.addEventListener("playing", handlePlaying);
+    videoRef.current.addEventListener("canplay", handleCanPlay);
+    videoRef.current.addEventListener("ratechange", handleRateChange);
+
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.removeEventListener("waiting", handleWaiting);
+        videoRef.current.removeEventListener("playing", handlePlaying);
+        videoRef.current.removeEventListener("canplay", handleCanPlay);
+        videoRef.current.removeEventListener("ratechange", handleRateChange);
+      }
+    };
+  }, [videoRef.current, playbackSpeed]);
 
   // Find video index in course videos
   const getVideoIndex = (): number | undefined => {
@@ -553,13 +611,13 @@ export function VideoPlayerDialog({
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-black/95 flex justify-center items-center z-[1000]" onClick={handleBackdropClick}>
       <div
-        className="bg-[var(--hextech-color-background-medium)] w-full h-full flex flex-row overflow-hidden"
+        className="bg-[var(--hextech-color-background-medium)] w-full h-full flex flex-row overflow-hidden border border-[var(--hextech-color-gold-dark)] font-[Spiegel]"
         onClick={stopPropagation}
       >
         {/* Left panel - Video and info */}
-        <div className="w-7/10 h-full flex flex-col border-r border-[var(--hextech-color-gold-dark)] flex-1">
+        <div className="w-7/10 h-full flex flex-col border-r-0 flex-1 bg-[var(--hextech-color-background-medium)] relative">
           {/* Video player area */}
-          <div className="lol-hextech-player-container">
+          <div className="relative w-full h-3/5 bg-black">
             {isLoading && (
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white p-3 rounded flex items-center gap-2 z-10">
                 <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
@@ -572,109 +630,178 @@ export function VideoPlayerDialog({
                 <p>{errorMessage}</p>
               </div>
             )}
+            {isBuffering && (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 text-[var(--hextech-color-gold)] p-3 rounded z-10 border border-[var(--hextech-color-gold-dark)]">
+                Loading...
+              </div>
+            )}
             <video
               ref={videoRef}
-              className="absolute top-0 left-0 w-full h-full lol-hextech-player"
+              className="absolute top-0 left-0 w-full h-full"
               controls
-              autoPlay
               playsInline
               onEnded={handleVideoEnded}
             />
           </div>
 
           {/* Video info area */}
-          <div className="bg-[var(--hextech-color-background-dark)] p-4 border-t border-[var(--hextech-color-gold-dark)] flex-1">
+          <div className="bg-[var(--hextech-color-background-dark)] p-6 border-t border-[var(--hextech-color-gold-dark)] flex-1 flex flex-col relative">
+            {/* Decorative top border */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--hextech-color-gold-dark)] via-[var(--hextech-color-gold)] to-[var(--hextech-color-gold-dark)]"></div>
+
             {/* Video title */}
-            <h2 className="m-0 text-lg text-[var(--hextech-color-gold-light)] flex flex-wrap items-center gap-2.5 mb-3">
+            <h2 className="m-0 text-lg text-[var(--hextech-color-gold-light)] flex flex-wrap items-center gap-3 mb-4 font-[500] font-[Beaufort_for_LOL]">
               {getVideoIndex() && (
-                <span className="text-[var(--hextech-color-gold-medium)] font-normal bg-black/30 py-0.5 px-1.5 rounded">
+                <span className="text-[var(--hextech-color-gold-medium)] font-normal bg-black/30 py-0.5 px-2 rounded">
                   #{getVideoIndex()}
                 </span>
               )}
               {getVideoIndex() && <span className="text-[var(--hextech-color-gold-dark)]">|</span>}
-              <span className="font-bold flex-grow">{currentVideo.title}</span>
-              <div className="flex gap-1">
-                {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
-                  <button
-                    key={speed}
-                    className={`text-xs px-2 py-0.5 rounded ${
-                      playbackSpeed === speed ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-200 hover:bg-gray-600"
-                    }`}
-                    onClick={() => changePlaybackSpeed(speed)}
-                  >
-                    {speed}x
-                  </button>
-                ))}
-              </div>
+              <span className="font-[700] flex-grow">{currentVideo.title}</span>
             </h2>
 
             {/* Video metadata */}
-            <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faClock} className="text-[var(--hextech-color-gold)] mr-2" />
-                <span className="text-gray-400 text-sm">Duration:</span>
+            <div className="flex flex-wrap gap-4 mb-2">
+              <div className="flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faClock} className="text-[var(--hextech-color-gold)]" title="Duration" />
                 <span className="text-white text-sm font-medium">
                   {actualDuration ? formatDuration(actualDuration) : "..."}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faCalendarAlt} className="text-[var(--hextech-color-gold)] mr-2" />
-                <span className="text-gray-400 text-sm">Released:</span>
+              <div className="flex items-center gap-2.5">
+                <FontAwesomeIcon
+                  icon={faCalendarAlt}
+                  className="text-[var(--hextech-color-gold)]"
+                  title="Release Date"
+                />
                 <span className="text-white text-sm font-medium">{currentVideo.releaseDate.toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faUserAlt} className="text-[var(--hextech-color-gold)] mr-2" />
-                <span className="text-gray-400 text-sm">Role:</span>
-                <span className="text-white text-sm font-medium">{currentVideo.role}</span>
+              <div className="flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faUserAlt} className="text-[var(--hextech-color-gold)]" title="Role" />
+                <span className="text-white text-sm font-medium">{roleToString(currentVideo.role)}</span>
+              </div>
+            </div>
+
+            {/* Spacer to push playback controls to bottom */}
+            <div className="flex-grow"></div>
+
+            {/* Playback controls */}
+            <div className="mt-5 border-t border-[var(--hextech-color-gold-dark)] pt-5">
+              {/* Combined playback controls in a single line */}
+              <div className="flex justify-between items-center w-full">
+                {/* Playback speed buttons */}
+                <div className="flex gap-0.5 p-2 bg-black/20 rounded">
+                  {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3].map((speed) => (
+                    <button
+                      key={speed}
+                      className={`text-xs py-2 rounded font-[Spiegel] font-medium w-10 flex justify-center items-center ${
+                        playbackSpeed === speed
+                          ? "bg-[var(--hextech-color-gold)] text-[var(--hextech-color-background-dark)]"
+                          : "bg-[var(--hextech-color-background-dark)] text-[var(--hextech-color-gold-light)] hover:bg-[var(--hextech-color-background-medium)] border border-[var(--hextech-color-gold-dark)]"
+                      }`}
+                      onClick={() => changePlaybackSpeed(speed)}
+                    >
+                      {speed}x
+                    </button>
+                  ))}
+                </div>
+
+                {/* Autoplay and Next buttons */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5 mr-4">
+                    <span className="text-xs text-[var(--hextech-color-gold-light)]">Autoplay</span>
+                    <button
+                      className="text-lg flex items-center"
+                      onClick={toggleAutoplay}
+                      title={autoplayEnabled ? "Disable autoplay" : "Enable autoplay"}
+                    >
+                      <FontAwesomeIcon
+                        icon={autoplayEnabled ? faToggleOn : faToggleOff}
+                        className={
+                          autoplayEnabled ? "text-[var(--hextech-color-gold)]" : "text-[var(--hextech-color-gold-dark)]"
+                        }
+                      />
+                    </button>
+                  </div>
+                  <button
+                    className="text-xs px-4 py-2 rounded bg-[var(--hextech-color-background-dark)] text-[var(--hextech-color-gold-light)] hover:bg-[var(--hextech-color-background-medium)] border border-[var(--hextech-color-gold-dark)] flex items-center gap-2 font-[Spiegel] font-medium"
+                    onClick={playNextInQueue}
+                    disabled={currentQueueIndex >= displayQueue.length - 1}
+                    title="Play next video"
+                  >
+                    <FontAwesomeIcon icon={faStepForward} />
+                    <span>Next</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right panel - Course info and list */}
-        <div className="w-3/10 h-full flex flex-col overflow-hidden">
+        <div className="w-3/10 h-full flex flex-col overflow-hidden shadow-[-6px_0_16px_rgba(0,0,0,0.4)] bg-[var(--hextech-color-background-dark)] bg-gradient-to-b from-black/40 to-black/20 border-l border-[var(--hextech-color-gold-dark)] relative">
+          {/* Decorative left border */}
+          <div className="absolute top-0 left-0 w-0.5 h-full bg-gradient-to-b from-[var(--hextech-color-gold-dark)] via-[var(--hextech-color-gold)] to-[var(--hextech-color-gold-dark)] opacity-60"></div>
+
           {/* Right panel header */}
-          <div className="flex justify-between items-center p-3 bg-[var(--hextech-color-background-dark)] border-b border-[var(--hextech-color-gold-dark)]">
-            <h2 className="m-0 text-[var(--hextech-color-gold-light)] text-lg font-semibold flex justify-between w-full items-center">
-              {course && (
-                <span className="text-[var(--hextech-color-gold-medium)] opacity-80 truncate">{course.title}</span>
-              )}
+          <div className="flex justify-between items-center p-4 bg-[var(--hextech-color-background-dark)] border-b border-[var(--hextech-color-gold-dark)] relative overflow-hidden">
+            {/* Decorative corners */}
+            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--hextech-color-gold)]"></div>
+            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[var(--hextech-color-gold)]"></div>
+
+            <h2 className="m-0 text-[var(--hextech-color-gold-light)] text-lg font-[700] flex justify-between w-full items-center font-[Beaufort_for_LOL]">
+              {course && <span className="text-[var(--hextech-color-gold)] opacity-90 truncate">{course.title}</span>}
               <button
-                className="bg-transparent border-none text-[var(--hextech-color-gold-medium)] text-2xl cursor-pointer p-0 px-2 hover:text-[var(--hextech-color-gold-light)]"
+                className="w-9 h-9 flex items-center justify-center bg-transparent border border-[var(--hextech-color-gold-dark)] text-[var(--hextech-color-gold-medium)] hover:text-[var(--hextech-color-gold-light)] hover:border-[var(--hextech-color-gold)] hover:shadow-[0_0_8px_rgba(201,172,98,0.3)] ml-2.5 p-0 cursor-pointer relative"
                 onClick={onClose}
+                aria-label="Close"
               >
-                <FontAwesomeIcon icon={faTimes} />
+                {/* Button corner decorations */}
+                <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-[var(--hextech-color-gold)]"></div>
+                <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-[var(--hextech-color-gold)]"></div>
+                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-[var(--hextech-color-gold)]"></div>
+                <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-[var(--hextech-color-gold)]"></div>
+                <FontAwesomeIcon icon={faTimes} size="lg" className="text-lg" />
               </button>
             </h2>
           </div>
 
           {/* Course description */}
           {course && course.description && (
-            <div className="p-3 border-b border-[var(--hextech-color-gold-dark)] bg-[var(--hextech-color-background-dark)]">
-              <div className="text-[var(--hextech-color-gold-light)] text-sm">{course.description}</div>
+            <div className="p-4 border-b border-[var(--hextech-color-gold-dark)] bg-[var(--hextech-color-background-medium)]">
+              <div className="text-[var(--hextech-color-gold-medium)] text-sm">{course.description}</div>
             </div>
           )}
 
           {/* Video list */}
-          <div className="flex-1 overflow-y-auto bg-[rgba(16,31,45,0.9)]">
+          <div className="flex-1 overflow-y-auto bg-[var(--hextech-color-background-dark)] text-sm leading-snug text-[13px]">
             <div className="overflow-y-auto">
               {displayQueue.map((queueVideo, index) => (
                 <div
                   key={queueVideo.uuid}
-                  className={`flex items-center p-3 cursor-pointer transition-colors mb-1 hover:bg-[var(--hextech-color-background-medium)] ${
+                  className={`flex items-center p-4 cursor-pointer transition-all duration-200 border-l-2 border-l-transparent hover:outline hover:outline-1 hover:outline-[rgba(201,172,98,0.15)] hover:outline-offset-[-1px] hover:shadow-[0_0_8px_rgba(201,172,98,0.05)] hover:border-l-2 hover:border-l-[rgba(201,172,98,0.3)] ${
                     queueVideo.uuid === currentVideo.uuid
-                      ? "bg-[var(--hextech-color-background-light)] border-l-2 border-l-[var(--hextech-color-blue-medium)]"
+                      ? "border-[var(--hextech-color-gold)] shadow-[0_0_12px_rgba(201,172,98,0.2)] outline outline-1 outline-[rgba(201,172,98,0.3)] outline-offset-[-4px] relative"
                       : ""
                   }`}
                   onClick={() => playQueueItem(index)}
                 >
-                  <div className="flex items-center justify-center min-w-6 h-6 bg-[var(--hextech-color-background-medium)] rounded-full mr-2 text-[var(--hextech-color-gold-medium)] text-xs font-medium">
+                  {queueVideo.uuid === currentVideo.uuid && (
+                    <>
+                      {/* Corner decorations for selected item */}
+                      <div className="absolute top-[-2px] left-[-2px] w-2.5 h-2.5 border-t-2 border-l-2 border-[var(--hextech-color-gold)] z-10"></div>
+                      <div className="absolute top-[-2px] right-[-2px] w-2.5 h-2.5 border-t-2 border-r-2 border-[var(--hextech-color-gold)] z-10"></div>
+                      <div className="absolute bottom-[-2px] left-[-2px] w-2.5 h-2.5 border-b-2 border-l-2 border-[var(--hextech-color-gold)] z-10"></div>
+                      <div className="absolute bottom-[-2px] right-[-2px] w-2.5 h-2.5 border-b-2 border-r-2 border-[var(--hextech-color-gold)] z-10"></div>
+                    </>
+                  )}
+                  <div className="flex items-center justify-center w-7 h-7 mr-3 border border-[var(--hextech-color-gold-dark)] font-[Beaufort_for_LOL] font-bold text-[15px] text-[var(--hextech-color-gold)] bg-gradient-to-br from-black/70 to-[#141414]/40 shadow-[0_0_3px_rgba(201,172,98,0.5)] tracking-[0.5px] leading-none pb-[1px] flex items-center justify-center">
                     {index + 1}
                   </div>
-                  <div className="flex-1 text-[var(--hextech-color-gold-light)] text-xs whitespace-nowrap overflow-hidden text-ellipsis mr-2">
+                  <div className="flex-1 text-[var(--hextech-color-gold-light)] text-xs whitespace-nowrap overflow-hidden text-ellipsis mr-3 font-[500]">
                     {queueVideo.title}
                   </div>
-                  <div className="text-[var(--hextech-color-gold-medium)] text-xs p-0 px-1.5 bg-black/30 rounded-sm whitespace-nowrap">
+                  <div className="text-[var(--hextech-color-gold-dark)] text-xs whitespace-nowrap">
                     {queueVideo.durationInSeconds ? formatDuration(queueVideo.durationInSeconds) : "..."}
                   </div>
                 </div>
