@@ -559,22 +559,22 @@ export function VideoPlayerDialog({
         {/* Left panel - Video and info */}
         <div className="w-7/10 h-full flex flex-col border-r border-[var(--hextech-color-gold-dark)] flex-1">
           {/* Video player area */}
-          <div>
+          <div className="lol-hextech-player-container">
             {isLoading && (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white p-3 rounded flex items-center gap-2 z-2">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white p-3 rounded flex items-center gap-2 z-10">
                 <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
                 <span>{status}</span>
               </div>
             )}
             {errorMessage && (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/90 text-white p-4 rounded-lg z-3 text-center w-4/5 max-w-md border border-red-600">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/90 text-white p-4 rounded-lg z-10 text-center w-4/5 max-w-md border border-red-600">
                 <h3 className="text-lg font-bold mb-2">Error loading video</h3>
                 <p>{errorMessage}</p>
               </div>
             )}
             <video
               ref={videoRef}
-              className="w-full h-full object-contain lol-hextech-player"
+              className="absolute top-0 left-0 w-full h-full lol-hextech-player"
               controls
               autoPlay
               playsInline
@@ -583,7 +583,7 @@ export function VideoPlayerDialog({
           </div>
 
           {/* Video info area */}
-          <div className="bg-[var(--hextech-color-background-dark)] p-4 border-t border-[var(--hextech-color-gold-dark)]">
+          <div className="bg-[var(--hextech-color-background-dark)] p-4 border-t border-[var(--hextech-color-gold-dark)] flex-1">
             {/* Video title */}
             <h2 className="m-0 text-lg text-[var(--hextech-color-gold-light)] flex flex-wrap items-center gap-2.5 mb-3">
               {getVideoIndex() && (

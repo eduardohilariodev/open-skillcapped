@@ -619,3 +619,33 @@ video::-webkit-media-controls-overlay-enclosure {
 video::-webkit-media-controls {
   background-color: transparent !important; /* Remove dark background */
 }
+
+/* Maintain 16:9 aspect ratio for video container */
+.lol-hextech-player-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  background-color: black;
+  overflow: hidden;
+}
+
+/* Video player fill container while maintaining aspect ratio */
+.lol-hextech-player {
+  object-fit: contain !important;
+  background-color: black;
+}
+
+/* Make sure video maintains proper positioning */
+video::-webkit-media-controls {
+  z-index: 2147483647;
+}
+
+/* Hide video length/duration display but keep current time visible */
+video::-webkit-media-controls-time-remaining-display {
+  display: none !important;
+}
+
+/* Override any styles that were previously setting content for the time remaining display */
+video::-webkit-media-controls-time-remaining-display::after {
+  content: none !important;
+}
