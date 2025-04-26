@@ -38,11 +38,18 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
   const episodeNumber = getVideoIndex();
 
   return (
-    <li className="episode-item-base">
-      <div className="episode-card-base" onClick={handleVideoClick}>
-        <div className="episode-content-base">
-          {episodeNumber && <div className="episode-number-base">{episodeNumber}</div>}
-          {episodeNumber && <span className="episode-separator-base">|</span>}
+    <li className="mb-3 flex items-center last:mb-0">
+      <div
+        className="bg-background-medium/30 border border-gold-dark rounded py-2 px-3 flex justify-between items-center cursor-pointer transition-all w-full hover:shadow-hextech-hover hover:bg-background-medium/50 hover:border-gold-medium"
+        onClick={handleVideoClick}
+      >
+        <div className="flex-1 flex items-center">
+          {episodeNumber && (
+            <div className="relative left-0 min-w-6 h-6 flex items-center justify-center bg-transparent text-blue-medium font-bold font-beaufort border-0 mr-0 flex-shrink-0">
+              {episodeNumber}
+            </div>
+          )}
+          {episodeNumber && <span className="text-gold-dark mx-2 opacity-60">|</span>}
           <Highlighter
             highlightClassName="bg-blue-medium/20 text-blue-light px-1 py-0.5 rounded"
             searchWords={matchedStrings}
@@ -51,7 +58,7 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
             className={classNames(isWatched ? "text-text-muted" : "text-gold-light", "text-sm font-medium")}
           />
         </div>
-        <div className="episode-actions-base">
+        <div className="flex gap-3 ml-3 pl-3 sm:gap-2 sm:ml-2 sm:pl-2">
           <WatchButton video={video} course={course} compact={true} />
         </div>
       </div>
