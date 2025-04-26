@@ -2,16 +2,8 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./components/App";
 import "./bulma.sass";
-// Import our League of Legends styles
-import "./index.css";
-// Import Bulma overrides
-import "./styles/bulma-overrides.css";
-// Import Hextech styling
-import "./styles/hextech-global.css";
-import "./styles/hextech-magic.css";
-import "./styles/hextech-animations.css";
-// Import the style guide
-import "./styles";
+// Import our centralized League of Legends Hextech styles
+import "./styles/main.css";
 import * as Sentry from "@sentry/react";
 import ReactGA4 from "react-ga4";
 

@@ -1,0 +1,236 @@
+/**
+ * League of Legends Hextech Modal Component
+ * Based on Riot Games' UI design patterns
+ */
+
+.hextech-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(1, 10, 19, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity var(--hextech-transition-duration) var(--hextech-easing-snap);
+}
+
+.hextech-modal-backdrop.is-active {
+  opacity: 1;
+}
+
+.hextech-modal {
+  position: relative;
+  background-color: var(--hextech-color-background-medium);
+  border: 2px solid var(--hextech-color-gold-medium);
+  border-radius: var(--hextech-border-radius-sm);
+  box-shadow:
+    var(--hextech-shadow-lg),
+    0 0 30px rgba(200, 170, 110, 0.2);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(20px);
+  opacity: 0;
+  transition:
+    transform var(--hextech-transition-duration) var(--hextech-easing-snap),
+    opacity var(--hextech-transition-duration) var(--hextech-easing-snap);
+  overflow: hidden;
+}
+
+.hextech-modal-backdrop.is-active .hextech-modal {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Modal variants */
+.hextech-modal--gold {
+  border-color: var(--hextech-color-gold-medium);
+  box-shadow:
+    var(--hextech-shadow-lg),
+    0 0 30px rgba(200, 170, 110, 0.2);
+}
+
+.hextech-modal--blue {
+  border-color: var(--hextech-color-blue-medium);
+  box-shadow:
+    var(--hextech-shadow-lg),
+    0 0 30px rgba(10, 200, 185, 0.2);
+}
+
+.hextech-modal--dark {
+  border-color: var(--hextech-color-grey);
+  background-color: var(--hextech-color-background-dark);
+}
+
+/* Modal header */
+.hextech-modal__header {
+  background-color: var(--hextech-color-gold-dark);
+  padding: var(--hextech-spacing-3) var(--hextech-spacing-4);
+  border-bottom: 2px solid var(--hextech-color-gold-medium);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hextech-modal--blue .hextech-modal__header {
+  background-color: var(--hextech-color-blue-dark);
+  border-bottom-color: var(--hextech-color-blue-medium);
+}
+
+.hextech-modal--dark .hextech-modal__header {
+  background-color: var(--hextech-color-black);
+  border-bottom-color: var(--hextech-color-grey);
+}
+
+.hextech-modal__title {
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  font-size: var(--hextech-font-size-lg);
+  color: var(--hextech-color-gold-light);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+  margin: 0;
+}
+
+.hextech-modal--blue .hextech-modal__title {
+  color: var(--hextech-color-blue-light);
+}
+
+.hextech-modal--dark .hextech-modal__title {
+  color: var(--hextech-color-light-grey);
+}
+
+.hextech-modal__close {
+  background: none;
+  border: none;
+  color: var(--hextech-color-gold-light);
+  font-size: var(--hextech-font-size-xl);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color var(--hextech-transition-duration) var(--hextech-easing-standard),
+    transform var(--hextech-transition-duration) var(--hextech-easing-standard);
+  padding: 0;
+}
+
+.hextech-modal__close:hover {
+  color: var(--hextech-color-white);
+  transform: scale(1.1);
+}
+
+.hextech-modal--blue .hextech-modal__close {
+  color: var(--hextech-color-blue-light);
+}
+
+.hextech-modal--blue .hextech-modal__close:hover {
+  color: var(--hextech-color-white);
+}
+
+/* Modal content */
+.hextech-modal__content {
+  padding: var(--hextech-spacing-4);
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Modal footer */
+.hextech-modal__footer {
+  padding: var(--hextech-spacing-3) var(--hextech-spacing-4);
+  background-color: var(--hextech-color-background-dark);
+  border-top: 1px solid var(--hextech-color-gold-dark);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--hextech-spacing-2);
+}
+
+.hextech-modal--blue .hextech-modal__footer {
+  border-top-color: var(--hextech-color-blue-dark);
+}
+
+.hextech-modal--dark .hextech-modal__footer {
+  border-top-color: var(--hextech-color-dark-grey);
+  background-color: var(--hextech-color-black);
+}
+
+/* Corner accents */
+.hextech-modal::before,
+.hextech-modal::after,
+.hextech-modal__content::before,
+.hextech-modal__content::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Top left corner */
+.hextech-modal::before {
+  top: 0;
+  left: 0;
+  border-top: 2px solid;
+  border-left: 2px solid;
+  border-color: inherit;
+}
+
+/* Top right corner */
+.hextech-modal::after {
+  top: 0;
+  right: 0;
+  border-top: 2px solid;
+  border-right: 2px solid;
+  border-color: inherit;
+}
+
+/* Bottom left corner */
+.hextech-modal__content::before {
+  bottom: 0;
+  left: 0;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+  border-color: inherit;
+}
+
+/* Bottom right corner */
+.hextech-modal__content::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+  border-color: inherit;
+}
+
+/* Animate modal closing */
+.hextech-modal-backdrop.is-closing {
+  opacity: 0;
+}
+
+.hextech-modal-backdrop.is-closing .hextech-modal {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hextech-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .hextech-modal__header,
+  .hextech-modal__content,
+  .hextech-modal__footer {
+    padding: var(--hextech-spacing-3);
+  }
+}

@@ -1,0 +1,130 @@
+/**
+ * League of Legends Hextech Global Styles
+ * Base styles for the entire app
+ */
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--hextech-font-family-body);
+  font-weight: var(--hextech-font-weight-regular);
+  font-size: var(--hextech-font-size-base);
+  line-height: var(--hextech-line-height-normal);
+  color: var(--hextech-color-gold-light);
+  background-color: var(--hextech-color-background-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  line-height: var(--hextech-line-height-tight);
+  margin-bottom: var(--hextech-spacing-4);
+  color: var(--hextech-color-gold-medium);
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+h1 {
+  font-size: var(--hextech-font-size-4xl);
+  margin-bottom: var(--hextech-spacing-6);
+}
+
+h2 {
+  font-size: var(--hextech-font-size-3xl);
+  margin-bottom: var(--hextech-spacing-5);
+}
+
+h3 {
+  font-size: var(--hextech-font-size-2xl);
+}
+
+h4 {
+  font-size: var(--hextech-font-size-xl);
+}
+
+h5 {
+  font-size: var(--hextech-font-size-lg);
+}
+
+h6 {
+  font-size: var(--hextech-font-size-base);
+}
+
+p {
+  margin-bottom: var(--hextech-spacing-4);
+}
+
+/* Links */
+a {
+  color: var(--hextech-color-gold-medium);
+  transition: color var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+a:hover {
+  color: var(--hextech-color-gold-light);
+  text-decoration: none;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--hextech-color-blue-medium);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-background-dark);
+}
+
+/* Hextech theme class */
+.hextech-theme {
+  color-scheme: dark;
+  overflow-x: hidden;
+}
+
+/* Basic layout containers */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--hextech-spacing-4);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--hextech-spacing-6);
+  }
+}
+
+/* Utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

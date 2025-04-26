@@ -1,0 +1,178 @@
+/**
+ * League of Legends Hextech Tag Component
+ * Used for filtering, categories, and metadata
+ */
+
+.hextech-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--hextech-spacing-1) var(--hextech-spacing-2);
+  font-family: var(--hextech-font-family-display);
+  font-size: var(--hextech-font-size-sm);
+  font-weight: var(--hextech-font-weight-medium);
+  color: var(--hextech-color-gold-light);
+  background-color: var(--hextech-color-background-light);
+  border: 1px solid var(--hextech-color-gold-dark);
+  border-radius: var(--hextech-border-radius-sm);
+  margin-right: var(--hextech-spacing-1);
+  margin-bottom: var(--hextech-spacing-1);
+}
+
+/* Tag sizes */
+.hextech-tag--sm {
+  font-size: var(--hextech-font-size-xs);
+  padding: var(--hextech-spacing-0-5) var(--hextech-spacing-1);
+}
+
+.hextech-tag--lg {
+  font-size: var(--hextech-font-size-base);
+  padding: var(--hextech-spacing-1-5) var(--hextech-spacing-3);
+}
+
+/* Tag variants */
+.hextech-tag--gold {
+  border-color: var(--hextech-color-gold-dark);
+  background-color: rgba(120, 90, 40, 0.3);
+  color: var(--hextech-color-gold-light);
+}
+
+.hextech-tag--gold-solid {
+  border-color: var(--hextech-color-gold-dark);
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-black);
+}
+
+.hextech-tag--blue {
+  border-color: var(--hextech-color-blue-dark);
+  background-color: rgba(10, 50, 60, 0.3);
+  color: var(--hextech-color-blue-light);
+}
+
+.hextech-tag--blue-solid {
+  border-color: var(--hextech-color-blue-dark);
+  background-color: var(--hextech-color-blue-medium);
+  color: var(--hextech-color-black);
+}
+
+.hextech-tag--dark {
+  border-color: var(--hextech-color-grey);
+  background-color: var(--hextech-color-dark-grey);
+  color: var(--hextech-color-light-grey);
+}
+
+/* Interactive tags (clickable) */
+.hextech-tag--interactive {
+  cursor: pointer;
+  transition: all var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+.hextech-tag--interactive:hover {
+  transform: translateY(-1px);
+}
+
+.hextech-tag--gold.hextech-tag--interactive:hover {
+  background-color: rgba(200, 170, 110, 0.3);
+  border-color: var(--hextech-color-gold-medium);
+  box-shadow: 0 2px 4px rgba(200, 170, 110, 0.2);
+}
+
+.hextech-tag--blue.hextech-tag--interactive:hover {
+  background-color: rgba(10, 200, 185, 0.2);
+  border-color: var(--hextech-color-blue-medium);
+  box-shadow: 0 2px 4px rgba(10, 200, 185, 0.2);
+}
+
+.hextech-tag--dark.hextech-tag--interactive:hover {
+  background-color: var(--hextech-color-grey);
+  border-color: var(--hextech-color-light-grey);
+}
+
+/* Selected state */
+.hextech-tag--selected.hextech-tag--gold {
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-black);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.5);
+}
+
+.hextech-tag--selected.hextech-tag--blue {
+  background-color: var(--hextech-color-blue-dark);
+  color: var(--hextech-color-blue-light);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.5);
+}
+
+.hextech-tag--selected.hextech-tag--dark {
+  background-color: var(--hextech-color-black);
+  color: var(--hextech-color-light-grey);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(61, 66, 77, 0.5);
+}
+
+/* Tag with icon */
+.hextech-tag__icon {
+  margin-right: var(--hextech-spacing-1);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Status tags */
+.hextech-tag--success {
+  border-color: var(--hextech-color-status-success);
+  background-color: rgba(30, 162, 125, 0.2);
+  color: var(--hextech-color-status-success);
+}
+
+.hextech-tag--warning {
+  border-color: var(--hextech-color-status-warning);
+  background-color: rgba(240, 169, 58, 0.2);
+  color: var(--hextech-color-status-warning);
+}
+
+.hextech-tag--error {
+  border-color: var(--hextech-color-status-error);
+  background-color: rgba(190, 30, 55, 0.2);
+  color: var(--hextech-color-status-error);
+}
+
+.hextech-tag--info {
+  border-color: var(--hextech-color-status-info);
+  background-color: rgba(10, 200, 185, 0.2);
+  color: var(--hextech-color-status-info);
+}
+
+/* Tag group */
+.hextech-tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hextech-spacing-1);
+  margin-bottom: var(--hextech-spacing-2);
+}
+
+/* Removable tag */
+.hextech-tag--removable {
+  padding-right: var(--hextech-spacing-1);
+}
+
+.hextech-tag__remove {
+  margin-left: var(--hextech-spacing-1);
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity var(--hextech-transition-duration) var(--hextech-easing-standard);
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.hextech-tag__remove:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Chip variation (rounded pill) */
+.hextech-tag--pill {
+  border-radius: 100px;
+  padding-left: var(--hextech-spacing-2-5);
+  padding-right: var(--hextech-spacing-2-5);
+}

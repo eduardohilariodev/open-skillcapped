@@ -1,0 +1,83 @@
+/**
+ * League of Legends Fonts
+ * Based on: https://brand.riotgames.com/en-us/league-of-legends/typography
+ */
+
+/* Beaufort for LOL Font */
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-Heavy.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Beaufort for LOL";
+  src: url("../../fonts/beaufort-for-lol/BeaufortforLOL-HeavyItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* Spiegel Font */
+@font-face {
+  font-family: "Spiegel";
+  src: url("../../fonts/Spiegel-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}

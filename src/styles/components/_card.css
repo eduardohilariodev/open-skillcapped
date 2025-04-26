@@ -1,0 +1,291 @@
+/**
+ * League of Legends Hextech Card Component
+ * Used for search results and content cards
+ */
+
+.hextech-card {
+  position: relative;
+  background-color: var(--hextech-color-background-medium);
+  border: 2px solid var(--hextech-color-gold-dark);
+  border-radius: var(--hextech-border-radius-sm);
+  padding: var(--hextech-spacing-4);
+  margin-bottom: var(--hextech-spacing-4);
+  overflow: hidden;
+  box-shadow: var(--hextech-shadow-md);
+  transition:
+    transform var(--hextech-transition-duration) var(--hextech-easing-standard),
+    box-shadow var(--hextech-transition-duration) var(--hextech-easing-standard);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card variants */
+.hextech-card--gold {
+  border-color: var(--hextech-color-gold-medium);
+}
+
+.hextech-card--blue {
+  border-color: var(--hextech-color-blue-medium);
+}
+
+.hextech-card--dark {
+  border-color: var(--hextech-color-grey);
+  background-color: var(--hextech-color-background-dark);
+}
+
+/* Interactive card */
+.hextech-card--interactive {
+  cursor: pointer;
+}
+
+.hextech-card--interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--hextech-shadow-lg);
+  border-color: var(--hextech-color-gold-medium);
+}
+
+.hextech-card--blue.hextech-card--interactive:hover {
+  border-color: var(--hextech-color-blue-medium);
+  box-shadow:
+    0 6px 12px rgba(10, 200, 185, 0.2),
+    var(--hextech-shadow-md);
+}
+
+/* Card header */
+.hextech-card__header {
+  margin: calc(-1 * var(--hextech-spacing-4));
+  margin-bottom: var(--hextech-spacing-4);
+  padding: var(--hextech-spacing-3) var(--hextech-spacing-4);
+  background-color: var(--hextech-color-gold-dark);
+  border-bottom: 2px solid var(--hextech-color-gold-medium);
+}
+
+.hextech-card--blue .hextech-card__header {
+  background-color: var(--hextech-color-blue-dark);
+  border-bottom-color: var(--hextech-color-blue-medium);
+}
+
+.hextech-card--dark .hextech-card__header {
+  background-color: var(--hextech-color-black);
+  border-bottom-color: var(--hextech-color-grey);
+}
+
+.hextech-card__title {
+  margin: 0;
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  font-size: var(--hextech-font-size-lg);
+  color: var(--hextech-color-gold-light);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+.hextech-card--blue .hextech-card__title {
+  color: var(--hextech-color-blue-light);
+}
+
+.hextech-card--dark .hextech-card__title {
+  color: var(--hextech-color-light-grey);
+}
+
+/* Card media */
+.hextech-card__media {
+  margin: calc(-1 * var(--hextech-spacing-4));
+  margin-bottom: var(--hextech-spacing-4);
+  position: relative;
+  overflow: hidden;
+}
+
+.hextech-card__media img {
+  width: 100%;
+  display: block;
+}
+
+.hextech-card__media-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--hextech-spacing-2) var(--hextech-spacing-4);
+  background: linear-gradient(to top, rgba(1, 10, 19, 0.9), rgba(1, 10, 19, 0));
+  color: var(--hextech-color-gold-light);
+}
+
+/* Card content */
+.hextech-card__content {
+  flex: 1;
+  color: var(--hextech-color-gold-light);
+}
+
+.hextech-card__description {
+  margin-bottom: var(--hextech-spacing-3);
+  font-size: var(--hextech-font-size-base);
+  line-height: var(--hextech-line-height-normal);
+}
+
+/* Card footer */
+.hextech-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--hextech-spacing-3);
+  padding-top: var(--hextech-spacing-3);
+  border-top: 1px solid var(--hextech-color-gold-dark);
+}
+
+.hextech-card--blue .hextech-card__footer {
+  border-top-color: var(--hextech-color-blue-dark);
+}
+
+.hextech-card--dark .hextech-card__footer {
+  border-top-color: var(--hextech-color-grey);
+}
+
+/* Card meta info */
+.hextech-card__meta {
+  display: flex;
+  gap: var(--hextech-spacing-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--hextech-spacing-3);
+}
+
+.hextech-card__meta-item {
+  display: flex;
+  align-items: center;
+  font-size: var(--hextech-font-size-sm);
+  color: var(--hextech-color-light-grey);
+}
+
+.hextech-card__meta-item-icon {
+  margin-right: var(--hextech-spacing-1);
+  color: var(--hextech-color-gold-medium);
+}
+
+.hextech-card--blue .hextech-card__meta-item-icon {
+  color: var(--hextech-color-blue-medium);
+}
+
+/* Corner accents for cards */
+.hextech-card::before,
+.hextech-card::after,
+.hextech-card__content::before,
+.hextech-card__content::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Top left corner */
+.hextech-card::before {
+  top: 0;
+  left: 0;
+  border-top: 2px solid;
+  border-left: 2px solid;
+  border-color: inherit;
+}
+
+/* Top right corner */
+.hextech-card::after {
+  top: 0;
+  right: 0;
+  border-top: 2px solid;
+  border-right: 2px solid;
+  border-color: inherit;
+}
+
+/* Bottom left corner */
+.hextech-card__content::before {
+  bottom: 0;
+  left: 0;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+  border-color: inherit;
+}
+
+/* Bottom right corner */
+.hextech-card__content::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+  border-color: inherit;
+}
+
+/* Search result specific styling */
+.hextech-search-result {
+  display: flex;
+  flex-direction: row;
+}
+
+.hextech-search-result__image {
+  flex: 0 0 120px;
+  margin-right: var(--hextech-spacing-4);
+  position: relative;
+}
+
+.hextech-search-result__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--hextech-border-radius-sm);
+  border: 1px solid var(--hextech-color-gold-dark);
+}
+
+.hextech-search-result__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hextech-search-result__title {
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  font-size: var(--hextech-font-size-lg);
+  color: var(--hextech-color-gold-medium);
+  margin-top: 0;
+  margin-bottom: var(--hextech-spacing-2);
+}
+
+.hextech-search-result__description {
+  font-size: var(--hextech-font-size-base);
+  color: var(--hextech-color-gold-light);
+  margin-bottom: var(--hextech-spacing-3);
+  line-height: var(--hextech-line-height-normal);
+}
+
+.hextech-search-result__meta {
+  display: flex;
+  gap: var(--hextech-spacing-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--hextech-spacing-2);
+}
+
+.hextech-search-result__actions {
+  display: flex;
+  gap: var(--hextech-spacing-2);
+  margin-top: auto;
+  justify-content: flex-end;
+}
+
+/* Highlight state */
+.hextech-search-result--highlight {
+  border-color: var(--hextech-color-gold-medium);
+  box-shadow: 0 0 var(--hextech-spacing-3) rgba(200, 170, 110, 0.3);
+}
+
+/* Responsive for mobile */
+@media (max-width: 640px) {
+  .hextech-search-result {
+    flex-direction: column;
+  }
+
+  .hextech-search-result__image {
+    flex: 0 0 auto;
+    height: 160px;
+    margin-right: 0;
+    margin-bottom: var(--hextech-spacing-3);
+  }
+}

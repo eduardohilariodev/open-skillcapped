@@ -8,6 +8,7 @@ import * as Sentry from "@sentry/react";
 import { Content } from "../model/Content";
 import { OmniSearch } from "./omnisearch/OmniSearch";
 import OmniSearchable from "./omnisearch/OmniSearchable";
+import ExamplePage from "./ui/ExamplePage";
 
 export interface RouterProps {
   content?: Content;
@@ -62,6 +63,7 @@ export function Router(props: RouterProps): React.ReactElement {
                       />
                     }
                   />
+                  <Route path="/ui-examples" element={<ExamplePage />} />
                   <Route
                     path="*"
                     element={

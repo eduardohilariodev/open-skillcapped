@@ -1,0 +1,104 @@
+/**
+ * League of Legends Hextech Example Page
+ * Component showcase styling
+ */
+
+.hextech-example-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--hextech-spacing-6);
+  background-color: var(--hextech-color-background-dark);
+  color: var(--hextech-color-gold-light);
+}
+
+.hextech-example-page__title {
+  font-family: var(--hextech-font-family-display);
+  font-size: var(--hextech-font-size-3xl);
+  color: var(--hextech-color-gold-medium);
+  text-align: center;
+  margin-bottom: var(--hextech-spacing-8);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+  position: relative;
+  padding-bottom: var(--hextech-spacing-4);
+}
+
+.hextech-example-page__title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--hextech-color-gold-medium) 25%,
+    var(--hextech-color-gold-medium) 75%,
+    transparent
+  );
+}
+
+.hextech-example-page__section {
+  margin-bottom: var(--hextech-spacing-10);
+  padding: var(--hextech-spacing-6);
+  background-color: var(--hextech-color-background-medium);
+  border: 1px solid var(--hextech-color-gold-dark);
+  border-radius: var(--hextech-border-radius-sm);
+  position: relative;
+}
+
+.hextech-example-page__section h2 {
+  font-family: var(--hextech-font-family-display);
+  font-size: var(--hextech-font-size-xl);
+  color: var(--hextech-color-gold-medium);
+  margin-bottom: var(--hextech-spacing-4);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+}
+
+/* Accent corners for sections */
+.hextech-example-page__section::before,
+.hextech-example-page__section::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--hextech-color-gold-medium);
+}
+
+.hextech-example-page__section::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+
+.hextech-example-page__section::after {
+  top: -1px;
+  right: -1px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+}
+
+/* Example grid item styling for visual clarity */
+.grid-example-item {
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-black);
+  padding: var(--hextech-spacing-4);
+  border-radius: var(--hextech-border-radius-sm);
+  text-align: center;
+  font-weight: var(--hextech-font-weight-bold);
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+  .hextech-example-page {
+    padding: var(--hextech-spacing-3);
+  }
+
+  .hextech-example-page__section {
+    padding: var(--hextech-spacing-3);
+  }
+}

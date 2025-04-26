@@ -1,0 +1,156 @@
+/**
+ * League of Legends Hextech Checkbox Component
+ * Based on Riot Games' UI design patterns
+ */
+
+/* Custom Checkbox Container */
+.hextech-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--hextech-font-family-body);
+  font-size: var(--hextech-font-size-base);
+  color: var(--hextech-color-gold-light);
+  margin: var(--hextech-spacing-1) 0;
+}
+
+/* Hide the default checkbox */
+.hextech-checkbox__input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Custom checkbox design */
+.hextech-checkbox__box {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  background-color: var(--hextech-color-background-dark);
+  border: 2px solid var(--hextech-color-gold-dark);
+  border-radius: var(--hextech-border-radius-sm);
+  margin-right: var(--hextech-spacing-2);
+  transition: all var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+/* Gold variant */
+.hextech-checkbox--gold .hextech-checkbox__box {
+  border-color: var(--hextech-color-gold-dark);
+}
+
+/* Blue variant */
+.hextech-checkbox--blue .hextech-checkbox__box {
+  border-color: var(--hextech-color-blue-dark);
+}
+
+/* Hover styles */
+.hextech-checkbox:hover .hextech-checkbox__box {
+  border-color: var(--hextech-color-gold-medium);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.3);
+}
+
+.hextech-checkbox--blue:hover .hextech-checkbox__box {
+  border-color: var(--hextech-color-blue-medium);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.3);
+}
+
+/* Checked state */
+.hextech-checkbox__input:checked ~ .hextech-checkbox__box {
+  background-color: var(--hextech-color-gold-medium);
+  border-color: var(--hextech-color-gold-light);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.5);
+}
+
+.hextech-checkbox--blue .hextech-checkbox__input:checked ~ .hextech-checkbox__box {
+  background-color: var(--hextech-color-blue-medium);
+  border-color: var(--hextech-color-blue-light);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.5);
+}
+
+/* Checkmark */
+.hextech-checkbox__box::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--hextech-color-background-dark);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.hextech-checkbox__input:checked ~ .hextech-checkbox__box::after {
+  display: block;
+}
+
+/* Focus state */
+.hextech-checkbox__input:focus-visible ~ .hextech-checkbox__box {
+  border-color: var(--hextech-color-gold-medium);
+  box-shadow: 0 0 0 2px rgba(200, 170, 110, 0.3);
+}
+
+.hextech-checkbox--blue .hextech-checkbox__input:focus-visible ~ .hextech-checkbox__box {
+  border-color: var(--hextech-color-blue-medium);
+  box-shadow: 0 0 0 2px rgba(10, 200, 185, 0.3);
+}
+
+/* Disabled state */
+.hextech-checkbox--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.hextech-checkbox--disabled .hextech-checkbox__box {
+  background-color: var(--hextech-color-dark-grey);
+  border-color: var(--hextech-color-grey);
+  box-shadow: none;
+}
+
+.hextech-checkbox--disabled:hover .hextech-checkbox__box {
+  border-color: var(--hextech-color-grey);
+  box-shadow: none;
+}
+
+/* Checkbox label */
+.hextech-checkbox__label {
+  margin-left: var(--hextech-spacing-2);
+  line-height: 1.2;
+}
+
+/* Checkbox group */
+.hextech-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hextech-spacing-2);
+}
+
+.hextech-checkbox-group--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--hextech-spacing-4);
+}
+
+/* Animation for checking */
+.hextech-checkbox__input:checked ~ .hextech-checkbox__box {
+  animation: hextech-checkbox-pulse 0.3s var(--hextech-easing-snap);
+}
+
+@keyframes hextech-checkbox-pulse {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

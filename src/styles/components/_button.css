@@ -1,0 +1,208 @@
+/**
+ * League of Legends Hextech Button Component
+ * Based on Riot Games' style guide
+ */
+
+.hextech-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--hextech-letter-spacing-wide);
+  padding: var(--hextech-spacing-2) var(--hextech-spacing-4);
+  border-radius: var(--hextech-border-radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--hextech-transition-duration) var(--hextech-easing-standard);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  min-width: 100px;
+  line-height: 1.2;
+}
+
+/* Button sizes */
+.hextech-button--sm {
+  font-size: var(--hextech-font-size-sm);
+  padding: var(--hextech-spacing-1) var(--hextech-spacing-3);
+  min-width: 80px;
+}
+
+.hextech-button--md {
+  font-size: var(--hextech-font-size-base);
+}
+
+.hextech-button--lg {
+  font-size: var(--hextech-font-size-lg);
+  padding: var(--hextech-spacing-3) var(--hextech-spacing-5);
+  min-width: 120px;
+}
+
+/* Primary (Blue) - Used for gameplay actions */
+.hextech-button--primary {
+  background-color: var(--hextech-color-blue-medium);
+  border-color: var(--hextech-color-blue-dark);
+  color: var(--hextech-color-black);
+  box-shadow:
+    0 0 var(--hextech-spacing-2) rgba(10, 200, 185, 0.4),
+    inset 0 0 var(--hextech-spacing-1) var(--hextech-color-blue-light);
+}
+
+.hextech-button--primary:hover,
+.hextech-button--primary:focus {
+  background-color: var(--hextech-color-blue-light);
+  border-color: var(--hextech-color-blue-medium);
+  transform: translateY(-2px);
+  box-shadow:
+    0 var(--hextech-spacing-1) var(--hextech-spacing-3) rgba(10, 200, 185, 0.5),
+    inset 0 0 var(--hextech-spacing-2) var(--hextech-color-blue-medium);
+}
+
+.hextech-button--primary:active {
+  transform: translateY(0);
+  background-color: var(--hextech-color-blue-dark);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(10, 200, 185, 0.3);
+}
+
+/* Secondary (Gold) - Used for navigation and modal actions */
+.hextech-button--secondary {
+  background-color: var(--hextech-color-gold-medium);
+  border-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-black);
+  box-shadow:
+    0 0 var(--hextech-spacing-2) rgba(200, 170, 110, 0.4),
+    inset 0 0 var(--hextech-spacing-1) var(--hextech-color-gold-light);
+}
+
+.hextech-button--secondary:hover,
+.hextech-button--secondary:focus {
+  background-color: var(--hextech-color-gold-light);
+  border-color: var(--hextech-color-gold-medium);
+  transform: translateY(-2px);
+  box-shadow:
+    0 var(--hextech-spacing-1) var(--hextech-spacing-3) rgba(200, 170, 110, 0.5),
+    inset 0 0 var(--hextech-spacing-2) var(--hextech-color-gold-medium);
+}
+
+.hextech-button--secondary:active {
+  transform: translateY(0);
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-gold-light);
+  box-shadow: 0 0 var(--hextech-spacing-1) rgba(200, 170, 110, 0.3);
+}
+
+/* Utility (Grey) - Used for filters, info */
+.hextech-button--utility {
+  background-color: var(--hextech-color-grey);
+  border-color: var(--hextech-color-dark-grey);
+  color: var(--hextech-color-light-grey);
+}
+
+.hextech-button--utility:hover,
+.hextech-button--utility:focus {
+  background-color: var(--hextech-color-dark-grey);
+  color: var(--hextech-color-gold-light);
+  border-color: var(--hextech-color-gold-dark);
+  transform: translateY(-1px);
+}
+
+.hextech-button--utility:active {
+  transform: translateY(0);
+  background-color: var(--hextech-color-black);
+}
+
+/* Disabled state */
+.hextech-button:disabled,
+.hextech-button--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.hextech-button:disabled:hover,
+.hextech-button--disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Button with icons */
+.hextech-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hextech-button__icon--left {
+  margin-right: var(--hextech-spacing-2);
+}
+
+.hextech-button__icon--right {
+  margin-left: var(--hextech-spacing-2);
+}
+
+/* Shimmer effect on hover */
+.hextech-button::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+.hextech-button:hover::after {
+  animation: hextech-button-shimmer 1.5s infinite;
+  opacity: 1;
+}
+
+@keyframes hextech-button-shimmer {
+  0% {
+    transform: rotate(30deg) translate(-90%, -90%);
+  }
+  100% {
+    transform: rotate(30deg) translate(90%, 90%);
+  }
+}
+
+/* Toggle Button States */
+.hextech-button--toggle {
+  position: relative;
+}
+
+.hextech-button--toggle.is-active.hextech-button--secondary {
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-gold-light);
+  box-shadow:
+    inset 0 0 var(--hextech-spacing-2) rgba(0, 0, 0, 0.3),
+    0 0 var(--hextech-spacing-2) rgba(200, 170, 110, 0.5);
+}
+
+.hextech-button--toggle.is-active.hextech-button--primary {
+  background-color: var(--hextech-color-blue-dark);
+  color: var(--hextech-color-blue-light);
+  box-shadow:
+    inset 0 0 var(--hextech-spacing-2) rgba(0, 0, 0, 0.3),
+    0 0 var(--hextech-spacing-2) rgba(10, 200, 185, 0.5);
+}
+
+.hextech-button--toggle.is-active.hextech-button--utility {
+  background-color: var(--hextech-color-black);
+  border-color: var(--hextech-color-grey);
+  color: var(--hextech-color-gold-light);
+  box-shadow: inset 0 0 var(--hextech-spacing-2) rgba(0, 0, 0, 0.3);
+}

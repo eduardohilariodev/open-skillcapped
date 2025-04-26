@@ -1,0 +1,190 @@
+/**
+ * League of Legends Hextech Fixed Layout
+ * Used for omnisearch and other fixed position layouts
+ */
+
+.hextech-fixed-layout {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 900;
+  background-color: rgba(1, 10, 19, 0.9);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.hextech-fixed-layout--hidden {
+  display: none;
+}
+
+/* Fixed layout header */
+.hextech-fixed-layout__header {
+  padding: var(--hextech-spacing-4);
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* Fixed layout content */
+.hextech-fixed-layout__content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Fixed layout sidebar */
+.hextech-fixed-layout__sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  background-color: var(--hextech-color-background-dark);
+  border-right: 1px solid var(--hextech-color-gold-dark);
+  padding: var(--hextech-spacing-4);
+  overflow-y: auto;
+}
+
+/* Fixed layout main */
+.hextech-fixed-layout__main {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--hextech-spacing-4);
+}
+
+/* Fixed layout footer */
+.hextech-fixed-layout__footer {
+  padding: var(--hextech-spacing-4);
+  background-color: var(--hextech-color-background-dark);
+  border-top: 1px solid var(--hextech-color-gold-dark);
+  flex-shrink: 0;
+}
+
+/* Search specific layout */
+.hextech-search-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.hextech-search-layout__searchbar {
+  margin-bottom: var(--hextech-spacing-4);
+}
+
+.hextech-search-layout__results {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: var(--hextech-spacing-2);
+}
+
+.hextech-search-layout__results-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hextech-spacing-4);
+}
+
+.hextech-search-layout__no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--hextech-spacing-8);
+  color: var(--hextech-color-gold-medium);
+}
+
+.hextech-search-layout__no-results-icon {
+  font-size: var(--hextech-font-size-4xl);
+  margin-bottom: var(--hextech-spacing-4);
+  opacity: 0.7;
+}
+
+.hextech-search-layout__no-results-text {
+  font-family: var(--hextech-font-family-display);
+  font-size: var(--hextech-font-size-lg);
+  margin-bottom: var(--hextech-spacing-2);
+}
+
+.hextech-search-layout__no-results-help {
+  font-size: var(--hextech-font-size-base);
+  color: var(--hextech-color-light-grey);
+}
+
+/* Filter panel */
+.hextech-filter-panel {
+  margin-bottom: var(--hextech-spacing-4);
+  border: 1px solid var(--hextech-color-gold-dark);
+  border-radius: var(--hextech-border-radius-sm);
+  overflow: hidden;
+}
+
+.hextech-filter-panel__header {
+  padding: var(--hextech-spacing-2) var(--hextech-spacing-3);
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-gold-light);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+.hextech-filter-panel__header:hover {
+  background-color: var(--hextech-color-gold-medium);
+}
+
+.hextech-filter-panel__content {
+  padding: var(--hextech-spacing-3);
+  background-color: var(--hextech-color-background-medium);
+}
+
+.hextech-filter-panel--blue .hextech-filter-panel__header {
+  background-color: var(--hextech-color-blue-dark);
+  color: var(--hextech-color-blue-light);
+  border-color: var(--hextech-color-blue-dark);
+}
+
+.hextech-filter-panel--blue .hextech-filter-panel__header:hover {
+  background-color: var(--hextech-color-blue-medium);
+}
+
+.hextech-filter-panel--blue {
+  border-color: var(--hextech-color-blue-dark);
+}
+
+/* Filter panel toggle indicator */
+.hextech-filter-panel__toggle {
+  transition: transform var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+.hextech-filter-panel--collapsed .hextech-filter-panel__toggle {
+  transform: rotate(-90deg);
+}
+
+.hextech-filter-panel--collapsed .hextech-filter-panel__content {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hextech-fixed-layout__content {
+    flex-direction: column;
+  }
+
+  .hextech-fixed-layout__sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--hextech-color-gold-dark);
+    max-height: 40%;
+  }
+
+  .hextech-fixed-layout__header,
+  .hextech-fixed-layout__sidebar,
+  .hextech-fixed-layout__main,
+  .hextech-fixed-layout__footer {
+    padding: var(--hextech-spacing-3);
+  }
+}

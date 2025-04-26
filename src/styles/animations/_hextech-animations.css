@@ -1,0 +1,214 @@
+/**
+ * League of Legends Hextech Animations
+ * Standardized animations for the Hextech UI system
+ */
+
+/* Hextech loading animation */
+.hextech-loading {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+}
+
+.hextech-loading::before,
+.hextech-loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid transparent;
+  border-top-color: var(--hextech-color-blue-medium);
+  border-radius: 50%;
+  animation: hextech-spin 1.5s linear infinite;
+}
+
+.hextech-loading::after {
+  animation-duration: 1s;
+  border-top-color: var(--hextech-color-gold-medium);
+  border-right-color: var(--hextech-color-gold-medium);
+}
+
+@keyframes hextech-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hextech pulse effect */
+.hextech-pulse {
+  animation: hextech-pulse 2s infinite;
+}
+
+@keyframes hextech-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(12, 200, 185, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(12, 200, 185, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(12, 200, 185, 0);
+  }
+}
+
+/* Transition effects for hover states */
+.hextech-hover-effect {
+  transition: all var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+.hextech-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(200, 170, 110, 0.2);
+}
+
+/* Hextech shimmer animation */
+.hextech-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.hextech-shimmer::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  pointer-events: none;
+  animation: hextech-shimmer 3.5s infinite;
+}
+
+@keyframes hextech-shimmer {
+  0% {
+    transform: rotate(30deg) translate(-30%, -30%);
+  }
+  100% {
+    transform: rotate(30deg) translate(30%, 30%);
+  }
+}
+
+/* Magic text glow effect */
+.hextech-text-glow {
+  color: var(--hextech-color-blue-medium);
+  text-shadow: 0 0 5px rgba(12, 200, 185, 0.7);
+  animation: hextech-text-glow 2s infinite alternate;
+}
+
+.hextech-text-glow--gold {
+  color: var(--hextech-color-gold-medium);
+  text-shadow: 0 0 5px rgba(200, 170, 110, 0.7);
+  animation: hextech-text-glow--gold 2s infinite alternate;
+}
+
+@keyframes hextech-text-glow {
+  0% {
+    text-shadow: 0 0 4px rgba(12, 200, 185, 0.5);
+  }
+  100% {
+    text-shadow:
+      0 0 10px rgba(12, 200, 185, 0.8),
+      0 0 15px rgba(12, 200, 185, 0.3);
+  }
+}
+
+@keyframes hextech-text-glow--gold {
+  0% {
+    text-shadow: 0 0 4px rgba(200, 170, 110, 0.5);
+  }
+  100% {
+    text-shadow:
+      0 0 10px rgba(200, 170, 110, 0.8),
+      0 0 15px rgba(200, 170, 110, 0.3);
+  }
+}
+
+/* Fade in animation */
+.hextech-fade-in {
+  animation: hextech-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes hextech-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Diamond rotation animation */
+.hextech-diamond-rotate {
+  animation: hextech-diamond-rotate 8s linear infinite;
+}
+
+@keyframes hextech-diamond-rotate {
+  0% {
+    transform: rotate(45deg);
+  }
+  100% {
+    transform: rotate(405deg);
+  }
+}
+
+/* Magic particles rising */
+.hextech-magic-rise {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hextech-magic-rise::before {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: radial-gradient(circle, rgba(12, 200, 185, 0.8) 0%, rgba(12, 200, 185, 0) 70%);
+  border-radius: 50%;
+  animation: hextech-rise 3s ease-in infinite;
+  opacity: 0;
+}
+
+.hextech-magic-rise--gold::before {
+  background: radial-gradient(circle, rgba(200, 170, 110, 0.8) 0%, rgba(200, 170, 110, 0) 70%);
+}
+
+@keyframes hextech-rise {
+  0% {
+    bottom: 0;
+    opacity: 0;
+    left: 10%;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.2;
+  }
+  100% {
+    bottom: 100%;
+    opacity: 0;
+    left: 15%;
+  }
+}

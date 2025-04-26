@@ -1,0 +1,110 @@
+/**
+ * League of Legends Hextech Theme CSS Custom Properties
+ * Based on Riot Games' style guide
+ */
+
+:root {
+  /* Colors (from colors.ts) */
+  --hextech-color-gold-light: #f0e6d2;
+  --hextech-color-gold-medium: #c8aa6e;
+  --hextech-color-gold-dark: #785a28;
+
+  --hextech-color-blue-light: #cdfafa;
+  --hextech-color-blue-medium: #0ac8b9;
+  --hextech-color-blue-dark: #0a323c;
+
+  --hextech-color-red: #af3131;
+  --hextech-color-orange: #da722b;
+  --hextech-color-yellow: #d6b23e;
+  --hextech-color-green: #1ca64c;
+  --hextech-color-dark-green: #008274;
+
+  --hextech-color-black: #010a13;
+  --hextech-color-dark-grey: #1e2328;
+  --hextech-color-grey: #3d424d;
+  --hextech-color-light-grey: #a09b8c;
+  --hextech-color-white: #f0e6d2;
+
+  --hextech-color-background-dark: #010a13;
+  --hextech-color-background-medium: #0a1428;
+  --hextech-color-background-light: #0a323c;
+
+  --hextech-color-magic-blue: #0ac8b9;
+  --hextech-color-magic-gold: #c89b3c;
+
+  --hextech-color-status-error: #be1e37;
+  --hextech-color-status-warning: #f0a93a;
+  --hextech-color-status-success: #1ea27d;
+  --hextech-color-status-info: #0ac8b9;
+
+  /* Typography (from typography.ts) */
+  --hextech-font-family-display: "Beaufort for LOL", serif;
+  --hextech-font-family-body: "Spiegel", "Spiegel Regular", sans-serif;
+
+  --hextech-font-weight-light: 300;
+  --hextech-font-weight-regular: 400;
+  --hextech-font-weight-medium: 500;
+  --hextech-font-weight-bold: 700;
+  --hextech-font-weight-heavy: 800;
+
+  --hextech-font-size-xs: 0.75rem;
+  --hextech-font-size-sm: 0.875rem;
+  --hextech-font-size-base: 1rem;
+  --hextech-font-size-lg: 1.125rem;
+  --hextech-font-size-xl: 1.25rem;
+  --hextech-font-size-2xl: 1.5rem;
+  --hextech-font-size-3xl: 1.875rem;
+  --hextech-font-size-4xl: 2.25rem;
+  --hextech-font-size-5xl: 3rem;
+  --hextech-font-size-6xl: 3.75rem;
+
+  --hextech-line-height-none: 1;
+  --hextech-line-height-tight: 1.25;
+  --hextech-line-height-normal: 1.5;
+  --hextech-line-height-relaxed: 1.75;
+  --hextech-line-height-loose: 2;
+
+  --hextech-letter-spacing-tight: -0.025em;
+  --hextech-letter-spacing-normal: 0;
+  --hextech-letter-spacing-wide: 0.025em;
+  --hextech-letter-spacing-wider: 0.05em;
+  --hextech-letter-spacing-widest: 0.1em;
+
+  /* Spacing (from spacing.ts) */
+  --hextech-spacing-0: 0;
+  --hextech-spacing-px: 1px;
+  --hextech-spacing-0-5: 0.125rem;
+  --hextech-spacing-1: 0.25rem;
+  --hextech-spacing-1-5: 0.375rem;
+  --hextech-spacing-2: 0.5rem;
+  --hextech-spacing-2-5: 0.625rem;
+  --hextech-spacing-3: 0.75rem;
+  --hextech-spacing-3-5: 0.875rem;
+  --hextech-spacing-4: 1rem;
+  --hextech-spacing-5: 1.25rem;
+  --hextech-spacing-6: 1.5rem;
+  --hextech-spacing-8: 2rem;
+  --hextech-spacing-10: 2.5rem;
+  --hextech-spacing-12: 3rem;
+  --hextech-spacing-16: 4rem;
+  --hextech-spacing-20: 5rem;
+  --hextech-spacing-24: 6rem;
+  --hextech-spacing-32: 8rem;
+
+  /* Transitions and animations */
+  --hextech-transition-duration: 0.2s;
+  --hextech-easing-standard: ease-out;
+  --hextech-easing-snap: cubic-bezier(0.5, 0, 0.1, 1);
+
+  /* Border radius */
+  --hextech-border-radius-sm: 2px;
+  --hextech-border-radius-md: 4px;
+  --hextech-border-radius-lg: 8px;
+
+  /* Box shadows */
+  --hextech-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --hextech-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --hextech-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --hextech-shadow-glow-gold: 0 0 8px rgba(200, 170, 110, 0.4);
+  --hextech-shadow-glow-blue: 0 0 8px rgba(10, 200, 185, 0.5);
+}

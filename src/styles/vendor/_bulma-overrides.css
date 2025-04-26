@@ -1,0 +1,256 @@
+/**
+ * League of Legends Bulma Framework Overrides
+ * Adapting Bulma to fit the Hextech aesthetic
+ */
+
+/* Override Bulma colors with League of Legends palette */
+
+/* Box component */
+.box {
+  background-color: var(--hextech-color-background-medium);
+  color: var(--hextech-color-gold-light);
+  border-radius: var(--hextech-border-radius-sm);
+  box-shadow: var(--hextech-shadow-md);
+  border: 1px solid var(--hextech-color-gold-dark);
+}
+
+/* Cards */
+.card {
+  background-color: var(--hextech-color-background-medium);
+  color: var(--hextech-color-gold-light);
+  border-radius: var(--hextech-border-radius-sm);
+  box-shadow: var(--hextech-shadow-md);
+  border: 1px solid var(--hextech-color-gold-dark);
+}
+
+.card-header {
+  background-color: var(--hextech-color-background-light);
+  border-bottom: 1px solid var(--hextech-color-gold-dark);
+}
+
+.card-header-title {
+  color: var(--hextech-color-gold-medium);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+}
+
+.card-content {
+  background-color: var(--hextech-color-background-medium);
+  padding: var(--hextech-spacing-6);
+}
+
+.card-footer {
+  background-color: var(--hextech-color-background-dark);
+  border-top: 1px solid var(--hextech-color-grey);
+}
+
+/* Buttons */
+.button {
+  background-color: var(--hextech-color-grey);
+  color: var(--hextech-color-gold-light);
+  border: 1px solid var(--hextech-color-grey);
+  font-family: var(--hextech-font-family-display);
+  transition: all var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+.button:hover {
+  background-color: var(--hextech-color-dark-grey);
+  border-color: var(--hextech-color-gold-dark);
+}
+
+.button.is-primary {
+  background-color: var(--hextech-color-gold-medium);
+  color: var(--hextech-color-background-dark);
+  border-color: var(--hextech-color-gold-dark);
+}
+
+.button.is-primary:hover {
+  background-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-gold-light);
+}
+
+.button.is-info {
+  background-color: var(--hextech-color-blue-medium);
+  color: var(--hextech-color-background-dark);
+  border-color: var(--hextech-color-blue-dark);
+}
+
+.button.is-info:hover {
+  background-color: var(--hextech-color-blue-dark);
+  color: var(--hextech-color-blue-light);
+}
+
+.button.is-success {
+  background-color: var(--hextech-color-green);
+  border-color: var(--hextech-color-dark-green);
+}
+
+.button.is-warning {
+  background-color: var(--hextech-color-yellow);
+  color: var(--hextech-color-background-dark);
+}
+
+.button.is-danger {
+  background-color: var(--hextech-color-status-error);
+  border-color: var(--hextech-color-red);
+}
+
+/* Inputs and Form Controls */
+.input,
+.textarea,
+.select select {
+  background-color: var(--hextech-color-background-dark);
+  color: var(--hextech-color-gold-light);
+  border-color: var(--hextech-color-gold-dark);
+  border-radius: var(--hextech-border-radius-sm);
+  transition: all var(--hextech-transition-duration) var(--hextech-easing-standard);
+}
+
+.input:focus,
+.textarea:focus,
+.select select:focus {
+  border-color: var(--hextech-color-gold-medium);
+  box-shadow: 0 0 0 0.125em rgba(200, 170, 110, 0.25);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--hextech-color-light-grey);
+  opacity: 0.7;
+}
+
+/* Tables */
+.table {
+  background-color: var(--hextech-color-background-medium);
+  color: var(--hextech-color-gold-light);
+}
+
+.table thead {
+  background-color: var(--hextech-color-background-light);
+}
+
+.table thead th {
+  color: var(--hextech-color-gold-medium);
+  font-family: var(--hextech-font-family-display);
+  border-bottom: 2px solid var(--hextech-color-gold-dark);
+}
+
+.table td,
+.table th {
+  border: 1px solid var(--hextech-color-grey);
+}
+
+.table.is-striped tbody tr:not(.is-selected):nth-child(even) {
+  background-color: var(--hextech-color-dark-grey);
+}
+
+/* Panels */
+.panel {
+  background-color: var(--hextech-color-background-medium);
+  border-radius: var(--hextech-border-radius-sm);
+  border: 1px solid var(--hextech-color-gold-dark);
+}
+
+.panel-heading {
+  background-color: var(--hextech-color-background-light);
+  color: var(--hextech-color-gold-medium);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+  border-bottom: 1px solid var(--hextech-color-gold-dark);
+}
+
+.panel-block {
+  color: var(--hextech-color-gold-light);
+  border-bottom: 1px solid var(--hextech-color-grey);
+}
+
+.panel-block:hover {
+  background-color: var(--hextech-color-background-light);
+}
+
+/* Pagination */
+.pagination-link,
+.pagination-next,
+.pagination-previous {
+  background-color: var(--hextech-color-dark-grey);
+  border-color: var(--hextech-color-grey);
+  color: var(--hextech-color-gold-light);
+}
+
+.pagination-link.is-current {
+  background-color: var(--hextech-color-gold-medium);
+  border-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-background-dark);
+}
+
+.pagination-link:hover,
+.pagination-next:hover,
+.pagination-previous:hover {
+  background-color: var(--hextech-color-background-light);
+  border-color: var(--hextech-color-gold-dark);
+  color: var(--hextech-color-gold-medium);
+}
+
+/* Notifications */
+.notification {
+  background-color: var(--hextech-color-background-light);
+  color: var(--hextech-color-gold-light);
+  border: 1px solid var(--hextech-color-gold-dark);
+  border-radius: var(--hextech-border-radius-sm);
+}
+
+.notification.is-info {
+  background-color: var(--hextech-color-blue-dark);
+  border-color: var(--hextech-color-blue-medium);
+}
+
+.notification.is-success {
+  background-color: var(--hextech-color-status-success);
+}
+
+.notification.is-warning {
+  background-color: var(--hextech-color-status-warning);
+  color: var(--hextech-color-background-dark);
+}
+
+.notification.is-danger {
+  background-color: var(--hextech-color-status-error);
+}
+
+/* Modal */
+.modal-card-head {
+  background-color: var(--hextech-color-background-light);
+  border-bottom: 1px solid var(--hextech-color-gold-dark);
+}
+
+.modal-card-title {
+  color: var(--hextech-color-gold-medium);
+  font-family: var(--hextech-font-family-display);
+  font-weight: var(--hextech-font-weight-bold);
+}
+
+.modal-card-body {
+  background-color: var(--hextech-color-background-medium);
+  color: var(--hextech-color-gold-light);
+}
+
+.modal-card-foot {
+  background-color: var(--hextech-color-background-dark);
+  border-top: 1px solid var(--hextech-color-gold-dark);
+}
+
+/* Tabs */
+.tabs li.is-active a {
+  color: var(--hextech-color-gold-medium);
+  border-bottom-color: var(--hextech-color-gold-medium);
+}
+
+.tabs a {
+  color: var(--hextech-color-light-grey);
+  border-bottom-color: var(--hextech-color-grey);
+}
+
+.tabs a:hover {
+  color: var(--hextech-color-gold-light);
+  border-bottom-color: var(--hextech-color-gold-dark);
+}
