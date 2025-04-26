@@ -41,24 +41,20 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
       <div className="box-content">
         <div className="corner-top-right"></div>
         <div className="corner-bottom-left"></div>
-        <div className="columns is-multiline">
-          <div className="column is-7">
-            <h3 className="title is-5">
-              <a href={video.skillCappedUrl} onClick={handleVideoClick}>
-                <Highlighter searchWords={matchedStrings} textToHighlight={video.title} autoEscape={true} />
-              </a>
-            </h3>
-            <p>
-              <Highlighter searchWords={matchedStrings} textToHighlight={video.description} autoEscape={true} />
-            </p>
-            <div className="tags">
-              <span className="tag is-primary">Content Type: Video</span>
-              <span className="tag is-primary is-light">Role: {roleToString(video.role)}</span>
-              <span className="tag is-primary is-light" title={video.releaseDate.toLocaleString()}>
-                Released: {video.releaseDate.toLocaleDateString()}
-              </span>
-            </div>
-            <div className="buttons">
+        <div className="columns">
+          {/* First column - Image */}
+          <div className="column is-3">
+            <figure className="image course-image">
+              <img
+                src={video.imageUrl}
+                alt="Video thumbnail"
+                className="thumbnail"
+                onClick={handleVideoClick}
+                style={{ cursor: "pointer" }}
+              />
+            </figure>
+
+            <div className="buttons mt-3">
               <ToggleBookmarkButton {...buttonProps} />
               <ToggleWatchStatusButton {...buttonProps} />
               {isDownloadEnabled && (
@@ -71,16 +67,24 @@ export function VideoSearchResult(props: VideoSearchResultProps): React.ReactEle
               )}
             </div>
           </div>
-          <div className="column is-5">
-            <figure className="image is-16by9">
-              <img
-                src={video.imageUrl}
-                alt="Video thumbnail"
-                className="thumbnail"
-                onClick={handleVideoClick}
-                style={{ cursor: "pointer" }}
-              />
-            </figure>
+
+          {/* Second column - Title, description, metadata */}
+          <div className="column is-9">
+            <h3 className="title is-4 mb-2">
+              <a href={video.skillCappedUrl} onClick={handleVideoClick}>
+                <Highlighter searchWords={matchedStrings} textToHighlight={video.title} autoEscape={true} />
+              </a>
+            </h3>
+            <p className="mb-3">
+              <Highlighter searchWords={matchedStrings} textToHighlight={video.description} autoEscape={true} />
+            </p>
+            <div className="tags mb-4">
+              <span className="tag is-primary">Content Type: Video</span>
+              <span className="tag is-primary is-light">Role: {roleToString(video.role)}</span>
+              <span className="tag is-primary is-light" title={video.releaseDate.toLocaleString()}>
+                Released: {video.releaseDate.toLocaleDateString()}
+              </span>
+            </div>
           </div>
         </div>
       </div>

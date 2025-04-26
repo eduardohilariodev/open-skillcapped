@@ -53,17 +53,44 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
 
   return (
     <div key={uuid} className="box hextech-card">
-      <div className="corner-top-right"></div>
-      <div className="corner-bottom-left"></div>
       <div className="box-content">
-        <div className="columns is-multiline">
-          <div className="column 7">
-            <h3 className="title is-5">
+        <div className="corner-top-right"></div>
+        <div className="corner-bottom-left"></div>
+        <div className="columns">
+          {/* First column - Image */}
+          <div className="column is-3">
+            <figure className="image course-image">
+              <img
+                src={commentary.imageUrl}
+                alt="Commentary thumbnail"
+                className="thumbnail"
+                onClick={handleVideoClick}
+                style={{ cursor: "pointer" }}
+              />
+            </figure>
+
+            <div className="buttons mt-3">
+              <ToggleBookmarkButton {...buttonProps} />
+              <ToggleWatchStatusButton {...buttonProps} />
+              {isDownloadEnabled && (
+                <a href={getStreamUrl(commentary)} className="button bookmark is-small">
+                  <span className="icon is-small">
+                    <FontAwesomeIcon icon={faCloudDownloadAlt} />
+                  </span>
+                  <span>Download</span>
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Second column - Title, metadata */}
+          <div className="column is-9">
+            <h3 className="title is-4 mb-2">
               <a href={skillCappedUrl} onClick={handleVideoClick}>
                 {champion} vs {opponent}
               </a>
             </h3>
-            <div className="tags">
+            <div className="tags mb-4">
               <span className="tag is-primary">Content Type: Commentary</span>
               <span className="tag is-primary is-light">Role: {roleToString(role)}</span>
               <span className="tag is-primary is-light" title={releaseDate.toLocaleString()}>
@@ -76,31 +103,6 @@ export function CommentarySearchResult(props: CommentarySearchResultProps): Reac
               <span className="tag">Game Length: {gameLengthInMinutes} minutes</span>
               <span className="tag">Carry Amount: {carry}</span>
               <span className="tag">Account Type: {type}</span>
-            </div>
-          </div>
-          <div className="column is-5">
-            <figure className="image is-16by9">
-              <img
-                src={commentary.imageUrl}
-                alt="Video thumbnail"
-                className="thumbnail"
-                onClick={handleVideoClick}
-                style={{ cursor: "pointer" }}
-              />
-            </figure>
-          </div>
-          <div className="column is-12">
-            <div className="buttons">
-              <ToggleBookmarkButton {...buttonProps} />
-              <ToggleWatchStatusButton {...buttonProps} />
-              {isDownloadEnabled && (
-                <a href={getStreamUrl(commentary)} className="button bookmark is-small">
-                  <span className="icon is-small">
-                    <FontAwesomeIcon icon={faCloudDownloadAlt} />
-                  </span>
-                  <span>Download</span>
-                </a>
-              )}
             </div>
           </div>
         </div>

@@ -46,35 +46,12 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
         <div className="corner-top-right"></div>
         <div className="corner-bottom-left"></div>
 
-        {/* Header section with image and title/metadata */}
         <div className="columns">
+          {/* First column - Image */}
           <div className="column is-3">
             <figure className="image course-image">
               <img src={course.image} alt="Course thumbnail" className="thumbnail" />
             </figure>
-          </div>
-          <div className="column is-9">
-            <h3 className="title is-4 mb-2">
-              <Highlighter searchWords={props.result.matchedStrings} textToHighlight={course.title} autoEscape={true} />
-            </h3>
-            <p className="mb-3">{course.description}</p>
-            <div className="tags">
-              <span className="tag is-primary">Content Type: Course</span>
-              <span className="tag is-primary is-light">Role: {roleToString(props.result.item.role)}</span>
-              <span className="tag is-primary is-light" title={props.result.item.releaseDate.toLocaleString()}>
-                Released: {props.result.item.releaseDate.toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Build list section */}
-        <div className="columns mt-3">
-          <div className="column is-12">
-            <h4 className="title is-5 mb-2">Build List</h4>
-            <div className="course-videos-list">
-              <ol className="video-list">{videos}</ol>
-            </div>
 
             <div className="buttons mt-3">
               <ToggleBookmarkButton
@@ -87,6 +64,27 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
                 isWatched={isWatched(course)}
                 onToggleWatchStatus={onToggleWatchStatus}
               />
+            </div>
+          </div>
+
+          {/* Second column - Title, metadata, and builds list */}
+          <div className="column is-9">
+            <h3 className="title is-4 mb-2">
+              <Highlighter searchWords={props.result.matchedStrings} textToHighlight={course.title} autoEscape={true} />
+            </h3>
+            <p className="mb-3">{course.description}</p>
+            <div className="tags mb-4">
+              <span className="tag is-primary">Content Type: Course</span>
+              <span className="tag is-primary is-light">Role: {roleToString(props.result.item.role)}</span>
+              <span className="tag is-primary is-light" title={props.result.item.releaseDate.toLocaleString()}>
+                Released: {props.result.item.releaseDate.toLocaleDateString()}
+              </span>
+            </div>
+
+            {/* Build list */}
+            <h4 className="title is-5 mb-2">Build List</h4>
+            <div className="course-videos-list">
+              <ol className="video-list">{videos}</ol>
             </div>
           </div>
         </div>
