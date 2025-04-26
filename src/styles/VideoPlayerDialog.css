@@ -19,9 +19,9 @@
   background-color: #0a1428; /* LoL background medium */
   border: 2px solid #785a28; /* LoL gold dark */
   border-radius: 4px;
-  width: 90%;
+  width: 80%;
   max-width: 1200px;
-  max-height: 90vh;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 10px 30px rgba(1, 10, 19, 0.7); /* Use LoL dark background for shadow */

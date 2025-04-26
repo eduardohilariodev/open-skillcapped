@@ -15,9 +15,9 @@
 .video-player-dialog {
   background-color: var(--hextech-color-background-medium);
   border-radius: 8px;
-  width: 90%;
+  width: 80%;
   max-width: 960px;
-  max-height: 90vh;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
