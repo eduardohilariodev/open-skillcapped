@@ -3,7 +3,6 @@ import React from "react";
 import Highlighter from "react-highlight-words";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
-import "../../styles/Episode.css";
 import { Watchable } from "../../model/WatchStatus";
 import { FuseSearchResult } from "./search/FuseSearch";
 import { CourseSearchResultVideo } from "./CourseSearchResultVideo";
@@ -69,8 +68,8 @@ export function CourseSearchResult(props: CourseSearchResultProps): React.ReactE
             </div>
 
             {/* Build list */}
-            <div className="course-videos-list">
-              <ol className="video-list">{videos}</ol>
+            <div className="mt-6 border-none rounded-none bg-transparent">
+              <ol className="list-none m-0 p-0">{videos}</ol>
             </div>
           </div>
         </div>

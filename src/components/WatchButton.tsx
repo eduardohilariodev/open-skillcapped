@@ -32,11 +32,11 @@ export function WatchButton(props: WatchButtonProps): React.ReactElement {
         onToggle={handleWatchClick}
         type={buttonType}
         disabled={disabled}
-        classes={`watch-button ${compact ? "compact" : ""}`}
+        classes={`watch-button ${compact ? "py-1 px-2 min-w-0 h-auto" : ""}`}
         buttonText={() => {
           return (
             <React.Fragment>
-              <span className="watch-icon">
+              <span className={`flex items-center justify-center ${!compact ? "mr-2" : ""}`}>
                 <FontAwesomeIcon icon={faPlay} />
               </span>
               {!compact && <span>Watch</span>}
