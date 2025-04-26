@@ -55,12 +55,6 @@
   margin-right: 8px;
 }
 
-.video-player-header .episode-number {
-  color: #0ac8b9; /* Hextech blue */
-  margin-right: 5px;
-  font-weight: normal;
-}
-
 .close-button {
   background: none;
   border: none;

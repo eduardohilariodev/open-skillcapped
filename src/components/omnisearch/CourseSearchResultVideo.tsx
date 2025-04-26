@@ -6,6 +6,7 @@ import { Bookmarkable } from "../../model/Bookmark";
 import { Watchable } from "../../model/WatchStatus";
 import classNames from "classnames";
 import "./SearchResult.css";
+import "../../styles/Episode.css";
 import "../../styles/card-states.css";
 import { useVideoPlayer } from "../../components/VideoPlayerPortal";
 import { WatchButton } from "../../components/WatchButton";
@@ -46,6 +47,7 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
       <div className="episode-card" onClick={handleVideoClick}>
         <div className="episode-content">
           {episodeNumber && <div className="episode-number">{episodeNumber}</div>}
+          {episodeNumber && <span className="episode-separator">|</span>}
           <Highlighter
             highlightClassName="bg-yellow-300"
             searchWords={matchedStrings}

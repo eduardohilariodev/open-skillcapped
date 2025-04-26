@@ -21,6 +21,7 @@ import {
 import "../styles/components/_button.css";
 import "../styles/components/_modal.css";
 import "../styles/components/_tag.css";
+import "../styles/Episode.css";
 import "./VideoPlayerDialog.css";
 
 // Storage keys

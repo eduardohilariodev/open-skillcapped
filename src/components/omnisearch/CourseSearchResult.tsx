@@ -3,6 +3,7 @@ import React from "react";
 import Highlighter from "react-highlight-words";
 import "./SearchResult.css";
 import "../../styles/card-states.css";
+import "../../styles/Episode.css";
 import { Watchable } from "../../model/WatchStatus";
 import { FuseSearchResult } from "./search/FuseSearch";
 import { CourseSearchResultVideo } from "./CourseSearchResultVideo";

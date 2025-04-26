@@ -1,0 +1,169 @@
+/**
+ * Centralized episode styling
+ * Used across the application for consistent episode representation
+ */
+
+/* Course video list container */
+.course-videos-list {
+  margin-top: 2rem;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.video-list {
+  list-style-position: inside;
+  margin: 0;
+  padding: 1.5rem 0;
+}
+
+/* Episode item container */
+.episode-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.episode-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Episode number indicator */
+.episode-number {
+  position: relative;
+  left: 0;
+  min-width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--hextech-color-blue-medium, #0ac8b9);
+  font-weight: 700;
+  font-family: "Beaufort for LOL", serif;
+  border: none;
+  margin-right: 0;
+  flex-shrink: 0;
+}
+
+/* Separator between episode number and title */
+.episode-separator {
+  color: #785a28; /* LoL gold dark */
+  margin: 0 0.5rem;
+  opacity: 0.6;
+}
+
+/* Episode card container */
+.episode-card {
+  background-color: rgba(10, 20, 40, 0.3);
+  border: 1px solid #785a28;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.episode-card:hover {
+  box-shadow: 0 4px 8px rgba(200, 170, 110, 0.15);
+  background-color: rgba(10, 20, 40, 0.5);
+  border-color: #c8aa6e;
+}
+
+/* Episode content area */
+.episode-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Episode title styling */
+.episode-title {
+  color: #f0e6d2; /* LoL gold light */
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.episode-title.watched {
+  color: #a09b8c; /* LoL text muted */
+}
+
+/* Episode actions area */
+.episode-actions {
+  display: flex;
+  gap: 1.5rem;
+  margin-left: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+/* Episode action buttons */
+.episode-action-button {
+  background: none;
+  border: none;
+  color: #a09b8c; /* LoL text muted */
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0.5rem;
+}
+
+.episode-action-button:hover {
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.episode-action-button.watched {
+  color: #0ac8b9; /* Hextech blue */
+}
+
+.episode-action-button.bookmarked {
+  color: #c8aa6e; /* LoL gold medium */
+}
+
+/* Reset default list styling when using with ol/ul */
+.box-content ol.video-list {
+  margin-left: 0;
+  list-style-type: none;
+  counter-reset: item;
+}
+
+.box-content ol.video-list > li {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.box-content ol.video-list > li:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .episode-number {
+    min-width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+  }
+
+  .episode-item {
+    margin-bottom: 2.5rem;
+  }
+
+  .episode-actions {
+    gap: 0.75rem;
+    margin-left: 0.75rem;
+    padding-left: 0.75rem;
+  }
+}
+
+/* Video player specific episode styling */
+.video-player-header .episode-number {
+  color: var(--hextech-color-blue-medium, #0ac8b9);
+  margin-right: 5px;
+  font-weight: 500;
+}

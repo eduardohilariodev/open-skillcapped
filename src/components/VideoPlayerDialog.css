@@ -51,12 +51,6 @@
   margin-right: 5px;
 }
 
-.episode-number {
-  color: var(--hextech-color-blue-medium);
-  margin-right: 5px;
-  font-weight: 500;
-}
-
 .video-title {
   font-weight: bold;
 }

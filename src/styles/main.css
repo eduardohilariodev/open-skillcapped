@@ -1,12 +1,11 @@
-/**
- * League of Legends Hextech UI System
- * Main entry point for all styles
- */
+@charset "utf-8";
 
-/* Theme variables */
+/**
+ * Main styles for League of Legends theme
+ */
 @import "./themes/hextech-theme.css";
 
-/* Base styles */
+/* Reset and base styles */
 @import "./base/_reset.css";
 @import "./base/_fonts.css";
 @import "./base/_global.css";
@@ -28,8 +27,11 @@
 @import "./components/_hero.css";
 @import "./components/_example-page.css";
 
+/* Centralized episode styling */
+@import "./Episode.css";
+
 /* Animations */
 @import "./animations/_hextech-animations.css";
 
-/* Third-party overrides */
+/* Vendor styles and overrides */
 @import "./vendor/_bulma-overrides.css";
