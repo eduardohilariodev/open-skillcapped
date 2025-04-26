@@ -125,20 +125,32 @@ export function VideoPlayerDialog({
   };
 
   const removeFromQueue = (index: number) => {
+    // If using filtered queue, find the actual video in the main queue
+    const videoToRemove = displayQueue[index];
+    if (!videoToRemove) return;
+
+    const mainQueueIndex = videoQueue.findIndex((v) => v.uuid === videoToRemove.uuid);
+    if (mainQueueIndex === -1) return;
+
     const newQueue = [...videoQueue];
-    newQueue.splice(index, 1);
+    newQueue.splice(mainQueueIndex, 1);
     setVideoQueue(newQueue);
     storageUtils.setItem(STORAGE_KEYS.VIDEO_QUEUE, newQueue);
 
+    // Get the updated filtered queue after removal
+    const updatedFilteredQueue = course?.videos
+      ? newQueue.filter((v) => course.videos.some((cv) => cv.video.uuid === v.uuid))
+      : newQueue;
+
     // Adjust current index if needed
-    if (index === currentQueueIndex && newQueue.length > 0) {
+    if (index === currentQueueIndex && updatedFilteredQueue.length > 0) {
       // If we removed the current video, play the next one
-      if (index < newQueue.length) {
+      if (index < updatedFilteredQueue.length) {
         // Keep index the same to play next video
         playQueueItem(index);
       } else {
         // We removed the last item, play the new last item
-        playQueueItem(newQueue.length - 1);
+        playQueueItem(updatedFilteredQueue.length - 1);
       }
     } else if (index < currentQueueIndex) {
       // We removed a video before the current one, adjust index
@@ -147,11 +159,11 @@ export function VideoPlayerDialog({
   };
 
   const playQueueItem = (index: number) => {
-    if (index >= 0 && index < videoQueue.length) {
+    if (index >= 0 && index < displayQueue.length) {
       setCurrentQueueIndex(index);
 
       // Get the video to play
-      const videoToPlay = videoQueue[index];
+      const videoToPlay = displayQueue[index];
 
       // Clean up current video playback
       if (hlsRef.current) {
@@ -376,17 +388,25 @@ Duration=${calculatedDuration}`;
   // Add this video to queue when opened
   useEffect(() => {
     if (isOpen && video) {
-      // Only add to queue if not already in queue
+      // Always add to the main queue if not already there
       if (!videoQueue.some((v) => v.uuid === video.uuid)) {
         addToQueue(video);
-        setCurrentQueueIndex(videoQueue.length); // Set to the index of the newly added video
+      }
+
+      // For showing the correct active item in the display queue
+      if (course) {
+        // Find the index of this video in the filtered queue
+        const filteredIndex = displayQueue.findIndex((v) => v.uuid === video.uuid);
+        if (filteredIndex !== -1) {
+          setCurrentQueueIndex(filteredIndex);
+        }
       } else {
-        // Find this video in the queue to set current index
+        // Find this video in the main queue
         const index = videoQueue.findIndex((v) => v.uuid === video.uuid);
         setCurrentQueueIndex(index);
       }
     }
-  }, [isOpen, video, videoQueue.length]);
+  }, [isOpen, video, videoQueue.length, displayQueue]);
 
   // When the dialog opens, play the currently selected video
   useEffect(() => {
@@ -756,7 +776,7 @@ Duration=${calculatedDuration}`;
               autoPlay
               playsInline
               preload="metadata"
-              className="video-player"
+              className="video-player lol-hextech-player"
               data-actual-duration={actualDuration ? formatDuration(actualDuration) : undefined}
               {...(actualDuration ? { "data-duration": actualDuration, duration: actualDuration } : {})}
               onLoadStart={(e) => {
@@ -841,7 +861,7 @@ Duration=${calculatedDuration}`;
         {/* Video Queue */}
         <div className="video-queue-container">
           <div className="queue-header">
-            <h3>Video Queue</h3>
+            <h3>{course ? `${course.title} Videos` : "Video Queue"}</h3>
             <div className="queue-controls">
               <button
                 className="queue-control-button"
@@ -863,7 +883,9 @@ Duration=${calculatedDuration}`;
           </div>
           <div className="queue-list">
             {displayQueue.length === 0 ? (
-              <div className="empty-queue-message">No videos in queue</div>
+              <div className="empty-queue-message">
+                {course ? `No videos available in "${course.title}"` : "No videos in queue"}
+              </div>
             ) : (
               displayQueue.map((queuedVideo, index) => (
                 <div

@@ -6,73 +6,59 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(1, 10, 19, 0.9); /* using black with high opacity */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(1, 10, 19, 0.95); /* LoL background dark with opacity */
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
 }
 
 .video-player-dialog {
   background-color: #0a1428; /* LoL background medium */
-  border: 1px solid #785a28; /* LoL gold dark */
+  border: 2px solid #785a28; /* LoL gold dark */
   border-radius: 4px;
   width: 90%;
-  max-width: 960px;
+  max-width: 1200px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  position: relative;
   overflow: hidden;
-  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
 }
 
 .video-player-header {
+  background-color: #091428; /* LoL blue dark */
+  border-bottom: 2px solid #785a28; /* LoL gold dark */
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background-color: #0a323c; /* LoL background light */
-  border-bottom: 1px solid #785a28; /* LoL gold dark */
 }
 
 .video-player-header h2 {
   margin: 0;
-  font-size: 18px;
   color: #f0e6d2; /* LoL gold light */
   font-family: "Beaufort for LOL", serif;
-  flex: 1;
+  font-size: 1.2rem;
+  font-weight: 700;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 5px;
+  flex-wrap: wrap;
 }
 
-.course-name {
-  color: #a09b8c; /* LoL light grey */
-  opacity: 0.9;
-  font-weight: normal;
-  margin-right: 5px;
-}
-
-.episode-number {
+.video-player-header .course-name {
   color: #c8aa6e; /* LoL gold medium */
+  margin-right: 8px;
+}
+
+.video-player-header .episode-number {
+  color: #0ac8b9; /* Hextech blue */
   margin-right: 5px;
-  font-weight: 500;
-}
-
-.video-title {
-  font-weight: bold;
-}
-
-.video-duration {
-  color: #a09b8c; /* LoL light grey */
-  margin-right: 12px;
-  font-size: 14px;
-  padding: 2px 6px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
+  font-weight: normal;
 }
 
 .close-button {
@@ -81,132 +67,117 @@
   color: #c8aa6e; /* LoL gold medium */
   font-size: 24px;
   cursor: pointer;
-  padding: 0 8px;
-  transition: color 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
 .close-button:hover {
   color: #f0e6d2; /* LoL gold light */
+  background-color: rgba(200, 170, 110, 0.1); /* LoL gold medium with transparency */
 }
 
 .video-player-content {
-  padding: 16px;
+  flex: 1;
+  min-height: 0;
   position: relative;
-  background-color: #010a13; /* LoL background dark */
+  overflow: hidden;
 }
 
 .video-container {
+  height: 100%;
   position: relative;
-  width: 100%;
-  background-color: #000;
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid #3d424d; /* LoL grey */
 }
 
 .video-player {
   width: 100%;
-  max-height: 70vh;
-  background-color: black;
+  height: 100%;
+  background-color: #000;
 }
 
-/* Custom video controls */
-.custom-video-controls {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(1, 10, 19, 0.7); /* LoL background dark with opacity */
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 10;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-  border-top: 1px solid #785a28; /* LoL gold dark */
-}
-
-.video-container:hover .custom-video-controls {
-  opacity: 1;
-}
-
-.progress-container {
-  width: 100%;
-  height: 10px;
-  position: relative;
-  cursor: pointer;
-}
-
-.custom-progress {
-  width: 100%;
-  height: 8px;
-  background-color: rgba(160, 155, 140, 0.2); /* LoL light grey with opacity */
-  border-radius: 4px;
-  overflow: hidden;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.custom-progress::-webkit-progress-bar {
-  background-color: rgba(160, 155, 140, 0.2); /* LoL light grey with opacity */
-  border-radius: 4px;
-}
-
-.custom-progress::-webkit-progress-value {
-  background-color: #c8aa6e; /* LoL gold medium */
-  border-radius: 4px;
-}
-
-.custom-progress::-moz-progress-bar {
-  background-color: #c8aa6e; /* LoL gold medium */
-  border-radius: 4px;
-}
-
-.time-display {
-  color: #f0e6d2; /* LoL gold light */
-  font-size: 12px;
-  margin-left: 10px;
-  display: inline-flex;
-  align-items: center;
-  font-family: "Spiegel", sans-serif;
-}
-
-/* Control buttons */
-.control-buttons {
+.video-player-footer {
+  background-color: #091428; /* LoL blue dark */
+  border-top: 1px solid #3d424d; /* LoL grey */
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.left-controls,
-.right-controls {
+.video-metadata {
+  display: flex;
+  gap: 20px;
+}
+
+.metadata-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
-.control-button {
-  background: none;
-  border: none;
-  color: #c8aa6e; /* LoL gold medium */
-  padding: 5px;
-  cursor: pointer;
-  border-radius: 3px;
-  transition: all 0.2s;
+.metadata-label {
+  color: #a09b8c; /* LoL text muted */
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: "Beaufort for LOL", serif;
 }
 
-.control-button:hover {
+.metadata-value {
   color: #f0e6d2; /* LoL gold light */
-  background-color: rgba(120, 90, 40, 0.3); /* LoL gold dark with opacity */
+  font-size: 0.9rem;
+  font-family: "Spiegel", sans-serif;
 }
 
-.control-button svg {
-  width: 18px;
-  height: 18px;
+.footer-playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Loading indicator */
+.speed-label {
+  color: #a09b8c; /* LoL text muted */
+  font-size: 0.85rem;
+  font-family: "Beaufort for LOL", serif;
+}
+
+.speed-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.speed-button {
+  background-color: #0a1428; /* LoL background medium */
+  color: #c8aa6e; /* LoL gold medium */
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 3px;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Spiegel", sans-serif;
+}
+
+.speed-button:hover {
+  background-color: #0a323c; /* LoL background light */
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.speed-button.active {
+  background-color: #785a28; /* LoL gold dark */
+  color: #f0e6d2; /* LoL gold light */
+  border-color: #c8aa6e; /* LoL gold medium */
+}
+
+.speed-saved-indicator {
+  opacity: 0.7;
+  margin-left: 5px;
+}
+
 .loading-indicator {
   position: absolute;
   top: 50%;
@@ -237,7 +208,7 @@
   }
 }
 
-/* Queue related styles */
+/* Video Queue Container */
 .video-queue-container {
   margin-top: 16px;
   padding: 12px;
@@ -303,6 +274,8 @@
   border-radius: 3px;
   transition: background-color 0.2s;
   color: #a09b8c; /* LoL light grey */
+  margin-bottom: 4px;
+  position: relative;
 }
 
 .queue-item:hover {
@@ -381,6 +354,16 @@
   font-family: "Spiegel", sans-serif;
 }
 
+.keyboard-shortcut {
+  opacity: 0.7;
+  font-size: 11px;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-left: 5px;
+  font-family: "Spiegel", sans-serif;
+}
+
 /* Error message */
 .error-message {
   position: absolute;
@@ -394,23 +377,131 @@
   max-width: 80%;
   text-align: center;
   border: 1px solid #af3131; /* LoL red */
+  font-family: "Spiegel", sans-serif;
+}
+
+/* Hextech accent line for the player */
+.video-player-dialog::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    #0ac8b9,
+    /* Hextech blue */ #cdfafa,
+    /* Hextech blue light */ #0ac8b9 /* Hextech blue */
+  );
+  z-index: 10;
+}
+
+/* Hextech-styled video controls */
+video::-webkit-media-controls-panel {
+  background-color: rgba(10, 32, 60, 0.7) !important; /* LoL background light with opacity */
+}
+
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-volume-slider-container,
+video::-webkit-media-controls-mute-button,
+video::-webkit-media-controls-timeline,
+video::-webkit-media-controls-fullscreen-button {
+  filter: hue-rotate(210deg) saturate(70%) brightness(130%);
+}
+
+/* Custom scrollbar for queue list */
+.queue-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.queue-list::-webkit-scrollbar-track {
+  background: #010a13; /* LoL background dark */
+}
+
+.queue-list::-webkit-scrollbar-thumb {
+  background-color: #785a28; /* LoL gold dark */
+  border-radius: 3px;
+}
+
+.queue-list::-webkit-scrollbar-thumb:hover {
+  background-color: #c8aa6e; /* LoL gold medium */
 }
 
 /* Media queries */
 @media (max-width: 768px) {
   .video-player-footer {
     flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
   }
 
   .video-metadata {
-    margin-bottom: 15px;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .footer-playback-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .video-player-header h2 {
+    font-size: 1rem;
   }
 
   .queue-item {
-    padding: 8px;
+    padding: 8px 4px;
+  }
+}
+
+/* Custom styling for League of Legends Hextech player */
+.lol-hextech-player {
+  --hextech-blue: #0ac8b9;
+  --hextech-blue-light: #cdfafa;
+  --lol-gold-medium: #c8aa6e;
+  --lol-gold-dark: #785a28;
+  --lol-background-dark: #010a13;
+  --lol-background-medium: #0a1428;
+}
+
+.lol-hextech-player::-webkit-media-controls-play-button {
+  filter: sepia(100%) hue-rotate(170deg) saturate(250%) brightness(90%);
+}
+
+.lol-hextech-player::-webkit-media-controls-timeline {
+  height: 8px;
+  filter: sepia(100%) hue-rotate(170deg) saturate(250%) brightness(90%);
+}
+
+.lol-hextech-player::-webkit-media-controls-volume-slider {
+  filter: sepia(100%) hue-rotate(170deg) saturate(250%) brightness(90%);
+}
+
+.lol-hextech-player::-webkit-media-controls-current-time-display,
+.lol-hextech-player::-webkit-media-controls-time-remaining-display {
+  color: var(--lol-gold-medium);
+  font-family: "Spiegel", sans-serif;
+}
+
+/* Add a hextech glow effect to the player when playing */
+.lol-hextech-player:not(:paused) {
+  box-shadow: 0 0 15px rgba(12, 200, 185, 0.2);
+}
+
+/* Custom styling for the player when fullscreen */
+.lol-hextech-player:fullscreen {
+  background-color: var(--lol-background-dark);
+}
+
+/* Custom progress bar colors */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .lol-hextech-player::-webkit-slider-thumb {
+    background-color: var(--hextech-blue);
   }
 
-  .queue-item-title {
-    font-size: 13px;
+  .lol-hextech-player::-webkit-slider-runnable-track {
+    background-color: var(--lol-gold-dark);
   }
 }
