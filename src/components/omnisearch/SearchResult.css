@@ -226,40 +226,112 @@ mark:hover::after {
 }
 
 .video-list {
-  list-style-position: outside;
+  list-style-position: inside;
   margin: 0;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem 0.75rem 3rem;
 }
 
-.video-list li {
-  margin-bottom: 0.75rem;
+/* Episode styling - new */
+.episode-item {
   position: relative;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
 }
 
-.video-list li:last-child {
+.episode-item:last-child {
   margin-bottom: 0;
+}
+
+.episode-number {
+  position: absolute;
+  left: -2.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #091428; /* LoL blue dark */
+  color: #c8aa6e; /* LoL gold medium */
+  font-weight: 700;
+  border: 1px solid #785a28; /* LoL gold dark */
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.episode-card {
+  background-color: rgba(10, 20, 40, 0.6);
+  border: 2px solid #0ac8b9; /* Hextech blue */
+  border-radius: 4px;
+  padding: 0.75rem 1rem 0.75rem 1.5rem;
+  margin-left: 0.5rem;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.episode-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(10, 200, 185, 0.2);
+  background-color: rgba(10, 30, 50, 0.8);
+  border-color: #cdfafa; /* Hextech blue light */
+}
+
+.episode-content {
+  flex: 1;
+}
+
+.episode-title {
+  color: #f0e6d2; /* LoL gold light */
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.episode-title.watched {
+  color: #a09b8c; /* LoL text muted */
+}
+
+.episode-actions {
+  display: flex;
+  gap: 1rem;
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 1px solid rgba(200, 170, 110, 0.2);
+}
+
+.episode-action-button {
+  background: none;
+  border: none;
+  color: #a09b8c; /* LoL text muted */
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0.5rem;
+}
+
+.episode-action-button:hover {
+  color: #f0e6d2; /* LoL gold light */
+}
+
+.episode-action-button.watched {
+  color: #0ac8b9; /* Hextech blue */
+}
+
+.episode-action-button.bookmarked {
+  color: #c8aa6e; /* LoL gold medium */
 }
 
 /* Reset default list styling */
 .box-content ol.video-list {
   margin-left: 2rem;
-  list-style-type: decimal;
+  list-style-type: none;
   counter-reset: item;
 }
 
 .box-content ol.video-list > li {
   display: block;
-}
-
-.box-content ol.video-list > li:before {
-  content: counter(item) ".";
-  counter-increment: item;
-  position: absolute;
-  left: -1.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-weight: 500;
-  color: #c8aa6e;
 }
 
 /* Responsive adjustments */
@@ -275,5 +347,18 @@ mark:hover::after {
 
   .column {
     padding: 0.5rem;
+  }
+
+  .episode-number {
+    left: -1.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.8rem;
+  }
+
+  .episode-actions {
+    gap: 0.5rem;
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
   }
 }

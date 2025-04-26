@@ -39,47 +39,49 @@ export function CourseSearchResultVideo(props: SearchResultVideoProps): React.Re
     showVideoPlayer(video, course);
   };
 
+  // Get the index of this video in the course (for episode number)
+  const getVideoIndex = (): number | undefined => {
+    if (!course || !course.videos) return undefined;
+    const index = course.videos.findIndex((cv) => cv.video.uuid === video.uuid);
+    return index !== -1 ? index + 1 : undefined;
+  };
+
+  const episodeNumber = getVideoIndex();
+
   return (
-    <li className="mb-2">
-      <div
-        className={classNames(
-          "flex gap-3 m-1 px-3 py-2 rounded-lg cursor-pointer hextech-card-secondary",
-          "hextech-card-hover hextech-card-active",
-        )}
-        onClick={handleVideoClick}
-      >
-        <div className="flex justify-between items-center w-full">
-          <div className="flex-1 pl-2">
-            <Highlighter
-              highlightClassName="bg-yellow-300"
-              searchWords={matchedStrings}
-              autoEscape={true}
-              textToHighlight={video.title}
-              className={classNames("text-base", isWatched ? "text-gray-400" : "text-white")}
-            />
-          </div>
-          <div className="flex gap-3 pr-2">
-            <button
-              className="text-gray-400 hover:text-gray-200"
-              onClick={(e) => {
-                e.stopPropagation();
-                props.onToggleWatchStatus(video);
-              }}
-              title={watchToggleHint}
-            >
-              <FontAwesomeIcon icon={watchToggleIcon} />
-            </button>
-            <button
-              className={classNames("hover:text-gray-200", isBookmarked ? "text-yellow-400" : "text-gray-400")}
-              onClick={(e) => {
-                e.stopPropagation();
-                props.onToggleBookmark(video);
-              }}
-              title={bookmarkHint}
-            >
-              <FontAwesomeIcon icon={faBookmark} />
-            </button>
-          </div>
+    <li className="episode-item">
+      {episodeNumber && <div className="episode-number">{episodeNumber}</div>}
+      <div className="episode-card" onClick={handleVideoClick}>
+        <div className="episode-content">
+          <Highlighter
+            highlightClassName="bg-yellow-300"
+            searchWords={matchedStrings}
+            autoEscape={true}
+            textToHighlight={video.title}
+            className={classNames("episode-title", isWatched ? "watched" : "")}
+          />
+        </div>
+        <div className="episode-actions">
+          <button
+            className={classNames("episode-action-button", isWatched ? "watched" : "")}
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onToggleWatchStatus(video);
+            }}
+            title={watchToggleHint}
+          >
+            <FontAwesomeIcon icon={watchToggleIcon} />
+          </button>
+          <button
+            className={classNames("episode-action-button", isBookmarked ? "bookmarked" : "")}
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onToggleBookmark(video);
+            }}
+            title={bookmarkHint}
+          >
+            <FontAwesomeIcon icon={faBookmark} />
+          </button>
         </div>
       </div>
     </li>
