@@ -1,7 +1,5 @@
 const CLOUDFRONT_URL = "https://d13z5uuzt1wkbz.cloudfront.net";
 const VIDEO_ID_REGEX = /([a-z0-9]{10})(:?\/|$)/g;
-const MAX_PARTS = 1000;
-const CHUNK_SIZE = 50;
 
 export class VideoUtils {
   static extractVideoId(url: string): string | null {
@@ -99,7 +97,7 @@ export class VideoUtils {
       data += `\n#EXTINF:10,\n${CLOUDFRONT_URL}/${videoId}/HIDDEN4500-${String(i).padStart(5, "0")}.ts`;
     }
 
-    return data + "\n#EXT-X-ENDLIST";
+    return `${data}\n#EXT-X-ENDLIST`;
   }
 
   // Add a helper method to silence CORS/403 errors
