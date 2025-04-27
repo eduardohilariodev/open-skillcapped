@@ -21,6 +21,46 @@ import "../styles/components/_modal.css";
 import "../styles/components/_tag.css";
 import "../styles/VideoPlayerDialog.css";
 
+// Utility function to patch video duration
+const patchVideoDuration = (videoElement: HTMLVideoElement, actualDuration: number) => {
+  // Only apply if the browser's native duration is significantly different
+  // Create a proxy for the duration property
+  const durationDescriptor = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "duration");
+  if (durationDescriptor?.get) {
+    const originalGetter = durationDescriptor.get;
+
+    // Monkey patch the duration getter
+    Object.defineProperty(videoElement, "duration", {
+      configurable: true,
+      get() {
+        return actualDuration;
+      },
+    });
+
+    // Set data attributes for UI
+    videoElement.dataset.actualDuration = String(actualDuration);
+
+    // Also handle the timeupdate event to prevent seeking past our real end
+    const handleTimeUpdate = () => {
+      if (videoElement.currentTime > actualDuration) {
+        videoElement.currentTime = actualDuration;
+      }
+    };
+
+    videoElement.addEventListener("timeupdate", handleTimeUpdate);
+
+    // Return cleanup function to restore original behavior
+    return () => {
+      Object.defineProperty(videoElement, "duration", {
+        configurable: true,
+        get: originalGetter,
+      });
+      videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+    };
+  }
+  return () => {}; // Return no-op cleanup if we didn't patch
+};
+
 // Storage keys
 const STORAGE_KEYS = {
   PLAYBACK_SPEED: "better-skill-capped-playback-speed",
@@ -51,18 +91,6 @@ const storageUtils = {
   },
 };
 
-// Role translation mapping for additional cases not covered by roleToString
-const ADDITIONAL_ROLE_MAPPINGS: Record<string, string> = {
-  general: "General",
-  guide: "Guide",
-  tutorial: "Tutorial",
-  beginner: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-  proguide: "Pro Guide",
-  fundamentals: "Fundamentals",
-};
-
 // Extend HTMLVideoElement type
 declare global {
   interface HTMLVideoElement {
@@ -89,29 +117,26 @@ export function VideoPlayerDialog({
   const [status, setStatus] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [actualDuration, setActualDuration] = useState<number | null>(null);
-  const [formattedCurrentTime, setFormattedCurrentTime] = useState<string>("0:00");
   const [currentVideo, setCurrentVideo] = useState<Video>(initialVideo);
   const [isBuffering, setIsBuffering] = useState(false);
 
   // Video queue state
-  const [videoQueue, setVideoQueue] = useState<Video[]>(() => {
-    return storageUtils.getItem(STORAGE_KEYS.VIDEO_QUEUE, []);
-  });
+  const [videoQueue, setVideoQueue] = useState<Video[]>(() => storageUtils.getItem(STORAGE_KEYS.VIDEO_QUEUE, []));
   const [currentQueueIndex, setCurrentQueueIndex] = useState(-1);
 
   // Autoplay setting
-  const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(() => {
-    return storageUtils.getItem(STORAGE_KEYS.AUTOPLAY_ENABLED, true);
-  });
+  const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(() =>
+    storageUtils.getItem(STORAGE_KEYS.AUTOPLAY_ENABLED, true),
+  );
 
   // Playback speed state
-  const [playbackSpeed, setPlaybackSpeed] = useState<number>(() => {
-    return storageUtils.getItem(STORAGE_KEYS.PLAYBACK_SPEED, 1);
-  });
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(() =>
+    storageUtils.getItem(STORAGE_KEYS.PLAYBACK_SPEED, 1),
+  );
 
   // Filter queue for current course
   const displayQueue = useMemo(() => {
-    if (course && course.videos) {
+    if (course?.videos) {
       return course.videos.map((cv) => cv.video);
     }
     return videoQueue;
@@ -157,11 +182,9 @@ export function VideoPlayerDialog({
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
 
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    } else {
-      return `${minutes}:${secs.toString().padStart(2, "0")}`;
-    }
+    return hours > 0
+      ? `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+      : `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
   // Handle speed change
@@ -176,66 +199,43 @@ export function VideoPlayerDialog({
   // Queue management
   const addToQueue = (videoToAdd: Video) => {
     const newQueue = [...videoQueue];
-    if (!newQueue.some((v) => v.uuid === videoToAdd.uuid)) {
-      newQueue.push(videoToAdd);
-      setVideoQueue(newQueue);
-      storageUtils.setItem(STORAGE_KEYS.VIDEO_QUEUE, newQueue);
+    if (newQueue.some((v) => v.uuid === videoToAdd.uuid)) {
+      return;
     }
-  };
-
-  const removeFromQueue = (index: number) => {
-    if (course) return;
-
-    const videoToRemove = displayQueue[index];
-    if (!videoToRemove) return;
-
-    const mainQueueIndex = videoQueue.findIndex((v) => v.uuid === videoToRemove.uuid);
-    if (mainQueueIndex === -1) return;
-
-    const newQueue = [...videoQueue];
-    newQueue.splice(mainQueueIndex, 1);
+    newQueue.push(videoToAdd);
     setVideoQueue(newQueue);
     storageUtils.setItem(STORAGE_KEYS.VIDEO_QUEUE, newQueue);
-
-    if (index === currentQueueIndex && displayQueue.length > 0) {
-      if (index < displayQueue.length) {
-        playQueueItem(index);
-      } else {
-        playQueueItem(displayQueue.length - 1);
-      }
-    } else if (index < currentQueueIndex) {
-      setCurrentQueueIndex(currentQueueIndex - 1);
-    }
   };
 
-  const playQueueItem = (index: number) => {
-    if (index >= 0 && index < displayQueue.length) {
-      setCurrentQueueIndex(index);
-      const videoToPlay = displayQueue[index];
-      setCurrentVideo(videoToPlay);
-
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
-
-      setIsLoading(true);
-      setErrorMessage(null);
-      setActualDuration(videoToPlay.durationInSeconds || null);
-
-      setupStreamForVideo(videoToPlay);
+  const playQueueItem = async (index: number) => {
+    if (!(index >= 0 && index < displayQueue.length)) {
+      return;
     }
+    setCurrentQueueIndex(index);
+    const videoToPlay = displayQueue[index];
+    setCurrentVideo(videoToPlay);
+
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    setIsLoading(true);
+    setErrorMessage(null);
+    setActualDuration(videoToPlay.durationInSeconds || null);
+
+    await setupStreamForVideo(videoToPlay);
   };
 
-  const playNextInQueue = () => {
+  const playNextInQueue = async () => {
     if (currentQueueIndex >= 0 && currentQueueIndex < displayQueue.length - 1) {
-      playQueueItem(currentQueueIndex + 1);
+      await playQueueItem(currentQueueIndex + 1);
     }
   };
 
-  const playPreviousInQueue = () => {
+  const playPreviousInQueue = async () => {
     if (currentQueueIndex > 0) {
-      playQueueItem(currentQueueIndex - 1);
+      await playQueueItem(currentQueueIndex - 1);
     }
   };
 
@@ -244,27 +244,6 @@ export function VideoPlayerDialog({
     const newValue = !autoplayEnabled;
     setAutoplayEnabled(newValue);
     storageUtils.setItem(STORAGE_KEYS.AUTOPLAY_ENABLED, newValue);
-  };
-
-  // Handle video ended to autoplay next
-  const handleVideoEnded = () => {
-    if (autoplayEnabled) {
-      // Check if we're in a course or in the queue
-      if (course && course.videos) {
-        const currentIndex = course.videos.findIndex((cv) => cv.video.uuid === currentVideo.uuid);
-        if (currentIndex !== -1 && currentIndex < course.videos.length - 1) {
-          // Play the next video in the course
-          playQueueItem(currentIndex + 1);
-        }
-      } else if (displayQueue.length > 0) {
-        // Handle general queue
-        const queueIndex =
-          currentQueueIndex >= 0 ? currentQueueIndex : displayQueue.findIndex((v) => v.uuid === currentVideo.uuid);
-        if (queueIndex !== -1 && queueIndex < displayQueue.length - 1) {
-          playQueueItem(queueIndex + 1);
-        }
-      }
-    }
   };
 
   // Setup stream for a specific video
@@ -292,39 +271,11 @@ export function VideoPlayerDialog({
         return;
       }
 
-      // If exactDuration is available, use it; otherwise estimate based on parts
-      const calculatedDuration = exactDuration || lastPart * 10;
-      setActualDuration(calculatedDuration);
+      setActualDuration(exactDuration);
 
-      // Force the video element to report the correct duration
+      // Store the expected duration for reference - will be used if HLS doesn't provide a valid one
       if (videoRef.current) {
-        // Store the actual duration for reference
-        videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
-        videoRef.current.dataset.fixedDuration = "true";
-
-        // Define a non-configurable duration property to prevent browser overrides
-        try {
-          // First delete existing property if defined
-          if (Object.getOwnPropertyDescriptor(videoRef.current, "duration")?.configurable !== false) {
-            // Only attempt to delete if it's configurable
-            Object.defineProperty(videoRef.current, "duration", {
-              configurable: true,
-              get: function () {
-                return calculatedDuration;
-              },
-            });
-          }
-
-          // Then redefine with our exact value
-          Object.defineProperty(videoRef.current, "duration", {
-            configurable: false, // Make it non-configurable to prevent overrides
-            get: function () {
-              return calculatedDuration;
-            },
-          });
-        } catch (e) {
-          console.error("Failed to override video duration:", e);
-        }
+        videoRef.current.dataset.expectedDuration = formatDuration(exactDuration);
       }
 
       // Generate M3U8 data
@@ -349,46 +300,48 @@ export function VideoPlayerDialog({
         hlsRef.current = hls;
 
         // Load M3U8 content directly with Base64 encoding
-        hls.loadSource("data:application/x-mpegURL;base64," + btoa(m3u8Data));
+        hls.loadSource(`data:application/x-mpegURL;base64,${btoa(m3u8Data)}`);
         hls.attachMedia(videoRef.current);
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          if (videoRef.current) {
-            // Set video duration immediately on manifest load
-            if (calculatedDuration) {
-              videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
-
-              // Override duration property - critical for seekbar positioning
-              Object.defineProperty(videoRef.current, "duration", {
-                configurable: true,
-                get: function () {
-                  return calculatedDuration;
-                },
-              });
-
-              // Manually trigger durationchange event to update UI
-              videoRef.current.dispatchEvent(new Event("durationchange"));
-            }
-
-            // Apply playback speed
-            videoRef.current.playbackRate = playbackSpeed;
-
-            // Remove autoplay attempts
-            setStatus("Video ready. Click play to start.");
+          if (!videoRef.current) {
+            return;
           }
+
+          if (exactDuration) {
+            setActualDuration(exactDuration);
+
+            // Apply our duration patch
+            patchVideoDuration(videoRef.current, exactDuration);
+          }
+
+          // Apply playback speed
+          videoRef.current.playbackRate = playbackSpeed;
+          setStatus("Video ready. Click play to start.");
         });
 
-        // Also fix duration when first fragments load
+        // Check again when fragments load
         hls.on(Hls.Events.FRAG_LOADED, () => {
-          if (videoRef.current && calculatedDuration) {
-            // Re-enforce duration property and trigger UI update
-            Object.defineProperty(videoRef.current, "duration", {
-              configurable: true,
-              get: function () {
-                return calculatedDuration;
-              },
-            });
-            videoRef.current.dispatchEvent(new Event("durationchange"));
+          // Re-check duration if needed
+          if (!videoRef.current) {
+            return;
+          }
+          const videoDuration = videoRef.current.duration;
+
+          if (videoDuration && isFinite(videoDuration)) {
+            setActualDuration(videoDuration);
+            videoRef.current.dataset.actualDuration = formatDuration(videoDuration);
+          } else if (actualDuration && isFinite(actualDuration)) {
+            // If video duration is still invalid but we have actualDuration, try to set directly
+            try {
+              Object.defineProperty(videoRef.current, "duration", {
+                value: actualDuration,
+                writable: false,
+              });
+              videoRef.current.dataset.actualDuration = formatDuration(actualDuration);
+            } catch {
+              // Silent fail - property might be non-configurable
+            }
           }
 
           // Clear errors when video loads successfully
@@ -416,43 +369,46 @@ export function VideoPlayerDialog({
         });
       } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
         // For Safari with native HLS support
-        const dataUrl = "data:application/x-mpegURL;base64," + btoa(m3u8Data);
+        const dataUrl = `data:application/x-mpegURL;base64,${btoa(m3u8Data)}`;
         videoRef.current.src = dataUrl;
 
         videoRef.current.addEventListener("loadedmetadata", () => {
-          if (calculatedDuration && videoRef.current) {
-            videoRef.current.dataset.actualDuration = formatDuration(calculatedDuration);
+          if (!videoRef.current) {
+            return;
+          }
+          // Check for native duration first
+          const nativeDuration = videoRef.current.duration;
+          if (nativeDuration && isFinite(nativeDuration)) {
+            setActualDuration(nativeDuration);
+            videoRef.current.dataset.actualDuration = formatDuration(nativeDuration);
+          } else if (exactDuration) {
+            // Fallback to our estimate
+            setActualDuration(exactDuration);
+            videoRef.current.dataset.actualDuration = formatDuration(exactDuration);
 
-            // Override duration property for consistent behavior
-            Object.defineProperty(videoRef.current, "duration", {
-              configurable: true,
-              get: function () {
-                return calculatedDuration;
-              },
-            });
-
-            // Manually trigger durationchange event
-            videoRef.current.dispatchEvent(new Event("durationchange"));
+            // Try to directly set duration on video element for seek bar
+            try {
+              Object.defineProperty(videoRef.current, "duration", {
+                value: exactDuration,
+                writable: false,
+              });
+            } catch (e) {
+              console.warn("Could not set duration property directly:", e);
+            }
           }
 
-          if (videoRef.current) {
-            videoRef.current.playbackRate = playbackSpeed;
-            setStatus("Video ready. Click play to start.");
-          }
+          videoRef.current.playbackRate = playbackSpeed;
+          setStatus("Video ready. Click play to start.");
         });
 
-        // Also ensure duration is correctly set when enough data is loaded
+        // Also check duration when more data is loaded
         videoRef.current.addEventListener("canplay", () => {
-          if (calculatedDuration && videoRef.current) {
-            // Reapply duration override
-            Object.defineProperty(videoRef.current, "duration", {
-              configurable: true,
-              get: function () {
-                return calculatedDuration;
-              },
-            });
-
-            videoRef.current.dispatchEvent(new Event("durationchange"));
+          if (videoRef.current) {
+            const nativeDuration = videoRef.current.duration;
+            if (nativeDuration && isFinite(nativeDuration)) {
+              setActualDuration(nativeDuration);
+              videoRef.current.dataset.actualDuration = formatDuration(nativeDuration);
+            }
           }
         });
       }
@@ -473,31 +429,40 @@ export function VideoPlayerDialog({
 
   // Add video to queue when opened
   useEffect(() => {
-    if (isOpen && initialVideo) {
-      if (!course && !videoQueue.some((v) => v.uuid === initialVideo.uuid)) {
-        addToQueue(initialVideo);
-      }
+    if (!(isOpen && initialVideo)) {
+      return;
+    }
+    if (!course && !videoQueue.some((v) => v.uuid === initialVideo.uuid)) {
+      addToQueue(initialVideo);
+    }
 
-      const index = displayQueue.findIndex((v) => v.uuid === initialVideo.uuid);
-      if (index !== -1) {
-        setCurrentQueueIndex(index);
-      }
+    const index = displayQueue.findIndex((v) => v.uuid === initialVideo.uuid);
+    if (index !== -1) {
+      setCurrentQueueIndex(index);
     }
   }, [isOpen, initialVideo, videoQueue.length, displayQueue, course]);
 
   // Play video when dialog opens and handle keyboard shortcuts
   useEffect(() => {
-    if (isOpen && initialVideo) {
-      setupStreamForVideo(initialVideo);
+    if (!(isOpen && initialVideo)) {
+      return;
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    // Define the async function inside useEffect
+    const loadVideo = async () => {
+      await setupStreamForVideo(initialVideo);
+    };
+
+    // Call the function and catch any errors
+    loadVideo().catch(console.error);
+
+    const handleKeyDown = async (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
       } else if (event.key === "ArrowRight" && event.altKey) {
-        playNextInQueue();
+        await playNextInQueue();
       } else if (event.key === "ArrowLeft" && event.altKey) {
-        playPreviousInQueue();
+        await playPreviousInQueue();
       }
     };
 
@@ -512,112 +477,96 @@ export function VideoPlayerDialog({
     };
   }, [isOpen, initialVideo, onClose]);
 
+  // Apply duration patch when actualDuration is available
+  useEffect(() => {
+    if (!videoRef.current || !actualDuration) return;
+
+    return patchVideoDuration(videoRef.current, actualDuration);
+  }, [videoRef.current, actualDuration]);
+
   // Apply playback speed after video loads
   useEffect(() => {
-    if (videoRef.current) {
-      const applyPlaybackSpeed = () => {
-        if (videoRef.current) {
-          videoRef.current.playbackRate = playbackSpeed;
-        }
-      };
-
-      applyPlaybackSpeed();
-
-      videoRef.current.addEventListener("loadedmetadata", applyPlaybackSpeed);
-      videoRef.current.addEventListener("canplay", applyPlaybackSpeed);
-      videoRef.current.addEventListener("playing", applyPlaybackSpeed);
-
-      return () => {
-        if (videoRef.current) {
-          videoRef.current.removeEventListener("loadedmetadata", applyPlaybackSpeed);
-          videoRef.current.removeEventListener("canplay", applyPlaybackSpeed);
-          videoRef.current.removeEventListener("playing", applyPlaybackSpeed);
-        }
-      };
+    if (!videoRef.current) {
+      return;
     }
+    const applyPlaybackSpeed = () => {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = playbackSpeed;
+      }
+    };
+
+    applyPlaybackSpeed();
+
+    videoRef.current.addEventListener("loadedmetadata", applyPlaybackSpeed);
+    videoRef.current.addEventListener("canplay", applyPlaybackSpeed);
+    videoRef.current.addEventListener("playing", applyPlaybackSpeed);
+
+    return () => {
+      if (!videoRef.current) {
+        return;
+      }
+      videoRef.current.removeEventListener("loadedmetadata", applyPlaybackSpeed);
+      videoRef.current.removeEventListener("canplay", applyPlaybackSpeed);
+      videoRef.current.removeEventListener("playing", applyPlaybackSpeed);
+    };
   }, [playbackSpeed]);
 
   // Update time display
   useEffect(() => {
-    if (!videoRef.current || !actualDuration) return;
+    if (!videoRef.current) return;
 
     const videoElement = videoRef.current;
 
-    // Force correct duration on the video element
-    const enforceDuration = () => {
-      if (videoElement && actualDuration) {
-        try {
-          // Make the property configurable first if it's not already
-          if (Object.getOwnPropertyDescriptor(videoElement, "duration")?.configurable === false) {
-            Object.defineProperty(videoElement, "duration", {
-              configurable: true,
-              get: function () {
-                return actualDuration;
-              },
-            });
-          }
-
-          // Then redefine it as non-configurable
-          Object.defineProperty(videoElement, "duration", {
-            configurable: false, // Prevent any further changes
-            get: function () {
-              return actualDuration;
-            },
-          });
-
-          // Also enforce maximum time value to prevent seeking beyond actual duration
-          if (videoElement.currentTime > actualDuration) {
-            videoElement.currentTime = actualDuration;
-          }
-
-          // Force UI update
-          const event = new Event("durationchange");
-          videoElement.dispatchEvent(event);
-        } catch (e) {
-          console.error("Error enforcing duration:", e);
-        }
-      }
-    };
-
     const updateTimeDisplay = () => {
       const currentTime = videoElement.currentTime || 0;
-      setFormattedCurrentTime(formatDuration(currentTime));
 
-      // Make sure current time never exceeds duration
-      if (currentTime > actualDuration) {
-        videoElement.currentTime = actualDuration;
+      // Get current duration from video element or fall back to state
+      const videoDuration = videoElement.duration;
+      const duration = videoDuration && isFinite(videoDuration) ? videoDuration : actualDuration;
+
+      // Update actualDuration state if video element has a valid duration that differs from state
+      if (videoDuration && isFinite(videoDuration) && videoDuration !== actualDuration) {
+        setActualDuration(videoDuration);
+      }
+      // If video duration is invalid but we have actualDuration in state, try to set directly
+      else if ((!videoDuration || !isFinite(videoDuration)) && actualDuration && isFinite(actualDuration)) {
+        try {
+          Object.defineProperty(videoElement, "duration", {
+            value: actualDuration,
+            writable: false,
+          });
+        } catch (e) {
+          // Silent fail - property might be non-configurable
+        }
       }
 
-      videoElement.dataset.actualDuration = formatDuration(actualDuration);
+      // Prevent seeking past the end if we have a valid duration
+      if (duration && currentTime > duration) {
+        videoElement.currentTime = duration;
+      }
+
+      // Update dataset for UI display
+      if (duration) {
+        videoElement.dataset.actualDuration = formatDuration(duration);
+      }
       videoElement.dataset.currentTime = formatDuration(currentTime);
     };
 
-    // Override seekbar behavior by intercepting timeupdate events
-    const handleTimeUpdate = (e: Event) => {
-      // Keep current time within bounds of actual duration
-      if (videoElement.currentTime > actualDuration) {
-        videoElement.currentTime = actualDuration;
-      }
+    // Handle timeupdate to update display and prevent overrun
+    const handleTimeUpdate = () => {
       updateTimeDisplay();
     };
 
-    // Also intercept seeking events to prevent seeking beyond the actual duration
+    // Prevent seeking beyond the actual duration
     const preventExcessiveSeeking = (e: Event) => {
-      if (e.target && (e.target as HTMLVideoElement).currentTime > actualDuration) {
-        (e.target as HTMLVideoElement).currentTime = actualDuration;
+      const target = e.target as HTMLVideoElement;
+      const videoDuration = target.duration;
+      const effectiveDuration = videoDuration && isFinite(videoDuration) ? videoDuration : actualDuration || 0;
+
+      if (target.currentTime > effectiveDuration) {
+        target.currentTime = effectiveDuration;
       }
     };
-
-    // Enforce duration multiple times to ensure it sticks
-    enforceDuration();
-
-    // Run enforcement more frequently at the beginning
-    const initialFixInterval = setInterval(enforceDuration, 100);
-    setTimeout(() => {
-      clearInterval(initialFixInterval);
-      const durationInterval = setInterval(enforceDuration, 1000); // Keep checking regularly
-      return () => clearInterval(durationInterval);
-    }, 3000);
 
     // Add event listeners
     videoElement.addEventListener("timeupdate", handleTimeUpdate);
@@ -633,13 +582,9 @@ export function VideoPlayerDialog({
         videoRef.current.playbackRate = playbackSpeed;
       }
     };
-
     videoElement.addEventListener("canplay", handlePlaybackRateChange);
 
     return () => {
-      // Clear all intervals
-      clearInterval(initialFixInterval);
-
       // Remove all event listeners
       videoElement.removeEventListener("timeupdate", handleTimeUpdate);
       videoElement.removeEventListener("seeking", preventExcessiveSeeking);
@@ -655,7 +600,7 @@ export function VideoPlayerDialog({
         delete videoRef.current._durationObserver;
       }
     };
-  }, [actualDuration, playbackSpeed]);
+  }, [actualDuration, playbackSpeed, formatDuration]);
 
   // Handle buffering state
   useEffect(() => {
@@ -670,26 +615,50 @@ export function VideoPlayerDialog({
       }
     };
 
+    // Handle video ended inline to avoid dependency issues
+    const handleEndedEvent = async () => {
+      if (autoplayEnabled) {
+        // Check if we're in a course or in the queue
+        if (course?.videos) {
+          const currentIndex = course.videos.findIndex((cv) => cv.video.uuid === currentVideo.uuid);
+          if (currentIndex !== -1 && currentIndex < course.videos.length - 1) {
+            // Play the next video in the course
+            await playQueueItem(currentIndex + 1);
+          }
+        } else if (displayQueue.length > 0) {
+          // Handle general queue
+          const queueIndex =
+            currentQueueIndex >= 0 ? currentQueueIndex : displayQueue.findIndex((v) => v.uuid === currentVideo.uuid);
+          if (queueIndex !== -1 && queueIndex < displayQueue.length - 1) {
+            await playQueueItem(queueIndex + 1);
+          }
+        }
+      }
+    };
+
     videoRef.current.addEventListener("waiting", handleWaiting);
     videoRef.current.addEventListener("playing", handlePlaying);
     videoRef.current.addEventListener("canplay", handleCanPlay);
     videoRef.current.addEventListener("ratechange", handleRateChange);
+    videoRef.current.addEventListener("ended", handleEndedEvent);
 
     return () => {
-      if (videoRef.current) {
-        videoRef.current.removeEventListener("waiting", handleWaiting);
-        videoRef.current.removeEventListener("playing", handlePlaying);
-        videoRef.current.removeEventListener("canplay", handleCanPlay);
-        videoRef.current.removeEventListener("ratechange", handleRateChange);
+      if (!videoRef.current) {
+        return;
       }
+      videoRef.current.removeEventListener("waiting", handleWaiting);
+      videoRef.current.removeEventListener("playing", handlePlaying);
+      videoRef.current.removeEventListener("canplay", handleCanPlay);
+      videoRef.current.removeEventListener("ratechange", handleRateChange);
+      videoRef.current.removeEventListener("ended", handleEndedEvent);
     };
-  }, [playbackSpeed]);
+  }, [playbackSpeed, autoplayEnabled, course, currentVideo, displayQueue, currentQueueIndex, playQueueItem]);
 
   // Find video index in course videos
   const getVideoIndex = (): number | undefined => {
     if (!course || !course.videos) return undefined;
     const index = course.videos.findIndex((cv) => cv.video.uuid === currentVideo.uuid);
-    return index !== -1 ? index + 1 : undefined;
+    return index === -1 ? undefined : index + 1;
   };
 
   // Handle backdrop clicks
@@ -705,14 +674,13 @@ export function VideoPlayerDialog({
   };
 
   // Create modal root if needed
-  let modalRoot = document.getElementById("modal-root");
   useEffect(() => {
-    if (!document.getElementById("modal-root")) {
-      const div = document.createElement("div");
-      div.id = "modal-root";
-      document.body.appendChild(div);
-      modalRoot = div;
+    if (document.getElementById("modal-root")) {
+      return;
     }
+    const div = document.createElement("div");
+    div.id = "modal-root";
+    document.body.appendChild(div);
   }, []);
 
   if (!isOpen) return null;
@@ -748,19 +716,13 @@ export function VideoPlayerDialog({
                 Loading...
               </div>
             )}
-            <video
-              ref={videoRef}
-              className="absolute top-0 left-0 w-full h-full"
-              controls
-              playsInline
-              onEnded={handleVideoEnded}
-            />
+            <video ref={videoRef} className="absolute top-0 left-0 w-full h-full" controls playsInline />
           </div>
 
           {/* Video info area */}
           <div className="bg-[var(--hextech-color-background-dark)] p-6 border-t border-[var(--hextech-color-gold-dark)] flex-1 flex flex-col relative">
             {/* Decorative top border */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--hextech-color-gold-dark)] via-[var(--hextech-color-gold)] to-[var(--hextech-color-gold-dark)]"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--hextech-color-gold-dark)] via-[var(--hextech-color-gold)] to-[var(--hextech-color-gold-dark)]" />
 
             {/* Video title */}
             <h2 className="m-0 text-lg text-[var(--hextech-color-gold-light)] flex flex-wrap items-center gap-3 mb-4 font-[500] font-[Beaufort_for_LOL]">
@@ -796,7 +758,7 @@ export function VideoPlayerDialog({
             </div>
 
             {/* Spacer to push playback controls to bottom */}
-            <div className="flex-grow"></div>
+            <div className="flex-grow" />
 
             {/* Playback controls */}
             <div className="mt-5 border-t border-[var(--hextech-color-gold-dark)] pt-5">
@@ -854,13 +816,13 @@ export function VideoPlayerDialog({
         {/* Right panel - Course info and list */}
         <div className="w-3/10 h-full flex flex-col overflow-hidden shadow-[-6px_0_16px_rgba(0,0,0,0.4)] bg-[var(--hextech-color-background-dark)] bg-gradient-to-b from-black/40 to-black/20 border-l border-[var(--hextech-color-gold-dark)] relative">
           {/* Decorative left border */}
-          <div className="absolute top-0 left-0 w-0.5 h-full bg-gradient-to-b from-[var(--hextech-color-gold-dark)] via-[var(--hextech-color-gold)] to-[var(--hextech-color-gold-dark)] opacity-60"></div>
+          <div className="absolute top-0 left-0 w-0.5 h-full bg-gradient-to-b from-[var(--hextech-color-gold-dark)] via-[var(--hextech-color-gold)] to-[var(--hextech-color-gold-dark)] opacity-60" />
 
           {/* Right panel header */}
           <div className="flex justify-between items-center p-4 bg-[var(--hextech-color-background-dark)] border-b border-[var(--hextech-color-gold-dark)] relative overflow-hidden">
             {/* Decorative corners */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--hextech-color-gold)]"></div>
-            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[var(--hextech-color-gold)]"></div>
+            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--hextech-color-gold)]" />
+            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[var(--hextech-color-gold)]" />
 
             <h2 className="m-0 text-[var(--hextech-color-gold-light)] text-lg font-[700] flex justify-between w-full items-center font-[Beaufort_for_LOL]">
               {course && <span className="text-[var(--hextech-color-gold)] opacity-90 truncate">{course.title}</span>}
@@ -870,17 +832,17 @@ export function VideoPlayerDialog({
                 aria-label="Close"
               >
                 {/* Button corner decorations */}
-                <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-[var(--hextech-color-gold)]"></div>
-                <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-[var(--hextech-color-gold)]"></div>
-                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-[var(--hextech-color-gold)]"></div>
-                <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-[var(--hextech-color-gold)]"></div>
+                <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-[var(--hextech-color-gold)]" />
+                <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-[var(--hextech-color-gold)]" />
+                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-[var(--hextech-color-gold)]" />
+                <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-[var(--hextech-color-gold)]" />
                 <FontAwesomeIcon icon={faTimes} size="lg" className="text-lg" />
               </button>
             </h2>
           </div>
 
           {/* Course description */}
-          {course && course.description && (
+          {course?.description && (
             <div className="p-4 border-b border-[var(--hextech-color-gold-dark)] bg-[var(--hextech-color-background-medium)]">
               <div className="text-[var(--hextech-color-gold-medium)] text-sm">{course.description}</div>
             </div>
@@ -902,10 +864,10 @@ export function VideoPlayerDialog({
                   {queueVideo.uuid === currentVideo.uuid && (
                     <>
                       {/* Corner decorations for selected item */}
-                      <div className="absolute top-[-2px] left-[-2px] w-2.5 h-2.5 border-t-2 border-l-2 border-[var(--hextech-color-gold)] z-10"></div>
-                      <div className="absolute top-[-2px] right-[-2px] w-2.5 h-2.5 border-t-2 border-r-2 border-[var(--hextech-color-gold)] z-10"></div>
-                      <div className="absolute bottom-[-2px] left-[-2px] w-2.5 h-2.5 border-b-2 border-l-2 border-[var(--hextech-color-gold)] z-10"></div>
-                      <div className="absolute bottom-[-2px] right-[-2px] w-2.5 h-2.5 border-b-2 border-r-2 border-[var(--hextech-color-gold)] z-10"></div>
+                      <div className="absolute top-[-2px] left-[-2px] w-2.5 h-2.5 border-t-2 border-l-2 border-[var(--hextech-color-gold)] z-10" />
+                      <div className="absolute top-[-2px] right-[-2px] w-2.5 h-2.5 border-t-2 border-r-2 border-[var(--hextech-color-gold)] z-10" />
+                      <div className="absolute bottom-[-2px] left-[-2px] w-2.5 h-2.5 border-b-2 border-l-2 border-[var(--hextech-color-gold)] z-10" />
+                      <div className="absolute bottom-[-2px] right-[-2px] w-2.5 h-2.5 border-b-2 border-r-2 border-[var(--hextech-color-gold)] z-10" />
                     </>
                   )}
                   <div className="flex items-center justify-center w-7 h-7 mr-3 border border-[var(--hextech-color-gold-dark)] font-[Beaufort_for_LOL] font-bold text-[15px] text-[var(--hextech-color-gold)] bg-gradient-to-br from-black/70 to-[#141414]/40 shadow-[0_0_3px_rgba(201,172,98,0.5)] tracking-[0.5px] leading-none pb-[1px] flex items-center justify-center">
